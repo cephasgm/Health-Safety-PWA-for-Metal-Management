@@ -1,0 +1,25 @@
+{
+  "name": "mms-safety-pwa",
+  "version": "2.0.0",
+  "description": "Metal Management Solutions Health & Safety PWA Dashboard",
+  "main": "index.html",
+  "scripts": {
+    "start": "http-server -p 8080",
+    "dev": "live-server --port=8080",
+    "build": "echo 'PWA build complete'",
+    "test": "echo 'No tests specified'"
+  },
+  "keywords": [
+    "pwa",
+    "safety",
+    "health",
+    "dashboard",
+    "metal-management"
+  ],
+  "author": "Metal Management Solutions",
+  "license": "Proprietary",
+  "devDependencies": {
+    "http-server": "^14.1.1",
+    "live-server": "^1.2.2"
+  }
+}

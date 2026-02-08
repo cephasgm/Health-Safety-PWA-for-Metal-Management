@@ -13,6 +13,7 @@
     <!-- Charts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
     <style>
         :root {
@@ -67,18 +68,21 @@
             padding: 0 1rem;
         }
 
-        .logo-icon {
+        .logo-img {
             width: 50px;
             height: 50px;
-            background: white;
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--primary);
-            font-weight: bold;
-            font-size: 1.25rem;
-            border: 2px solid rgba(255,255,255,0.3);
+            background: white;
+            padding: 5px;
+        }
+
+        .logo-img img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
         }
 
         .logo-text {
@@ -167,7 +171,7 @@
             font-size: 1rem;
         }
 
-        /* Stats Grid */
+        /* Enhanced Statistics Cards */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -176,20 +180,20 @@
         }
 
         .stat-card {
-            background: var(--surface);
+            background: linear-gradient(135deg, var(--surface) 0%, #f8fafc 100%);
             padding: 1.5rem;
-            border-radius: 12px;
+            border-radius: 16px;
             border: 1px solid var(--border);
             position: relative;
             overflow: hidden;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
 
         .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
             border-color: var(--primary);
         }
 
@@ -208,6 +212,7 @@
             font-weight: 800;
             color: var(--primary);
             margin-bottom: 0.5rem;
+            position: relative;
         }
 
         .stat-label {
@@ -216,16 +221,30 @@
             font-weight: 500;
         }
 
-        /* Chart Container */
+        .stat-details {
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            display: none;
+            border-top: 1px solid var(--border);
+            padding-top: 1rem;
+        }
+
+        .stat-card:hover .stat-details {
+            display: block;
+        }
+
+        /* Enhanced Chart Container */
         .chart-container {
             background: var(--surface);
-            padding: 1.5rem;
-            border-radius: 12px;
+            padding: 1.25rem;
+            border-radius: 16px;
             border: 1px solid var(--border);
             margin-bottom: 2rem;
-            height: 400px;
+            height: 450px;
             display: flex;
             flex-direction: column;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
 
         .chart-header {
@@ -284,45 +303,60 @@
             border-color: var(--primary);
         }
 
-        .chart-canvas-container {
-            flex: 1;
-            min-height: 0;
-            position: relative;
-            background: var(--background);
-            border-radius: 8px;
-            overflow: hidden;
+        .custom-calendar {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
         }
 
-        /* Risk Matrix */
-        .risk-matrix {
+        .date-input {
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
             background: var(--surface);
-            border-radius: 12px;
+            font-family: inherit;
+            font-size: 0.875rem;
+        }
+
+        .date-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(13, 77, 156, 0.1);
+        }
+
+        /* Enhanced Risk Assessment Matrix */
+        .risk-matrix {
+            background: linear-gradient(135deg, var(--surface) 0%, #f8fafc 100%);
+            border-radius: 16px;
             border: 1px solid var(--border);
             padding: 1.5rem;
             margin-bottom: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
 
         .matrix-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: repeat(5, 1fr);
             gap: 1rem;
             margin-top: 1.5rem;
         }
 
         .matrix-cell {
             padding: 1.5rem 1rem;
-            border-radius: 8px;
+            border-radius: 12px;
             text-align: center;
             font-weight: 600;
             font-size: 0.875rem;
             cursor: pointer;
             transition: all 0.3s ease;
+            position: relative;
             border: 2px solid transparent;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
         .matrix-cell:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
         }
 
         .risk-low { 
@@ -349,6 +383,278 @@
             background: linear-gradient(135deg, #fca5a5, #f87171);
             color: #7f1d1d; 
             border-color: #ef4444;
+        }
+
+        /* Enhanced Tables with Full Edit */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background: var(--surface);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .data-table th {
+            background: var(--background);
+            font-weight: 600;
+            color: var(--text);
+            position: sticky;
+            top: 0;
+        }
+
+        .data-table tbody tr:hover {
+            background: var(--background);
+        }
+
+        .data-table td.editable {
+            cursor: pointer;
+            position: relative;
+            transition: background-color 0.2s;
+        }
+
+        .data-table td.editable:hover {
+            background: rgba(13, 77, 156, 0.05);
+        }
+
+        .data-table td.editing {
+            background: rgba(13, 77, 156, 0.1);
+            border: 1px solid var(--primary);
+            border-radius: 4px;
+            padding: 0.5rem;
+        }
+
+        .edit-input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 2px solid var(--primary);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: inherit;
+            background: var(--surface);
+            color: var(--text);
+            outline: none;
+        }
+
+        .edit-input:focus {
+            box-shadow: 0 0 0 3px rgba(13, 77, 156, 0.1);
+        }
+
+        .edit-select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 2px solid var(--primary);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: inherit;
+            background: var(--surface);
+            color: var(--text);
+            outline: none;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            font-family: inherit;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(13, 77, 156, 0.2);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .btn-outline:hover {
+            background: var(--background);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-danger {
+            background: var(--error);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            z-index: 1000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast-success {
+            border-left: 4px solid var(--success);
+        }
+
+        .toast-error {
+            border-left: 4px solid var(--error);
+        }
+
+        .toast-warning {
+            border-left: 4px solid var(--warning);
+        }
+
+        .toast-icon {
+            font-size: 1.25rem;
+        }
+
+        .toast-success .toast-icon { color: var(--success); }
+        .toast-error .toast-icon { color: var(--error); }
+        .toast-warning .toast-icon { color: var(--warning); }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .toast-message {
+            font-size: 0.875rem;
+            color: var(--text-light);
+        }
+
+        .close-toast {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            font-size: 1.25rem;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-toast:hover {
+            color: var(--text);
+        }
+
+        /* Confirm Dialog */
+        .confirm-dialog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .confirm-dialog.show {
+            display: flex;
+        }
+
+        .confirm-content {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .confirm-icon {
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            color: var(--error);
+        }
+
+        .confirm-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .confirm-message {
+            color: var(--text-light);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .confirm-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .confirm-buttons .btn {
+            flex: 1;
         }
 
         /* Module Grid */
@@ -403,110 +709,14 @@
             line-height: 1.5;
         }
 
-        /* Buttons */
-        .btn {
-            padding: 0.5rem 1.25rem;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.875rem;
-            font-family: inherit;
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(13, 77, 156, 0.2);
-        }
-
-        .btn-success {
-            background: var(--success);
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #059669;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--text);
-        }
-
-        .btn-outline:hover {
+        /* Chart Canvas Container */
+        .chart-canvas-container {
+            flex: 1;
+            min-height: 0;
+            position: relative;
             background: var(--background);
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        /* Tables */
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-            background: var(--surface);
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        .data-table th,
-        .data-table td {
-            padding: 0.75rem;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .data-table th {
-            background: var(--background);
-            font-weight: 600;
-            color: var(--text);
-            position: sticky;
-            top: 0;
-        }
-
-        .data-table tbody tr:hover {
-            background: var(--background);
-        }
-
-        .data-table td.editable {
-            cursor: pointer;
-            position: relative;
-            transition: background-color 0.2s;
-        }
-
-        .data-table td.editable:hover {
-            background: rgba(13, 77, 156, 0.05);
-        }
-
-        /* Footer */
-        .footer {
-            text-align: center;
-            padding: 2rem;
-            margin-top: 3rem;
-            color: var(--text-light);
-            border-top: 1px solid var(--border);
-            font-size: 0.9rem;
-        }
-
-        .footer-logo {
-            color: var(--primary);
-            font-weight: bold;
-            font-size: 1.2rem;
-            margin-bottom: 0.5rem;
         }
 
         /* Modal Styles */
@@ -528,7 +738,7 @@
             padding: 2rem;
             border-radius: 12px;
             width: 90%;
-            max-width: 800px;
+            max-width: 900px;
             position: relative;
             max-height: 90vh;
             overflow-y: auto;
@@ -579,31 +789,198 @@
             gap: 1rem;
         }
 
-        /* Toast */
-        .toast {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .action-buttons .btn {
+            flex: 1;
+        }
+
+        .success-message {
+            background: #dcfce7;
+            color: #166534;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .error-message {
+            background: #fecaca;
+            color: #991b1b;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .modal-header {
+            margin-bottom: 2rem;
+        }
+
+        .modal-header h2 {
+            color: var(--primary);
+            margin-right: 2rem;
+        }
+
+        /* Standards Cards Grid */
+        .standards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .standard-card {
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1rem;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            z-index: 1000;
-            transform: translateY(100px);
-            opacity: 0;
+            border-radius: 12px;
+            padding: 1.5rem;
             transition: all 0.3s ease;
+            position: relative;
         }
 
-        .toast.show {
-            transform: translateY(0);
-            opacity: 1;
+        .standard-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            border-color: var(--primary);
         }
 
-        /* Responsive */
+        .standard-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-international {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #93c5fd;
+        }
+
+        .badge-national {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+
+        .standard-card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        .standard-code {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+            font-family: monospace;
+        }
+
+        .standard-industry {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            background: var(--background);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .standard-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .status-compliant {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-noncompliant {
+            background: #fecaca;
+            color: #991b1b;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .standard-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        /* Tab Container */
+        .tab-container {
+            margin-bottom: 2rem;
+        }
+
+        .tab-buttons {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            overflow-x: auto;
+        }
+
+        .tab-button {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--text-light);
+            white-space: nowrap;
+        }
+
+        .tab-button.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+            color: var(--text-light);
+            border-top: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+
+        .footer-logo {
+            color: var(--primary);
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Responsive Design */
         @media (max-width: 1024px) {
             .dashboard {
                 grid-template-columns: 1fr;
@@ -620,8 +997,14 @@
                 grid-column: 1;
                 padding: 1rem;
             }
+            .matrix-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
             .form-row {
                 grid-template-columns: 1fr;
+            }
+            .standards-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             }
         }
 
@@ -632,11 +1015,25 @@
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
+            .matrix-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .chart-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .chart-controls {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+            .chart-container {
+                height: 400px;
+            }
             .module-grid {
                 grid-template-columns: 1fr;
             }
-            .chart-container {
-                height: 350px;
+            .standards-grid {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -644,8 +1041,17 @@
             .stats-grid {
                 grid-template-columns: 1fr;
             }
+            .matrix-grid {
+                grid-template-columns: 1fr;
+            }
             .chart-container {
-                height: 300px;
+                height: 350px;
+            }
+            .action-buttons {
+                flex-direction: column;
+            }
+            .action-buttons .btn {
+                width: 100%;
             }
         }
 
@@ -671,14 +1077,65 @@
                 opacity: 0;
             }
         }
+
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 101;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+        }
+
+        @media (max-width: 1024px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .status-active {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-inactive {
+            background: #fecaca;
+            color: #991b1b;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
     </style>
 </head>
 <body>
+    <!-- Mobile Menu Button -->
+    <button class="mobile-menu-btn" onclick="toggleSidebar()">☰ Menu</button>
+
     <div class="dashboard">
         <!-- Sidebar -->
-        <nav class="sidebar">
+        <nav class="sidebar" id="sidebar">
             <div class="logo">
-                <div class="logo-icon">MMS</div>
+                <div class="logo-img">
+                    <!-- MMS Logo - Using text as fallback since image URL wasn't accessible -->
+                    <div style="color: var(--primary); font-weight: bold; font-size: 1.25rem;">MMS</div>
+                </div>
                 <div class="logo-text">
                     <div>Metal Management Solutions</div>
                     <div>Safety Dashboard</div>
@@ -704,24 +1161,40 @@
                     Incident Management
                 </button>
                 <button class="nav-item" onclick="openModal('riskModal')">
-                    <span class="nav-icon">📈</span>
+                    <span class="nav-icon">📊</span>
                     Risk Assessment
                 </button>
                 <button class="nav-item" onclick="openModal('ppeModal')">
                     <span class="nav-icon">🥽</span>
                     PPE Management
                 </button>
+                <button class="nav-item" onclick="openModal('trainingModal')">
+                    <span class="nav-icon">🎓</span>
+                    Safety Training
+                </button>
             </div>
 
             <div class="nav-section">
                 <div class="nav-title">Compliance</div>
+                <button class="nav-item" onclick="openModal('standardsModal')">
+                    <span class="nav-icon">📋</span>
+                    Standards Compliance
+                </button>
                 <button class="nav-item" onclick="openModal('auditModal')">
                     <span class="nav-icon">🔍</span>
                     Audit & Inspection
                 </button>
-                <button class="nav-item" onclick="openModal('standardsModal')">
-                    <span class="nav-icon">📋</span>
-                    Standards Compliance
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Operations</div>
+                <button class="nav-item" onclick="openModal('healthModal')">
+                    <span class="nav-icon">🏥</span>
+                    Health Surveillance
+                </button>
+                <button class="nav-item" onclick="openModal('contractorModal')">
+                    <span class="nav-icon">👷</span>
+                    Contractor Safety
                 </button>
             </div>
         </nav>
@@ -739,7 +1212,6 @@
                     <button class="btn btn-primary" onclick="openModal('reportIncidentModal')">
                         🚨 Report Incident
                     </button>
-                    <!-- Install button will be added by pwa-init.js -->
                 </div>
             </div>
 
@@ -748,22 +1220,30 @@
                 <div class="stat-card" onclick="openModal('incidentsModal')">
                     <div class="stat-number" id="lostTimeInjuries">0</div>
                     <div class="stat-label">Lost Time Injuries</div>
-                    <div class="stat-details">Last 30 days: 0 incidents</div>
+                    <div class="stat-details" id="ltiDetails">
+                        Last 30 days: 0 incidents
+                    </div>
                 </div>
                 <div class="stat-card" onclick="openModal('employeesModal')">
                     <div class="stat-number" id="totalEmployees">0</div>
                     <div class="stat-label">Total Employees</div>
-                    <div class="stat-details">Across all locations</div>
+                    <div class="stat-details">
+                        Across all locations
+                    </div>
                 </div>
                 <div class="stat-card" onclick="openModal('standardsModal')">
                     <div class="stat-number" id="complianceRate">98%</div>
                     <div class="stat-label">Compliance Rate</div>
-                    <div class="stat-details">Based on 45 standards</div>
+                    <div class="stat-details">
+                        Based on 45 standards
+                    </div>
                 </div>
                 <div class="stat-card" onclick="openModal('auditModal')">
                     <div class="stat-number" id="activeAudits">12</div>
                     <div class="stat-label">Active Audits</div>
-                    <div class="stat-details">8 internal, 4 external</div>
+                    <div class="stat-details">
+                        8 internal, 4 external
+                    </div>
                 </div>
             </div>
 
@@ -778,11 +1258,52 @@
                         <div class="chart-type-selector">
                             <button class="chart-type-btn active" onclick="changeChartType('line')">📈 Line</button>
                             <button class="chart-type-btn" onclick="changeChartType('bar')">📊 Bar</button>
+                            <button class="chart-type-btn" onclick="changeChartType('pie')">🥧 Pie</button>
+                            <button class="chart-type-btn" onclick="changeChartType('doughnut')">🍩 Doughnut</button>
+                        </div>
+                        <div class="custom-calendar">
+                            <input type="date" id="startDate" class="date-input" onchange="updateChartWithCustomRange()">
+                            <span>to</span>
+                            <input type="date" id="endDate" class="date-input" onchange="updateChartWithCustomRange()">
                         </div>
                     </div>
                 </div>
                 <div class="chart-canvas-container">
                     <canvas id="incidentTrendChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Incident Management System -->
+            <div class="risk-matrix">
+                <div class="chart-header">
+                    <div>
+                        <div class="chart-title">Recent Incidents</div>
+                        <div class="chart-subtitle">Click on any cell to edit, hover for actions</div>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary" onclick="openModal('reportIncidentModal')">
+                            + Report Incident
+                        </button>
+                    </div>
+                </div>
+                <div style="overflow-x: auto; margin-top: 1rem;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Type</th>
+                                <th>Date</th>
+                                <th>Location</th>
+                                <th>Reported By</th>
+                                <th>Severity</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="allIncidentsTableBody">
+                            <!-- Incidents will be loaded here -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
@@ -798,26 +1319,7 @@
                     </div>
                 </div>
                 <div class="matrix-grid" id="riskMatrix">
-                    <div class="matrix-cell risk-low" onclick="editRiskCell(this)">
-                        <div>Low Risk</div>
-                        <div>Admin</div>
-                    </div>
-                    <div class="matrix-cell risk-medium" onclick="editRiskCell(this)">
-                        <div>Medium Risk</div>
-                        <div>Sales</div>
-                    </div>
-                    <div class="matrix-cell risk-high" onclick="editRiskCell(this)">
-                        <div>High Risk</div>
-                        <div>Warehouse</div>
-                    </div>
-                    <div class="matrix-cell risk-very-high" onclick="editRiskCell(this)">
-                        <div>Very High Risk</div>
-                        <div>Manufacturing</div>
-                    </div>
-                    <div class="matrix-cell risk-extreme" onclick="editRiskCell(this)">
-                        <div>Extreme Risk</div>
-                        <div>Construction</div>
-                    </div>
+                    <!-- Matrix cells will be loaded here -->
                 </div>
             </div>
 
@@ -828,16 +1330,31 @@
                     <h3>Incident Management</h3>
                     <p>Report, track, and investigate workplace incidents with full documentation</p>
                 </div>
+
                 <div class="module-card" onclick="openModal('ppeModal')">
                     <div class="module-icon">🥽</div>
                     <h3>PPE Management</h3>
                     <p>Track personal protective equipment issuance, maintenance, and compliance</p>
                 </div>
+
+                <div class="module-card" onclick="openModal('healthModal')">
+                    <div class="module-icon">🏥</div>
+                    <h3>Health Surveillance</h3>
+                    <p>Employee health monitoring, medical examinations, and wellness programs</p>
+                </div>
+
+                <div class="module-card" onclick="openModal('contractorModal')">
+                    <div class="module-icon">👷</div>
+                    <h3>Contractor Safety</h3>
+                    <p>Manage contractor safety compliance, permits, and site-specific inductions</p>
+                </div>
+
                 <div class="module-card" onclick="openModal('auditModal')">
                     <div class="module-icon">🔍</div>
                     <h3>Audit & Inspection</h3>
                     <p>Schedule and conduct safety audits, inspections, and compliance verifications</p>
                 </div>
+
                 <div class="module-card" onclick="openModal('standardsModal')">
                     <div class="module-icon">📋</div>
                     <h3>Standards Compliance</h3>
@@ -862,30 +1379,49 @@
             <div class="toast-title"></div>
             <div class="toast-message"></div>
         </div>
+        <button class="close-toast" onclick="hideToast()">×</button>
     </div>
 
-    <!-- Modals -->
+    <!-- Confirm Dialog -->
+    <div class="confirm-dialog" id="confirmDialog">
+        <div class="confirm-content">
+            <div class="confirm-icon">⚠️</div>
+            <div class="confirm-title" id="confirmTitle">Confirm Delete</div>
+            <div class="confirm-message" id="confirmMessage">Are you sure you want to delete this item? This action cannot be undone.</div>
+            <div class="confirm-buttons">
+                <button class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+                <button class="btn btn-outline" onclick="hideConfirmDialog()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Incident Modal -->
     <div id="reportIncidentModal" class="modal">
         <div class="modal-content">
             <button class="close-modal" onclick="closeModal('reportIncidentModal')">×</button>
-            <div style="margin-bottom: 2rem;">
-                <h2 style="color: var(--primary);">Report Safety Incident</h2>
+            <div class="modal-header">
+                <h2>Report Safety Incident</h2>
             </div>
+            
+            <div class="success-message" id="reportSuccess">Incident reported successfully!</div>
+            <div class="error-message" id="reportError">Please fill all required fields.</div>
             
             <div class="form-row">
                 <div class="form-group">
                     <label>Incident Type *</label>
-                    <select id="incidentType">
+                    <select id="incidentType" required>
                         <option value="">Select type</option>
                         <option value="Near Miss">Near Miss</option>
                         <option value="First Aid">First Aid</option>
                         <option value="Medical Treatment">Medical Treatment</option>
                         <option value="Lost Time Injury">Lost Time Injury</option>
+                        <option value="Property Damage">Property Damage</option>
+                        <option value="Environmental Incident">Environmental Incident</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label>Severity Level *</label>
-                    <select id="incidentSeverity">
+                    <select id="incidentSeverity" required>
                         <option value="">Select severity</option>
                         <option value="Minor">Minor</option>
                         <option value="Moderate">Moderate</option>
@@ -898,27 +1434,64 @@
             <div class="form-row">
                 <div class="form-group">
                     <label>Date & Time *</label>
-                    <input type="datetime-local" id="incidentDateTime">
+                    <input type="datetime-local" id="incidentDateTime" required>
                 </div>
                 <div class="form-group">
                     <label>Location *</label>
-                    <input type="text" id="incidentLocation" placeholder="Enter location">
+                    <select id="incidentLocation" required>
+                        <option value="">Select location</option>
+                        <optgroup label="South Africa">
+                            <option value="Cape Town (HQ)">Cape Town (HQ)</option>
+                            <option value="Cosco Durban">Cosco Durban</option>
+                            <option value="AGL Durban">AGL Durban</option>
+                        </optgroup>
+                        <optgroup label="Tanzania">
+                            <option value="Impala Dar">Impala Dar</option>
+                            <option value="Polytra Dar">Polytra Dar</option>
+                            <option value="Access Dar">Access Dar</option>
+                        </optgroup>
+                        <optgroup label="Namibia">
+                            <option value="WBCT Bulk Shed">WBCT Bulk Shed</option>
+                            <option value="WBCT Quay Side Shed">WBCT Quay Side Shed</option>
+                            <option value="Bridge Walvis Bay">Bridge Walvis Bay</option>
+                            <option value="Pindulo Walvis Bay">Pindulo Walvis Bay</option>
+                        </optgroup>
+                        <optgroup label="Zambia">
+                            <option value="Reload Giga Terminal">Reload Giga Terminal</option>
+                            <option value="AGL Chingola Hub">AGL Chingola Hub</option>
+                            <option value="Polytra Kitwe">Polytra Kitwe</option>
+                            <option value="Impala Ndola">Impala Ndola</option>
+                            <option value="SLS Ndola">SLS Ndola</option>
+                            <option value="Poseidon Zambia">Poseidon Zambia</option>
+                            <option value="Polytra Kapiri Mposhi">Polytra Kapiri Mposhi</option>
+                        </optgroup>
+                    </select>
                 </div>
             </div>
             
             <div class="form-group">
                 <label>Reported By *</label>
-                <input type="text" id="reportedBy" placeholder="Your name">
+                <input type="text" id="reportedBy" placeholder="Your name" required>
             </div>
             
             <div class="form-group">
                 <label>Description *</label>
-                <textarea id="incidentDescription" rows="4" placeholder="Provide detailed description"></textarea>
+                <textarea id="incidentDescription" rows="4" placeholder="Provide detailed description" required></textarea>
             </div>
             
-            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
-                <button class="btn btn-primary" onclick="submitIncidentReport()" style="flex: 1;">Submit Report</button>
-                <button class="btn btn-outline" onclick="closeModal('reportIncidentModal')" style="flex: 1;">Cancel</button>
+            <div class="form-group">
+                <label>Immediate Actions Taken</label>
+                <textarea id="immediateActions" rows="3" placeholder="Describe immediate response actions"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Proposed Recommendations/Comments</label>
+                <textarea id="recommendations" rows="3" placeholder="Enter recommendations or comments"></textarea>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="submitIncidentReport()">Submit Report</button>
+                <button class="btn btn-outline" onclick="closeModal('reportIncidentModal')">Cancel</button>
             </div>
         </div>
     </div>
@@ -927,12 +1500,12 @@
     <div id="employeesModal" class="modal">
         <div class="modal-content">
             <button class="close-modal" onclick="closeModal('employeesModal')">×</button>
-            <div style="margin-bottom: 2rem;">
-                <h2 style="color: var(--primary);">Employee Management</h2>
-                <p style="color: var(--text-light); margin-top: 0.5rem;">Click on any cell to edit, hover for actions</p>
+            <div class="modal-header">
+                <h2>Employee Management</h2>
+                <p>All MMS Employees - Click on any cell to edit</p>
             </div>
             
-            <div style="overflow-x: auto;">
+            <div style="overflow-x: auto; margin-top: 1rem;">
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -951,9 +1524,364 @@
                 </table>
             </div>
             
-            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
-                <button class="btn btn-primary" onclick="addEmployee()" style="flex: 1;">+ Add Employee</button>
-                <button class="btn btn-outline" onclick="closeModal('employeesModal')" style="flex: 1;">Close</button>
+            <div class="action-buttons" style="margin-top: 2rem;">
+                <button class="btn btn-outline" onclick="addEmployee()">+ Add Employee</button>
+                <button class="btn btn-outline" onclick="closeModal('employeesModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Incident Management Modal -->
+    <div id="incidentsModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal('incidentsModal')">×</button>
+            <div class="modal-header">
+                <h2>Incident Management System</h2>
+                <p>All Incidents - Click on any cell to edit, hover for actions</p>
+            </div>
+            
+            <div style="overflow-x: auto; margin-top: 1rem;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Type</th>
+                            <th>Date</th>
+                            <th>Location</th>
+                            <th>Reported By</th>
+                            <th>Severity</th>
+                            <th>Status</th>
+                            <th>Description</th>
+                            <th>Actions Taken</th>
+                            <th>Recommendations</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modalIncidentsTableBody">
+                        <!-- Incidents will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="action-buttons" style="margin-top: 2rem;">
+                <button class="btn btn-outline" onclick="closeModal('incidentsModal')">Close</button>
+                <button class="btn btn-primary" onclick="openModal('reportIncidentModal')">+ Report New Incident</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PPE Management Modal -->
+    <div id="ppeModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal('ppeModal')">×</button>
+            <div class="modal-header">
+                <h2>PPE Management System</h2>
+                <p>Personal Protective Equipment Management - Click on any cell to edit</p>
+            </div>
+            
+            <div style="overflow-x: auto; margin-top: 1rem;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>PPE ID</th>
+                            <th>Equipment Type</th>
+                            <th>Department</th>
+                            <th>Assigned To</th>
+                            <th>Issue Date</th>
+                            <th>Expiry Date</th>
+                            <th>Status</th>
+                            <th>Condition</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ppeTableBody">
+                        <!-- PPE items will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="action-buttons" style="margin-top: 2rem;">
+                <button class="btn btn-outline" onclick="addPPEItem()">+ Add PPE Item</button>
+                <button class="btn btn-outline" onclick="closeModal('ppeModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Health Surveillance Modal -->
+    <div id="healthModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal('healthModal')">×</button>
+            <div class="modal-header">
+                <h2>Health Surveillance Management</h2>
+                <p>Employee Health Monitoring</p>
+            </div>
+            
+            <div style="overflow-x: auto; margin-top: 1rem;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Employee ID</th>
+                            <th>Name</th>
+                            <th>Department</th>
+                            <th>Last Medical</th>
+                            <th>Next Due</th>
+                            <th>Medical Status</th>
+                            <th>Vaccination Status</th>
+                            <th>Health Notes</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="healthTableBody">
+                        <!-- Health records will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="action-buttons" style="margin-top: 2rem;">
+                <button class="btn btn-outline" onclick="addHealthRecord()">+ Add Health Record</button>
+                <button class="btn btn-outline" onclick="closeModal('healthModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contractor Safety Modal -->
+    <div id="contractorModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal('contractorModal')">×</button>
+            <div class="modal-header">
+                <h2>Contractor Safety Management</h2>
+                <p>Contractor Safety Compliance</p>
+            </div>
+            
+            <div style="overflow-x: auto; margin-top: 1rem;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Contractor ID</th>
+                            <th>Company</th>
+                            <th>Contact Person</th>
+                            <th>Work Type</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Safety Rating</th>
+                            <th>Compliance Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="contractorTableBody">
+                        <!-- Contractor records will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="action-buttons" style="margin-top: 2rem;">
+                <button class="btn btn-outline" onclick="addContractor()">+ Add Contractor</button>
+                <button class="btn btn-outline" onclick="closeModal('contractorModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audit & Inspection Modal -->
+    <div id="auditModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal('auditModal')">×</button>
+            <div class="modal-header">
+                <h2>Audit & Inspection Management</h2>
+                <p>Safety Audits and Inspections</p>
+            </div>
+            
+            <div style="overflow-x: auto; margin-top: 1rem;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Audit ID</th>
+                            <th>Type</th>
+                            <th>Department</th>
+                            <th>Audit Date</th>
+                            <th>Auditor</th>
+                            <th>Score</th>
+                            <th>Status</th>
+                            <th>Findings</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="auditTableBody">
+                        <!-- Audit records will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="action-buttons" style="margin-top: 2rem;">
+                <button class="btn btn-outline" onclick="addAudit()">+ Schedule Audit</button>
+                <button class="btn btn-outline" onclick="closeModal('auditModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Standards Compliance Modal -->
+    <div id="standardsModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal('standardsModal')">×</button>
+            <div class="modal-header">
+                <h2>Standards & Compliance Management</h2>
+                <p>Manage International and National Safety Standards</p>
+            </div>
+            
+            <div class="action-buttons" style="margin-bottom: 2rem;">
+                <button class="btn btn-primary" onclick="addStandard()">+ Add Standard</button>
+            </div>
+            
+            <div class="standards-grid" id="standardsGrid">
+                <!-- Standards cards will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Standard Modal -->
+    <div id="standardModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal('standardModal')">×</button>
+            <div class="modal-header">
+                <h2 id="standardModalTitle">Add New Standard</h2>
+            </div>
+            
+            <div class="success-message" id="standardSuccess">Standard saved successfully!</div>
+            <div class="error-message" id="standardError">Please fill all required fields.</div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Standard Name *</label>
+                    <input type="text" id="standardName" placeholder="e.g., ISO 45001:2018" required>
+                </div>
+                <div class="form-group">
+                    <label>Standard Code *</label>
+                    <input type="text" id="standardCode" placeholder="e.g., ISO45001" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Standard Type *</label>
+                    <select id="standardType" required>
+                        <option value="">Select type</option>
+                        <option value="International">International</option>
+                        <option value="National">National</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Industry *</label>
+                    <select id="standardIndustry" required>
+                        <option value="">Select industry</option>
+                        <option value="General Industry">General Industry</option>
+                        <option value="Construction">Construction</option>
+                        <option value="Manufacturing">Manufacturing</option>
+                        <option value="Healthcare">Healthcare</option>
+                        <option value="Oil & Gas">Oil & Gas</option>
+                        <option value="Mining">Mining</option>
+                        <option value="Transportation">Transportation</option>
+                        <option value="Chemical">Chemical</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Description *</label>
+                <textarea id="standardDescription" rows="4" placeholder="Description of the standard and its requirements" required></textarea>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Status *</label>
+                    <select id="standardStatus" required>
+                        <option value="">Select status</option>
+                        <option value="Compliant">Compliant</option>
+                        <option value="Non-Compliant">Non-Compliant</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Pending Review">Pending Review</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Effective Date</label>
+                    <input type="date" id="standardEffectiveDate">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Remarks</label>
+                <textarea id="standardRemarks" rows="3" placeholder="Additional remarks or notes"></textarea>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-success" onclick="saveStandard()">💾 Save Standard</button>
+                <button class="btn btn-outline" onclick="closeModal('standardModal')">Cancel</button>
+                <button class="btn btn-danger" id="deleteStandardBtn" style="display: none;" onclick="deleteCurrentStandard()">🗑️ Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Risk Assessment Modal -->
+    <div id="riskModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal('riskModal')">×</button>
+            <div class="modal-header">
+                <h2>Risk Assessment Management</h2>
+                <p>Click on any risk cell to edit details</p>
+            </div>
+            
+            <div class="risk-matrix">
+                <div class="chart-header">
+                    <div>
+                        <div class="chart-title">Risk Assessment Matrix</div>
+                        <div class="chart-subtitle">Edit risk levels and departments</div>
+                    </div>
+                    <div>
+                        <button class="btn btn-success" onclick="saveRiskMatrix()">💾 Save Matrix</button>
+                    </div>
+                </div>
+                <div class="matrix-grid" id="modalRiskMatrix">
+                    <!-- Matrix cells will be loaded here -->
+                </div>
+            </div>
+            
+            <div class="action-buttons" style="margin-top: 2rem;">
+                <button class="btn btn-outline" onclick="closeModal('riskModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Training Management Modal -->
+    <div id="trainingModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal('trainingModal')">×</button>
+            <div class="modal-header">
+                <h2>Safety Training Management</h2>
+                <p>Track employee safety training and certifications</p>
+            </div>
+            
+            <div style="overflow-x: auto; margin-top: 1rem;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Training ID</th>
+                            <th>Course Name</th>
+                            <th>Employee</th>
+                            <th>Trainer</th>
+                            <th>Date Completed</th>
+                            <th>Expiry Date</th>
+                            <th>Status</th>
+                            <th>Certificate</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="trainingTableBody">
+                        <!-- Training records will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="action-buttons" style="margin-top: 2rem;">
+                <button class="btn btn-outline" onclick="addTrainingRecord()">+ Add Training</button>
+                <button class="btn btn-outline" onclick="closeModal('trainingModal')">Close</button>
             </div>
         </div>
     </div>
@@ -964,9 +1892,15 @@
         let incidents = [];
         let employees = [];
         let ppeItems = [];
+        let healthRecords = [];
+        let contractors = [];
         let audits = [];
         let standards = [];
+        let trainings = [];
         let incidentTrendChart = null;
+        let editingCell = null;
+        let itemToDelete = null;
+        let editingStandardIndex = -1;
         let currentChartType = 'line';
 
         // Initialize Application
@@ -977,7 +1911,18 @@
         function initializeApp() {
             loadAllData();
             initializeCharts();
+            loadAllTables();
+            loadStandards();
+            setupEventListeners();
             updateStatistics();
+            
+            // Set default dates for chart
+            const endDate = new Date();
+            const startDate = new Date();
+            startDate.setMonth(startDate.getMonth() - 6);
+            
+            document.getElementById('startDate').valueAsDate = startDate;
+            document.getElementById('endDate').valueAsDate = endDate;
             
             // Set current date/time for incident report
             const now = new Date();
@@ -987,43 +1932,39 @@
             document.getElementById('incidentDateTime').value = localDateTime;
         }
 
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+
         function loadAllData() {
-            // Load incidents
-            const savedIncidents = localStorage.getItem('mms_incidents');
-            incidents = savedIncidents ? JSON.parse(savedIncidents) : getDefaultIncidents();
-            
-            // Load employees
+            // Load employees with company data
             const savedEmployees = localStorage.getItem('mms_employees');
             employees = savedEmployees ? JSON.parse(savedEmployees) : getDefaultEmployees();
             
-            // Load PPE items
+            // Load other data
+            const savedIncidents = localStorage.getItem('mms_incidents');
+            incidents = savedIncidents ? JSON.parse(savedIncidents) : getDefaultIncidents();
+            
             const savedPPE = localStorage.getItem('mms_ppe');
-            ppeItems = savedPPE ? JSON.parse(savedPPE) : [];
+            ppeItems = savedPPE ? JSON.parse(savedPPE) : getDefaultPPE();
             
-            // Load audits
+            const savedHealth = localStorage.getItem('mms_health');
+            healthRecords = savedHealth ? JSON.parse(savedHealth) : getDefaultHealth();
+            
+            const savedContractors = localStorage.getItem('mms_contractors');
+            contractors = savedContractors ? JSON.parse(savedContractors) : getDefaultContractors();
+            
             const savedAudits = localStorage.getItem('mms_audits');
-            audits = savedAudits ? JSON.parse(savedAudits) : [];
+            audits = savedAudits ? JSON.parse(savedAudits) : getDefaultAudits();
             
-            // Load standards
             const savedStandards = localStorage.getItem('mms_standards');
             standards = savedStandards ? JSON.parse(savedStandards) : getDefaultStandards();
             
-            updateEmployeeCount();
-        }
-
-        function getDefaultIncidents() {
-            return [
-                {
-                    id: 'INC-2024-001',
-                    type: 'Near Miss',
-                    severity: 'Minor',
-                    location: 'Warehouse B',
-                    reportedBy: 'John Mwita',
-                    date: '2024-01-15T10:30',
-                    status: 'Under Investigation',
-                    description: 'Forklift almost collided with pedestrian.'
-                }
-            ];
+            const savedTrainings = localStorage.getItem('mms_trainings');
+            trainings = savedTrainings ? JSON.parse(savedTrainings) : getDefaultTrainings();
+            
+            updateStatistics();
         }
 
         function getDefaultEmployees() {
@@ -1070,7 +2011,7 @@
                     location: 'Bridge Walvis Bay',
                     status: 'Active'
                 },
-                // South Africa
+                // South Africa - HQ
                 {
                     id: 'SA-001',
                     name: 'Katlego Matsane',
@@ -1087,11 +2028,11 @@
                     location: 'Cape Town (HQ)',
                     status: 'Active'
                 },
-                // Zambia - First few examples
+                // Zambia - Complete list
                 {
                     id: 'ZM-001',
                     name: 'Alick Banda',
-                    position: 'Inventory Control Specialist',
+                    position: '',
                     country: 'Zambia',
                     location: 'AGL Chingola Hub',
                     status: 'Active'
@@ -1099,10 +2040,288 @@
                 {
                     id: 'ZM-002',
                     name: 'Alinaswe Mwanamoonga',
-                    position: 'Inventory Control Specialist',
+                    position: '',
                     country: 'Zambia',
                     location: 'Polytra Kitwe',
                     status: 'Active'
+                },
+                {
+                    id: 'ZM-003',
+                    name: 'Caleb Simpanzye',
+                    position: '',
+                    country: 'Zambia',
+                    location: '',
+                    status: 'Active'
+                },
+                {
+                    id: 'ZM-004',
+                    name: 'Cephas Phiri',
+                    position: '',
+                    country: 'Zambia',
+                    location: '',
+                    status: 'Active'
+                },
+                {
+                    id: 'ZM-005',
+                    name: 'Changwa Sikombe',
+                    position: '',
+                    country: 'Zambia',
+                    location: '',
+                    status: 'Active'
+                },
+                {
+                    id: 'ZM-006',
+                    name: 'Chiti Mwamba',
+                    position: '',
+                    country: 'Zambia',
+                    location: '',
+                    status: 'Active'
+                },
+                {
+                    id: 'ZM-007',
+                    name: 'Edward Vyande',
+                    position: '',
+                    country: 'Zambia',
+                    location: '',
+                    status: 'Active'
+                },
+                {
+                    id: 'ZM-008',
+                    name: 'Given Phiri',
+                    position: '',
+                    country: 'Zambia',
+                    location: '',
+                    status: 'Active'
+                },
+                {
+                    id: 'ZM-009',
+                    name: 'Happie M\'gode',
+                    position: '',
+                    country: 'Zambia',
+                    location: '',
+                    status: 'Active'
+                },
+                {
+                    id: 'ZM-010',
+                    name: 'Ivan Mbewe',
+                    position: '',
+                    country: 'Zambia',
+                    location: '',
+                    status: 'Active'
+                },
+                {
+                    id: 'ZM-011',
+                    name: 'Joseph Banda',
+                    position: '',
+                    country: 'Zambia',
+                    location: '',
+                    status: 'Active'
+                },
+                {
+                    id: 'ZM-012',
+                    name: 'Julius Makambwe',
+                    position: '',
+                    country: 'Zambia',
+                    location: '',
+                    status: 'Active'
+                },
+                {
+                    id: 'ZM-013',
+                    name: 'Malambo Kozi',
+                    position: '',
+                    country: 'Zambia',
+                    location: '',
+                    status: 'Active'
+                },
+                {
+                    id: 'ZM-014',
+                    name: 'Miles Kaweche',
+                    position: '',
+                    country: 'Zambia',
+                    location: '',
+                    status: 'Active'
+                },
+                {
+                    id: 'ZM-015',
+                    name: 'Zachariah Musonda',
+                    position: '',
+                    country: 'Zambia',
+                    location: '',
+                    status: 'Active'
+                },
+                {
+                    id: 'ZM-016',
+                    name: 'Mutandi Kalaluka',
+                    position: '',
+                    country: 'Zambia',
+                    location: '',
+                    status: 'Active'
+                },
+                {
+                    id: 'ZM-017',
+                    name: 'Natasha Tembo',
+                    position: '',
+                    country: 'Zambia',
+                    location: '',
+                    status: 'Active'
+                },
+                {
+                    id: 'ZM-018',
+                    name: 'Patrick Mwale',
+                    position: '',
+                    country: 'Zambia',
+                    location: '',
+                    status: 'Active'
+                },
+                {
+                    id: 'ZM-019',
+                    name: 'Phius Mweene',
+                    position: '',
+                    country: 'Zambia',
+                    location: '',
+                    status: 'Active'
+                },
+                {
+                    id: 'ZM-020',
+                    name: 'Richard Phiri',
+                    position: '',
+                    country: 'Zambia',
+                    location: '',
+                    status: 'Active'
+                },
+                {
+                    id: 'ZM-021',
+                    name: 'Gerald Mwale',
+                    position: '',
+                    country: 'Zambia',
+                    location: '',
+                    status: 'Active'
+                },
+                {
+                    id: 'ZM-022',
+                    name: 'Jackson Chola',
+                    position: '',
+                    country: 'Zambia',
+                    location: '',
+                    status: 'Active'
+                },
+                {
+                    id: 'ZM-023',
+                    name: 'Michael Mwate',
+                    position: '',
+                    country: 'Zambia',
+                    location: '',
+                    status: 'Active'
+                },
+                {
+                    id: 'ZM-024',
+                    name: 'Mfula Mighty',
+                    position: '',
+                    country: 'Zambia',
+                    location: '',
+                    status: 'Active'
+                },
+                {
+                    id: 'ZM-025',
+                    name: 'Richard Mwaba',
+                    position: '',
+                    country: 'Zambia',
+                    location: '',
+                    status: 'Active'
+                },
+                {
+                    id: 'ZM-026',
+                    name: 'David Muzeka',
+                    position: '',
+                    country: 'Zambia',
+                    location: '',
+                    status: 'Active'
+                },
+                {
+                    id: 'ZM-027',
+                    name: 'Yamba Yamba',
+                    position: '',
+                    country: 'Zambia',
+                    location: '',
+                    status: 'Active'
+                }
+            ];
+        }
+
+        function getDefaultIncidents() {
+            return [
+                {
+                    id: 'INC-2024-001',
+                    type: 'Near Miss',
+                    severity: 'Minor',
+                    location: 'Warehouse B',
+                    reportedBy: 'John Mwita',
+                    date: '2024-01-15T10:30',
+                    status: 'Under Investigation',
+                    description: 'Forklift almost collided with pedestrian.',
+                    actions: 'Area cordoned off, investigation started.',
+                    recommendations: 'Improve pedestrian walkway markings.',
+                    createdAt: new Date().toISOString()
+                }
+            ];
+        }
+
+        function getDefaultPPE() {
+            return [
+                {
+                    id: 'PPE-001',
+                    type: 'Safety Helmet',
+                    department: 'Construction',
+                    assignedTo: 'Cephas Gideon Mkama',
+                    issueDate: '2024-01-15',
+                    expiryDate: '2025-01-15',
+                    status: 'Active',
+                    condition: 'Good'
+                }
+            ];
+        }
+
+        function getDefaultHealth() {
+            return [
+                {
+                    id: 'HLTH-001',
+                    name: 'Cephas Gideon Mkama',
+                    department: 'Inventory Control',
+                    lastMedical: '2024-01-15',
+                    nextDue: '2025-01-15',
+                    medicalStatus: 'Fit',
+                    vaccinationStatus: 'Up to date',
+                    healthNotes: 'No issues reported'
+                }
+            ];
+        }
+
+        function getDefaultContractors() {
+            return [
+                {
+                    id: 'CTR-001',
+                    company: 'ABC Construction',
+                    contactPerson: 'John Doe',
+                    workType: 'Building Maintenance',
+                    startDate: '2024-01-01',
+                    endDate: '2024-12-31',
+                    safetyRating: 'A',
+                    complianceStatus: 'Compliant'
+                }
+            ];
+        }
+
+        function getDefaultAudits() {
+            return [
+                {
+                    id: 'AUD-001',
+                    type: 'Safety Audit',
+                    department: 'Warehouse',
+                    auditDate: '2024-02-15',
+                    auditor: 'Safety Officer',
+                    score: '92%',
+                    status: 'Completed',
+                    findings: 'Minor issues identified'
                 }
             ];
         }
@@ -1114,51 +2333,77 @@
                     name: 'ISO 45001:2018',
                     code: 'ISO45001',
                     type: 'International',
-                    status: 'Compliant'
+                    industry: 'General Industry',
+                    description: 'Occupational health and safety management systems - Requirements with guidance for use.',
+                    status: 'Compliant',
+                    effectiveDate: '2024-01-01',
+                    remarks: 'Fully implemented across all departments'
                 },
                 {
                     id: 'STD-002',
                     name: 'OSHA Regulations',
                     code: 'OSHA-29CFR',
                     type: 'National',
-                    status: 'Compliant'
+                    industry: 'General Industry',
+                    description: 'Occupational Safety and Health Administration regulations for workplace safety.',
+                    status: 'Compliant',
+                    effectiveDate: '2024-01-01',
+                    remarks: 'Regular audits conducted'
                 }
             ];
         }
 
-        function updateEmployeeCount() {
-            document.getElementById('totalEmployees').textContent = employees.length;
+        function getDefaultTrainings() {
+            return [
+                {
+                    id: 'TRN-001',
+                    courseName: 'Safety Induction',
+                    employee: 'Cephas Gideon Mkama',
+                    trainer: 'Safety Officer',
+                    dateCompleted: '2024-01-15',
+                    expiryDate: '2025-01-15',
+                    status: 'Completed',
+                    certificate: 'Yes'
+                }
+            ];
         }
 
         function updateStatistics() {
             // Update Lost Time Injuries
             const ltiCount = incidents.filter(i => i.type === 'Lost Time Injury').length;
             document.getElementById('lostTimeInjuries').textContent = ltiCount;
+            document.getElementById('ltiDetails').textContent = `Last 30 days: ${ltiCount} incidents`;
+            
+            // Update Employee Count
+            document.getElementById('totalEmployees').textContent = employees.length;
             
             // Update Compliance Rate
             const compliantStandards = standards.filter(s => s.status === 'Compliant').length;
-            const complianceRate = standards.length > 0 ? 
-                Math.round((compliantStandards / standards.length) * 100) : 100;
+            const complianceRate = standards.length > 0 ? Math.round((compliantStandards / standards.length) * 100) : 0;
             document.getElementById('complianceRate').textContent = complianceRate + '%';
             
             // Update Active Audits
-            const activeAuditsCount = audits.filter(a => a.status === 'In Progress').length;
-            document.getElementById('activeAudits').textContent = activeAuditsCount || 12;
-            
-            updateEmployeeCount();
+            const activeAuditsCount = audits.filter(a => a.status === 'In Progress' || a.status === 'Scheduled').length;
+            document.getElementById('activeAudits').textContent = activeAuditsCount;
         }
 
         function saveAllData() {
-            localStorage.setItem('mms_incidents', JSON.stringify(incidents));
             localStorage.setItem('mms_employees', JSON.stringify(employees));
+            localStorage.setItem('mms_incidents', JSON.stringify(incidents));
             localStorage.setItem('mms_ppe', JSON.stringify(ppeItems));
+            localStorage.setItem('mms_health', JSON.stringify(healthRecords));
+            localStorage.setItem('mms_contractors', JSON.stringify(contractors));
             localStorage.setItem('mms_audits', JSON.stringify(audits));
             localStorage.setItem('mms_standards', JSON.stringify(standards));
+            localStorage.setItem('mms_trainings', JSON.stringify(trainings));
         }
 
         // Chart Functions
         function initializeCharts() {
-            const ctx = document.getElementById('incidentTrendChart').getContext('2d');
+            const ctx = document.getElementById('incidentTrendChart');
+            if (!ctx) return;
+            
+            const ctx2d = ctx.getContext('2d');
             
             // Generate data for the last 6 months
             const months = [];
@@ -1176,7 +2421,11 @@
                 firstAidData.push(Math.floor(Math.random() * 4) + 1);
             }
             
-            incidentTrendChart = new Chart(ctx, {
+            if (incidentTrendChart) {
+                incidentTrendChart.destroy();
+            }
+            
+            incidentTrendChart = new Chart(ctx2d, {
                 type: currentChartType,
                 data: {
                     labels: months,
@@ -1232,57 +2481,138 @@
             event.target.classList.add('active');
             
             // Update chart type
-            incidentTrendChart.destroy();
             initializeCharts();
         }
 
+        function updateChartWithCustomRange() {
+            const startDateInput = document.getElementById('startDate');
+            const endDateInput = document.getElementById('endDate');
+            
+            if (!startDateInput.value || !endDateInput.value) {
+                showToast('Warning', 'Please select both start and end dates', 'warning');
+                return;
+            }
+            
+            const startDate = new Date(startDateInput.value);
+            const endDate = new Date(endDateInput.value);
+            
+            if (startDate > endDate) {
+                showToast('Error', 'Start date cannot be after end date', 'error');
+                return;
+            }
+            
+            showToast('Success', `Chart updated for ${startDateInput.value} to ${endDateInput.value}`, 'success');
+        }
+
         // Risk Matrix Functions
+        function loadRiskMatrix() {
+            const matrixContainer = document.getElementById('riskMatrix');
+            const modalMatrixContainer = document.getElementById('modalRiskMatrix');
+            
+            const matrixData = [
+                { riskLevel: 'Low Risk', department: 'Admin', colorClass: 'risk-low' },
+                { riskLevel: 'Medium Risk', department: 'Sales', colorClass: 'risk-medium' },
+                { riskLevel: 'High Risk', department: 'Warehouse', colorClass: 'risk-high' },
+                { riskLevel: 'Very High Risk', department: 'Manufacturing', colorClass: 'risk-very-high' },
+                { riskLevel: 'Extreme Risk', department: 'Construction', colorClass: 'risk-extreme' }
+            ];
+            
+            const containers = [matrixContainer, modalMatrixContainer].filter(container => container);
+            
+            containers.forEach(container => {
+                container.innerHTML = '';
+                
+                matrixData.forEach((item, index) => {
+                    const cell = document.createElement('div');
+                    cell.className = `matrix-cell ${item.colorClass}`;
+                    cell.innerHTML = `
+                        <div>${item.riskLevel}</div>
+                        <div>${item.department}</div>
+                    `;
+                    cell.onclick = function() { editRiskCell(this); };
+                    container.appendChild(cell);
+                });
+            });
+        }
+
         function editRiskCell(cell) {
+            if (editingCell) return;
+            
+            editingCell = cell;
             const originalContent = cell.innerHTML;
+            
+            // Get current values
             const lines = cell.textContent.split('\n').map(line => line.trim()).filter(line => line);
             const riskLevel = lines[0] || 'Low Risk';
             const department = lines[1] || 'Department';
             
+            // Create edit form
             cell.innerHTML = `
-                <input type="text" class="edit-input" value="${riskLevel}" placeholder="Risk Level" style="margin-bottom: 0.5rem; width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px;">
-                <input type="text" class="edit-input" value="${department}" placeholder="Department" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px;">
-                <div style="margin-top: 0.5rem; display: flex; gap: 0.5rem;">
+                <input type="text" class="edit-input mb-1" value="${riskLevel}" placeholder="Risk Level">
+                <input type="text" class="edit-input mb-1" value="${department}" placeholder="Department">
+                <select class="edit-select mb-1" id="riskColor">
+                    <option value="risk-low" ${cell.classList.contains('risk-low') ? 'selected' : ''}>Low Risk</option>
+                    <option value="risk-medium" ${cell.classList.contains('risk-medium') ? 'selected' : ''}>Medium Risk</option>
+                    <option value="risk-high" ${cell.classList.contains('risk-high') ? 'selected' : ''}>High Risk</option>
+                    <option value="risk-very-high" ${cell.classList.contains('risk-very-high') ? 'selected' : ''}>Very High Risk</option>
+                    <option value="risk-extreme" ${cell.classList.contains('risk-extreme') ? 'selected' : ''}>Extreme Risk</option>
+                </select>
+                <div class="mt-1">
                     <button class="btn btn-sm btn-success" onclick="saveRiskCellEdit(this)">Save</button>
                     <button class="btn btn-sm btn-outline" onclick="cancelRiskCellEdit(this, '${originalContent.replace(/'/g, "\\'")}')">Cancel</button>
                 </div>
             `;
             
-            cell.style.padding = '1rem';
+            cell.classList.add('editing');
+            cell.querySelector('input').focus();
         }
 
         function saveRiskCellEdit(button) {
             const cell = button.closest('.matrix-cell');
-            const inputs = cell.querySelectorAll('input');
+            const inputs = cell.querySelectorAll('input, select');
+            
             const riskLevel = inputs[0].value;
             const department = inputs[1].value;
+            const colorClass = inputs[2].value;
             
+            // Update cell
+            cell.className = `matrix-cell ${colorClass}`;
             cell.innerHTML = `
                 <div>${riskLevel}</div>
                 <div>${department}</div>
             `;
-            cell.style.padding = '1.5rem 1rem';
+            
+            // Restore click handler
             cell.onclick = function() { editRiskCell(this); };
             
+            editingCell = null;
             showToast('Success', 'Risk cell updated!', 'success');
         }
 
         function cancelRiskCellEdit(button, originalContent) {
             const cell = button.closest('.matrix-cell');
             cell.innerHTML = originalContent;
-            cell.style.padding = '1.5rem 1rem';
+            cell.classList.remove('editing');
             cell.onclick = function() { editRiskCell(this); };
+            editingCell = null;
         }
 
         function saveRiskMatrix() {
             showToast('Success', 'Risk matrix saved successfully!', 'success');
         }
 
-        // Employee Functions
+        // Table Loading Functions
+        function loadAllTables() {
+            loadEmployeesTable();
+            loadIncidentsTable();
+            loadPPETable();
+            loadHealthTable();
+            loadContractorTable();
+            loadAuditTable();
+            loadTrainingTable();
+            loadRiskMatrix();
+        }
+
         function loadEmployeesTable() {
             const table = document.getElementById('employeesTableBody');
             if (!table) return;
@@ -1293,47 +2623,520 @@
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${employee.id}</td>
-                    <td class="editable" onclick="editEmployeeCell(this, ${index}, 'name')">${employee.name}</td>
-                    <td class="editable" onclick="editEmployeeCell(this, ${index}, 'position')">${employee.position}</td>
-                    <td>${employee.country}</td>
-                    <td class="editable" onclick="editEmployeeCell(this, ${index}, 'location')">${employee.location}</td>
-                    <td><span style="color: var(--success); font-weight: 500;">${employee.status}</span></td>
+                    <td class="editable" onclick="editTableCell(this, 'employees', ${index}, 'name')">${employee.name}</td>
+                    <td class="editable" onclick="editTableCell(this, 'employees', ${index}, 'position')">${employee.position}</td>
+                    <td class="editable" onclick="editTableCell(this, 'employees', ${index}, 'country')">${employee.country}</td>
+                    <td class="editable" onclick="editTableCell(this, 'employees', ${index}, 'location')">${employee.location}</td>
+                    <td><span class="status-badge ${employee.status === 'Active' ? 'status-active' : 'status-inactive'}">${employee.status}</span></td>
                     <td>
-                        <button class="btn btn-sm btn-outline" onclick="deleteEmployee(${index})">Delete</button>
+                        <button class="btn btn-sm btn-outline" onclick="deleteItem('employees', ${index})">Delete</button>
                     </td>
                 `;
                 table.appendChild(row);
             });
         }
 
-        function editEmployeeCell(cell, index, field) {
-            const employee = employees[index];
-            const originalValue = employee[field];
+        function loadIncidentsTable() {
+            const mainTable = document.getElementById('allIncidentsTableBody');
+            const modalTable = document.getElementById('modalIncidentsTableBody');
             
-            cell.innerHTML = `<input type="text" value="${originalValue}" style="width: 100%; padding: 0.5rem; border: 1px solid var(--primary); border-radius: 4px;">`;
-            const input = cell.querySelector('input');
+            const tables = [mainTable, modalTable].filter(table => table);
             
-            input.focus();
-            input.select();
-            
-            const saveEdit = () => {
-                employee[field] = input.value;
-                cell.textContent = input.value;
-                saveAllData();
-                showToast('Success', 'Employee updated!', 'success');
-            };
-            
-            input.addEventListener('blur', saveEdit);
-            input.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') saveEdit();
+            tables.forEach(table => {
+                table.innerHTML = '';
+                
+                incidents.forEach((incident, index) => {
+                    const row = document.createElement('tr');
+                    const date = new Date(incident.date);
+                    const formattedDate = date.toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric'
+                    });
+                    
+                    row.innerHTML = `
+                        <td>${incident.id}</td>
+                        <td class="editable" onclick="editTableCell(this, 'incidents', ${index}, 'type')">${incident.type}</td>
+                        <td class="editable" onclick="editTableCell(this, 'incidents', ${index}, 'date')">${formattedDate}</td>
+                        <td class="editable" onclick="editTableCell(this, 'incidents', ${index}, 'location')">${incident.location}</td>
+                        <td class="editable" onclick="editTableCell(this, 'incidents', ${index}, 'reportedBy')">${incident.reportedBy}</td>
+                        <td class="editable" onclick="editTableCell(this, 'incidents', ${index}, 'severity')">${incident.severity}</td>
+                        <td class="editable" onclick="editTableCell(this, 'incidents', ${index}, 'status')">${incident.status}</td>
+                        <td class="editable" onclick="editTableCell(this, 'incidents', ${index}, 'description')">${incident.description}</td>
+                        <td class="editable" onclick="editTableCell(this, 'incidents', ${index}, 'actions')">${incident.actions || ''}</td>
+                        <td class="editable" onclick="editTableCell(this, 'incidents', ${index}, 'recommendations')">${incident.recommendations || ''}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline" onclick="deleteItem('incidents', ${index})">Delete</button>
+                        </td>
+                    `;
+                    table.appendChild(row);
+                });
             });
         }
 
+        function loadPPETable() {
+            const table = document.getElementById('ppeTableBody');
+            if (!table) return;
+            
+            table.innerHTML = '';
+            
+            ppeItems.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="editable" onclick="editTableCell(this, 'ppeItems', ${index}, 'id')">${item.id}</td>
+                    <td class="editable" onclick="editTableCell(this, 'ppeItems', ${index}, 'type')">${item.type}</td>
+                    <td class="editable" onclick="editTableCell(this, 'ppeItems', ${index}, 'department')">${item.department}</td>
+                    <td class="editable" onclick="editTableCell(this, 'ppeItems', ${index}, 'assignedTo')">${item.assignedTo}</td>
+                    <td class="editable" onclick="editTableCell(this, 'ppeItems', ${index}, 'issueDate')">${item.issueDate}</td>
+                    <td class="editable" onclick="editTableCell(this, 'ppeItems', ${index}, 'expiryDate')">${item.expiryDate}</td>
+                    <td class="editable" onclick="editTableCell(this, 'ppeItems', ${index}, 'status')">${item.status}</td>
+                    <td class="editable" onclick="editTableCell(this, 'ppeItems', ${index}, 'condition')">${item.condition}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline" onclick="deleteItem('ppeItems', ${index})">Delete</button>
+                    </td>
+                `;
+                table.appendChild(row);
+            });
+        }
+
+        function loadHealthTable() {
+            const table = document.getElementById('healthTableBody');
+            if (!table) return;
+            
+            table.innerHTML = '';
+            
+            healthRecords.forEach((record, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="editable" onclick="editTableCell(this, 'healthRecords', ${index}, 'id')">${record.id}</td>
+                    <td class="editable" onclick="editTableCell(this, 'healthRecords', ${index}, 'name')">${record.name}</td>
+                    <td class="editable" onclick="editTableCell(this, 'healthRecords', ${index}, 'department')">${record.department}</td>
+                    <td class="editable" onclick="editTableCell(this, 'healthRecords', ${index}, 'lastMedical')">${record.lastMedical}</td>
+                    <td class="editable" onclick="editTableCell(this, 'healthRecords', ${index}, 'nextDue')">${record.nextDue}</td>
+                    <td class="editable" onclick="editTableCell(this, 'healthRecords', ${index}, 'medicalStatus')">${record.medicalStatus}</td>
+                    <td class="editable" onclick="editTableCell(this, 'healthRecords', ${index}, 'vaccinationStatus')">${record.vaccinationStatus}</td>
+                    <td class="editable" onclick="editTableCell(this, 'healthRecords', ${index}, 'healthNotes')">${record.healthNotes}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline" onclick="deleteItem('healthRecords', ${index})">Delete</button>
+                    </td>
+                `;
+                table.appendChild(row);
+            });
+        }
+
+        function loadContractorTable() {
+            const table = document.getElementById('contractorTableBody');
+            if (!table) return;
+            
+            table.innerHTML = '';
+            
+            contractors.forEach((contractor, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="editable" onclick="editTableCell(this, 'contractors', ${index}, 'id')">${contractor.id}</td>
+                    <td class="editable" onclick="editTableCell(this, 'contractors', ${index}, 'company')">${contractor.company}</td>
+                    <td class="editable" onclick="editTableCell(this, 'contractors', ${index}, 'contactPerson')">${contractor.contactPerson}</td>
+                    <td class="editable" onclick="editTableCell(this, 'contractors', ${index}, 'workType')">${contractor.workType}</td>
+                    <td class="editable" onclick="editTableCell(this, 'contractors', ${index}, 'startDate')">${contractor.startDate}</td>
+                    <td class="editable" onclick="editTableCell(this, 'contractors', ${index}, 'endDate')">${contractor.endDate}</td>
+                    <td class="editable" onclick="editTableCell(this, 'contractors', ${index}, 'safetyRating')">${contractor.safetyRating}</td>
+                    <td class="editable" onclick="editTableCell(this, 'contractors', ${index}, 'complianceStatus')">${contractor.complianceStatus}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline" onclick="deleteItem('contractors', ${index})">Delete</button>
+                    </td>
+                `;
+                table.appendChild(row);
+            });
+        }
+
+        function loadAuditTable() {
+            const table = document.getElementById('auditTableBody');
+            if (!table) return;
+            
+            table.innerHTML = '';
+            
+            audits.forEach((audit, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="editable" onclick="editTableCell(this, 'audits', ${index}, 'id')">${audit.id}</td>
+                    <td class="editable" onclick="editTableCell(this, 'audits', ${index}, 'type')">${audit.type}</td>
+                    <td class="editable" onclick="editTableCell(this, 'audits', ${index}, 'department')">${audit.department}</td>
+                    <td class="editable" onclick="editTableCell(this, 'audits', ${index}, 'auditDate')">${audit.auditDate}</td>
+                    <td class="editable" onclick="editTableCell(this, 'audits', ${index}, 'auditor')">${audit.auditor}</td>
+                    <td class="editable" onclick="editTableCell(this, 'audits', ${index}, 'score')">${audit.score}</td>
+                    <td class="editable" onclick="editTableCell(this, 'audits', ${index}, 'status')">${audit.status}</td>
+                    <td class="editable" onclick="editTableCell(this, 'audits', ${index}, 'findings')">${audit.findings}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline" onclick="deleteItem('audits', ${index})">Delete</button>
+                    </td>
+                `;
+                table.appendChild(row);
+            });
+        }
+
+        function loadTrainingTable() {
+            const table = document.getElementById('trainingTableBody');
+            if (!table) return;
+            
+            table.innerHTML = '';
+            
+            trainings.forEach((training, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="editable" onclick="editTableCell(this, 'trainings', ${index}, 'id')">${training.id}</td>
+                    <td class="editable" onclick="editTableCell(this, 'trainings', ${index}, 'courseName')">${training.courseName}</td>
+                    <td class="editable" onclick="editTableCell(this, 'trainings', ${index}, 'employee')">${training.employee}</td>
+                    <td class="editable" onclick="editTableCell(this, 'trainings', ${index}, 'trainer')">${training.trainer}</td>
+                    <td class="editable" onclick="editTableCell(this, 'trainings', ${index}, 'dateCompleted')">${training.dateCompleted}</td>
+                    <td class="editable" onclick="editTableCell(this, 'trainings', ${index}, 'expiryDate')">${training.expiryDate}</td>
+                    <td class="editable" onclick="editTableCell(this, 'trainings', ${index}, 'status')">${training.status}</td>
+                    <td class="editable" onclick="editTableCell(this, 'trainings', ${index}, 'certificate')">${training.certificate}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline" onclick="deleteItem('trainings', ${index})">Delete</button>
+                    </td>
+                `;
+                table.appendChild(row);
+            });
+        }
+
+        // Standards Management Functions
+        function loadStandards() {
+            const grid = document.getElementById('standardsGrid');
+            if (!grid) return;
+            
+            grid.innerHTML = '';
+            
+            standards.forEach((standard, index) => {
+                const card = document.createElement('div');
+                card.className = 'standard-card';
+                
+                const statusClass = standard.status === 'Compliant' ? 'status-compliant' : 
+                                  standard.status === 'Non-Compliant' ? 'status-noncompliant' : 'status-pending';
+                
+                card.innerHTML = `
+                    <div class="standard-badge ${standard.type === 'International' ? 'badge-international' : 'badge-national'}">
+                        ${standard.type}
+                    </div>
+                    <h3>${standard.name}</h3>
+                    <div class="standard-code">${standard.code}</div>
+                    <div class="standard-industry">${standard.industry}</div>
+                    <div class="standard-status ${statusClass}">${standard.status}</div>
+                    <p style="font-size: 0.9rem; margin-bottom: 1rem; color: var(--text-light);">
+                        ${standard.description.substring(0, 150)}...
+                    </p>
+                    <div style="font-size: 0.8rem; color: var(--text-light); margin-bottom: 1rem;">
+                        <strong>Effective:</strong> ${standard.effectiveDate || 'N/A'}
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--text-light); margin-bottom: 1rem;">
+                        <strong>Remarks:</strong> ${standard.remarks || 'No remarks'}
+                    </div>
+                    <div class="standard-actions">
+                        <button class="btn btn-sm btn-outline" onclick="editStandard(${index})">Edit</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteStandard(${index})">Delete</button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function addStandard() {
+            editingStandardIndex = -1;
+            document.getElementById('standardModalTitle').textContent = 'Add New Standard';
+            document.getElementById('deleteStandardBtn').style.display = 'none';
+            document.getElementById('standardSuccess').style.display = 'none';
+            document.getElementById('standardError').style.display = 'none';
+            
+            // Clear form
+            document.getElementById('standardName').value = '';
+            document.getElementById('standardCode').value = '';
+            document.getElementById('standardType').value = '';
+            document.getElementById('standardIndustry').value = '';
+            document.getElementById('standardDescription').value = '';
+            document.getElementById('standardStatus').value = '';
+            document.getElementById('standardEffectiveDate').value = '';
+            document.getElementById('standardRemarks').value = '';
+            
+            openModal('standardModal');
+        }
+
+        function editStandard(index) {
+            editingStandardIndex = index;
+            const standard = standards[index];
+            
+            document.getElementById('standardModalTitle').textContent = 'Edit Standard';
+            document.getElementById('deleteStandardBtn').style.display = 'inline-flex';
+            document.getElementById('standardSuccess').style.display = 'none';
+            document.getElementById('standardError').style.display = 'none';
+            
+            // Fill form
+            document.getElementById('standardName').value = standard.name;
+            document.getElementById('standardCode').value = standard.code;
+            document.getElementById('standardType').value = standard.type;
+            document.getElementById('standardIndustry').value = standard.industry;
+            document.getElementById('standardDescription').value = standard.description;
+            document.getElementById('standardStatus').value = standard.status;
+            document.getElementById('standardEffectiveDate').value = standard.effectiveDate || '';
+            document.getElementById('standardRemarks').value = standard.remarks || '';
+            
+            openModal('standardModal');
+        }
+
+        function saveStandard() {
+            // Get form values
+            const name = document.getElementById('standardName').value;
+            const code = document.getElementById('standardCode').value;
+            const type = document.getElementById('standardType').value;
+            const industry = document.getElementById('standardIndustry').value;
+            const description = document.getElementById('standardDescription').value;
+            const status = document.getElementById('standardStatus').value;
+            const effectiveDate = document.getElementById('standardEffectiveDate').value;
+            const remarks = document.getElementById('standardRemarks').value;
+            
+            // Validation
+            if (!name || !code || !type || !industry || !description || !status) {
+                document.getElementById('standardError').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('standardError').style.display = 'none';
+                }, 3000);
+                return;
+            }
+            
+            if (editingStandardIndex >= 0) {
+                // Update existing standard
+                standards[editingStandardIndex] = {
+                    ...standards[editingStandardIndex],
+                    name,
+                    code,
+                    type,
+                    industry,
+                    description,
+                    status,
+                    effectiveDate,
+                    remarks,
+                    updatedAt: new Date().toISOString()
+                };
+            } else {
+                // Add new standard
+                const newStandard = {
+                    id: `STD-${new Date().getFullYear()}-${(standards.length + 1).toString().padStart(3, '0')}`,
+                    name,
+                    code,
+                    type,
+                    industry,
+                    description,
+                    status,
+                    effectiveDate,
+                    remarks,
+                    createdAt: new Date().toISOString()
+                };
+                standards.push(newStandard);
+            }
+            
+            saveAllData();
+            loadStandards();
+            updateStatistics();
+            
+            // Show success message
+            document.getElementById('standardSuccess').style.display = 'block';
+            
+            // Close modal after delay
+            setTimeout(() => {
+                closeModal('standardModal');
+                document.getElementById('standardSuccess').style.display = 'none';
+            }, 2000);
+        }
+
+        function deleteCurrentStandard() {
+            if (editingStandardIndex >= 0) {
+                deleteStandard(editingStandardIndex);
+                closeModal('standardModal');
+            }
+        }
+
+        function deleteStandard(index) {
+            showConfirmDialog('Delete Standard', 'Are you sure you want to delete this standard?', function() {
+                standards.splice(index, 1);
+                saveAllData();
+                loadStandards();
+                updateStatistics();
+                showToast('Deleted', 'Standard deleted successfully!', 'success');
+            });
+        }
+
+        // Table Cell Editing Function
+        function editTableCell(cell, dataType, index, field) {
+            if (editingCell) return;
+            
+            editingCell = cell;
+            const originalValue = cell.textContent;
+            
+            // Determine input type based on field
+            let inputType = 'text';
+            let options = [];
+            
+            if (field === 'severity') {
+                options = ['Minor', 'Moderate', 'Serious', 'Critical'];
+                inputType = 'select';
+            } else if (field === 'type' && dataType === 'incidents') {
+                options = ['Near Miss', 'First Aid', 'Medical Treatment', 'Lost Time Injury', 'Property Damage', 'Environmental Incident'];
+                inputType = 'select';
+            } else if (field === 'status') {
+                if (dataType === 'incidents') {
+                    options = ['Reported', 'Under Investigation', 'Resolved', 'Closed'];
+                } else if (dataType === 'employees') {
+                    options = ['Active', 'Inactive', 'On Leave'];
+                } else {
+                    options = ['Active', 'Inactive', 'Pending'];
+                }
+                inputType = 'select';
+            } else if (field === 'country') {
+                options = ['South Africa', 'Tanzania', 'Namibia', 'Zambia'];
+                inputType = 'select';
+            } else if (field === 'location') {
+                // Location options based on country
+                const dataArray = getDataArray(dataType);
+                const item = dataArray[index];
+                if (item && item.country) {
+                    options = getLocationsByCountry(item.country);
+                    inputType = 'select';
+                }
+            } else if (field === 'date' || field.includes('Date')) {
+                inputType = 'date';
+            }
+            
+            cell.classList.add('editing');
+            cell.innerHTML = '';
+            
+            if (inputType === 'select') {
+                const select = document.createElement('select');
+                select.className = 'edit-select';
+                select.style.width = '100%';
+                
+                options.forEach(option => {
+                    const opt = document.createElement('option');
+                    opt.value = option;
+                    opt.textContent = option;
+                    if (option === originalValue) opt.selected = true;
+                    select.appendChild(opt);
+                });
+                
+                select.onblur = function() {
+                    saveTableCell(dataType, index, field, this.value, cell);
+                };
+                
+                select.onkeypress = function(e) {
+                    if (e.key === 'Enter') {
+                        saveTableCell(dataType, index, field, this.value, cell);
+                    }
+                };
+                
+                cell.appendChild(select);
+                select.focus();
+            } else if (inputType === 'date') {
+                const input = document.createElement('input');
+                input.type = 'date';
+                input.className = 'edit-input';
+                input.value = originalValue;
+                
+                input.onblur = function() {
+                    saveTableCell(dataType, index, field, this.value, cell);
+                };
+                
+                input.onkeypress = function(e) {
+                    if (e.key === 'Enter') {
+                        saveTableCell(dataType, index, field, this.value, cell);
+                    }
+                };
+                
+                cell.appendChild(input);
+                input.focus();
+            } else {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'edit-input';
+                input.value = originalValue;
+                
+                input.onblur = function() {
+                    saveTableCell(dataType, index, field, this.value, cell);
+                };
+                
+                input.onkeypress = function(e) {
+                    if (e.key === 'Enter') {
+                        saveTableCell(dataType, index, field, this.value, cell);
+                    }
+                };
+                
+                cell.appendChild(input);
+                input.focus();
+                input.select();
+            }
+        }
+
+        function getDataArray(dataType) {
+            switch(dataType) {
+                case 'employees': return employees;
+                case 'incidents': return incidents;
+                case 'ppeItems': return ppeItems;
+                case 'healthRecords': return healthRecords;
+                case 'contractors': return contractors;
+                case 'audits': return audits;
+                case 'trainings': return trainings;
+                default: return [];
+            }
+        }
+
+        function getLocationsByCountry(country) {
+            const locations = {
+                'South Africa': ['Cape Town (HQ)', 'Cosco Durban', 'AGL Durban'],
+                'Tanzania': ['Impala Dar', 'Polytra Dar', 'Access Dar'],
+                'Namibia': ['WBCT Bulk Shed', 'WBCT Quay Side Shed', 'Bridge Walvis Bay', 'Pindulo Walvis Bay'],
+                'Zambia': ['Reload Giga Terminal', 'AGL Chingola Hub', 'Polytra Kitwe', 'Impala Ndola', 'SLS Ndola', 'Poseidon Zambia', 'Polytra Kapiri Mposhi']
+            };
+            return locations[country] || [];
+        }
+
+        function saveTableCell(dataType, index, field, value, cell) {
+            // Get the appropriate data array
+            let dataArray = getDataArray(dataType);
+            
+            // Update the data
+            if (dataArray[index]) {
+                dataArray[index][field] = value;
+                
+                // Format display value for dates
+                let displayValue = value;
+                if (field === 'date' || field.includes('Date')) {
+                    const date = new Date(value);
+                    if (!isNaN(date.getTime())) {
+                        displayValue = date.toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric'
+                        });
+                    }
+                }
+                
+                // Update cell display
+                cell.textContent = displayValue;
+                cell.classList.remove('editing');
+                
+                // Save data and reload tables
+                saveAllData();
+                loadAllTables();
+                updateStatistics();
+                
+                showToast('Success', `${field} updated successfully!`, 'success');
+            }
+            
+            editingCell = null;
+        }
+
+        // Add New Items Functions
         function addEmployee() {
             const newEmployee = {
-                id: `EMP-${Date.now().toString().slice(-6)}`,
+                id: `EMP-${new Date().getFullYear()}-${(employees.length + 1).toString().padStart(3, '0')}`,
                 name: 'New Employee',
-                position: 'Inventory Control Specialist',
+                position: '',
                 country: 'South Africa',
                 location: 'Cape Town (HQ)',
                 status: 'Active'
@@ -1342,34 +3145,137 @@
             employees.push(newEmployee);
             saveAllData();
             loadEmployeesTable();
-            updateEmployeeCount();
-            showToast('Success', 'Employee added!', 'success');
+            updateStatistics();
+            showToast('Success', 'New employee added!', 'success');
         }
 
-        function deleteEmployee(index) {
-            if (confirm('Are you sure you want to delete this employee?')) {
-                employees.splice(index, 1);
+        function addPPEItem() {
+            const newItem = {
+                id: `PPE-${new Date().getFullYear()}-${(ppeItems.length + 1).toString().padStart(3, '0')}`,
+                type: 'New Equipment',
+                department: 'Department',
+                assignedTo: 'Employee Name',
+                issueDate: new Date().toISOString().split('T')[0],
+                expiryDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
+                status: 'Active',
+                condition: 'Good'
+            };
+            
+            ppeItems.push(newItem);
+            saveAllData();
+            loadPPETable();
+            showToast('Success', 'New PPE item added!', 'success');
+        }
+
+        function addHealthRecord() {
+            const newRecord = {
+                id: `HLTH-${new Date().getFullYear()}-${(healthRecords.length + 1).toString().padStart(3, '0')}`,
+                name: 'New Employee',
+                department: 'Department',
+                lastMedical: new Date().toISOString().split('T')[0],
+                nextDue: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
+                medicalStatus: 'Fit',
+                vaccinationStatus: 'Up to date',
+                healthNotes: 'No issues reported'
+            };
+            
+            healthRecords.push(newRecord);
+            saveAllData();
+            loadHealthTable();
+            showToast('Success', 'New health record added!', 'success');
+        }
+
+        function addContractor() {
+            const newContractor = {
+                id: `CTR-${new Date().getFullYear()}-${(contractors.length + 1).toString().padStart(3, '0')}`,
+                company: 'New Company',
+                contactPerson: 'Contact Name',
+                workType: 'Work Type',
+                startDate: new Date().toISOString().split('T')[0],
+                endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
+                safetyRating: 'A',
+                complianceStatus: 'Compliant'
+            };
+            
+            contractors.push(newContractor);
+            saveAllData();
+            loadContractorTable();
+            showToast('Success', 'New contractor added!', 'success');
+        }
+
+        function addAudit() {
+            const newAudit = {
+                id: `AUD-${new Date().getFullYear()}-${(audits.length + 1).toString().padStart(3, '0')}`,
+                type: 'Safety Audit',
+                department: 'Department',
+                auditDate: new Date().toISOString().split('T')[0],
+                auditor: 'Safety Officer',
+                score: '100%',
+                status: 'Scheduled',
+                findings: 'No findings yet'
+            };
+            
+            audits.push(newAudit);
+            saveAllData();
+            loadAuditTable();
+            updateStatistics();
+            showToast('Success', 'New audit scheduled!', 'success');
+        }
+
+        function addTrainingRecord() {
+            const newTraining = {
+                id: `TRN-${new Date().getFullYear()}-${(trainings.length + 1).toString().padStart(3, '0')}`,
+                courseName: 'Safety Training',
+                employee: 'Employee Name',
+                trainer: 'Safety Officer',
+                dateCompleted: new Date().toISOString().split('T')[0],
+                expiryDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
+                status: 'Completed',
+                certificate: 'Yes'
+            };
+            
+            trainings.push(newTraining);
+            saveAllData();
+            loadTrainingTable();
+            showToast('Success', 'New training record added!', 'success');
+        }
+
+        // Delete Item Function
+        function deleteItem(dataType, index) {
+            let dataArray = getDataArray(dataType);
+            let itemName = dataArray[index]?.id || 'item';
+            
+            showConfirmDialog('Delete Item', `Are you sure you want to delete ${itemName}?`, function() {
+                dataArray.splice(index, 1);
                 saveAllData();
-                loadEmployeesTable();
-                updateEmployeeCount();
-                showToast('Success', 'Employee deleted!', 'success');
-            }
+                loadAllTables();
+                updateStatistics();
+                showToast('Deleted', `${itemName} deleted successfully!`, 'success');
+            });
         }
 
         // Incident Report Function
         function submitIncidentReport() {
+            // Get form values
             const type = document.getElementById('incidentType').value;
             const severity = document.getElementById('incidentSeverity').value;
             const dateTime = document.getElementById('incidentDateTime').value;
             const location = document.getElementById('incidentLocation').value;
             const reportedBy = document.getElementById('reportedBy').value;
             const description = document.getElementById('incidentDescription').value;
+            const actions = document.getElementById('immediateActions').value;
+            const recommendations = document.getElementById('recommendations').value;
             
+            // Validation
             if (!type || !severity || !dateTime || !location || !reportedBy || !description) {
-                showToast('Error', 'Please fill all required fields', 'error');
+                document.getElementById('reportError').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('reportError').style.display = 'none';
+                }, 3000);
                 return;
             }
             
+            // Create new incident
             const newIncident = {
                 id: `INC-${new Date().getFullYear()}-${(incidents.length + 1).toString().padStart(3, '0')}`,
                 type: type,
@@ -1379,11 +3285,16 @@
                 date: dateTime,
                 status: 'Reported',
                 description: description,
+                actions: actions,
+                recommendations: recommendations,
                 createdAt: new Date().toISOString()
             };
             
             incidents.unshift(newIncident);
             saveAllData();
+            
+            // Show success message
+            document.getElementById('reportSuccess').style.display = 'block';
             
             // Clear form
             document.getElementById('incidentType').value = '';
@@ -1392,30 +3303,22 @@
             document.getElementById('incidentLocation').value = '';
             document.getElementById('reportedBy').value = '';
             document.getElementById('incidentDescription').value = '';
+            document.getElementById('immediateActions').value = '';
+            document.getElementById('recommendations').value = '';
             
-            closeModal('reportIncidentModal');
+            // Update UI
+            loadAllTables();
             updateStatistics();
-            showToast('Success', 'Incident reported successfully!', 'success');
-        }
-
-        // Modal Functions
-        function openModal(modalId) {
-            document.getElementById(modalId).style.display = 'block';
-            document.body.style.overflow = 'hidden';
             
-            // Load data for specific modals
-            if (modalId === 'employeesModal') {
-                loadEmployeesTable();
-            }
+            // Close modal after delay
+            setTimeout(() => {
+                closeModal('reportIncidentModal');
+                document.getElementById('reportSuccess').style.display = 'none';
+            }, 2000);
         }
 
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
-
-        // Toast Notification
-        function showToast(title, message, type = 'info') {
+        // Toast Notification Functions
+        function showToast(title, message, type) {
             const toast = document.getElementById('toast');
             const toastTitle = toast.querySelector('.toast-title');
             const toastMessage = toast.querySelector('.toast-message');
@@ -1438,16 +3341,117 @@
             toast.classList.remove('show');
         }
 
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            if (event.target.classList.contains('modal')) {
-                event.target.style.display = 'none';
-                document.body.style.overflow = 'auto';
-            }
-        };
-    </script>
+        // Confirm Dialog Functions
+        function showConfirmDialog(title, message, onConfirm) {
+            const dialog = document.getElementById('confirmDialog');
+            const dialogTitle = document.getElementById('confirmTitle');
+            const dialogMessage = document.getElementById('confirmMessage');
+            const confirmBtn = document.getElementById('confirmDeleteBtn');
+            
+            dialogTitle.textContent = title;
+            dialogMessage.textContent = message;
+            
+            confirmBtn.onclick = function() {
+                hideConfirmDialog();
+                if (onConfirm) onConfirm();
+            };
+            
+            dialog.classList.add('show');
+        }
 
-    <!-- PWA Initialization -->
-    <script src="pwa-init.js"></script>
+        function hideConfirmDialog() {
+            const dialog = document.getElementById('confirmDialog');
+            dialog.classList.remove('show');
+        }
+
+        // Modal Functions
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            
+            // Reload data for the modal
+            if (modalId === 'employeesModal') {
+                loadEmployeesTable();
+            } else if (modalId === 'incidentsModal') {
+                loadIncidentsTable();
+            } else if (modalId === 'ppeModal') {
+                loadPPETable();
+            } else if (modalId === 'healthModal') {
+                loadHealthTable();
+            } else if (modalId === 'contractorModal') {
+                loadContractorTable();
+            } else if (modalId === 'auditModal') {
+                loadAuditTable();
+            } else if (modalId === 'riskModal') {
+                loadRiskMatrix();
+            } else if (modalId === 'standardsModal') {
+                loadStandards();
+            } else if (modalId === 'trainingModal') {
+                loadTrainingTable();
+            } else if (modalId === 'reportIncidentModal') {
+                // Set current date/time
+                const now = new Date();
+                const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+                    .toISOString()
+                    .slice(0, 16);
+                document.getElementById('incidentDateTime').value = localDateTime;
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function showSection(sectionId) {
+            // Handle section switching if needed
+            console.log('Showing section:', sectionId);
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Close modal when clicking outside
+            window.onclick = function(event) {
+                if (event.target.classList.contains('modal')) {
+                    event.target.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }
+            };
+            
+            // Escape key to close modal
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    const modals = document.querySelectorAll('.modal');
+                    modals.forEach(modal => {
+                        if (modal.style.display === 'block') {
+                            modal.style.display = 'none';
+                            document.body.style.overflow = 'auto';
+                        }
+                    });
+                }
+            });
+            
+            // Save edit on clicking outside
+            document.addEventListener('click', function(e) {
+                if (editingCell && !editingCell.contains(e.target) && !e.target.closest('.edit-input') && !e.target.closest('.edit-select')) {
+                    editingCell = null;
+                }
+            });
+            
+            // Navigation active state
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Close sidebar on mobile
+                    if (window.innerWidth <= 1024) {
+                        toggleSidebar();
+                    }
+                });
+            });
+        }
+    </script>
 </body>
 </html>

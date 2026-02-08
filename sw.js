@@ -1,5 +1,5 @@
 // Service Worker for MMS Safety PWA
-const CACHE_NAME = 'mms-safety-v1.0';
+const CACHE_NAME = 'mms-safety-v1.1'; // Updated version
 const urlsToCache = [
   './',
   './index.html',

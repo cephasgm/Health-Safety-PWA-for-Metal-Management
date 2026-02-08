@@ -6,10 +6,11 @@ A Progressive Web Application for managing occupational health and safety at Met
 **Metal Management Solutions (MMS)** - https://www.metalmanagementsolutions.com/
 
 ### Operational Locations:
-- **South Africa**: Capetown (HQ), Cosco Durban, AGL Durban
+- **South Africa**: Cape Town (HQ), Cosco Durban, AGL Durban
 - **Tanzania**: Impala Dar, Polytra Dar, Access Dar
 - **Namibia**: WBCT Bulk Shed, WBCT Quay Side Shed, Bridge Walvis Bay, Pindulo Walvis Bay
-- **Zambia**: Multiple facilities with comprehensive team
+- **Zambia**: Reload Giga Terminal, AGL Chingola Hub, Polytra Kitwe, Impala Ndola, SLS Ndola, Poseidon Zambia, Polytra Kapiri Mposhi
+
 
 ## 🚀 Features
 
@@ -31,7 +32,7 @@ A Progressive Web Application for managing occupational health and safety at Met
 
 ### As PWA:
 1. Visit the deployed application
-2. Click "Install App" or use browser install option
+2. Click "Install App" or use the browser install option
 3. App will be added to your home screen/desktop
 
 ### Local Development:
@@ -42,7 +43,7 @@ git clone https://github.com/yourusername/mms-safety-pwa.git
 # Run with any HTTP server
 python -m http.server 8000
 # or
-npx serve .
+npx serve.
 🤝 Support
 For issues or questions, contact:
 

@@ -3,26 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Health & Safety - Metal Management Solutions</title>
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="icon-192.png">
+    <meta name="description" content="MMS Safety Dashboard">
+    <meta name="theme-color" content="#1a3568">
+    <title>MMS Health & Safety Management</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <style>
         :root {
             --primary: #1a3568;
-            --primary-dark: #142954;
+            --primary-dark: #0d1c3a;
             --secondary: #2d5aa0;
             --accent: #e63946;
             --success: #27ae60;
             --warning: #f39c12;
             --error: #e74c3c;
-            --background: #f5f7fa;
-            --surface: #ffffff;
-            --text: #2c3e50;
-            --text-light: #7f8c8d;
-            --border: #dfe6e9;
+            --background: #0d1c3a;
+            --surface: rgba(255, 255, 255, 0.95);
+            --text: #ffffff;
+            --text-light: #b8c2cc;
+            --border: rgba(255, 255, 255, 0.1);
         }
 
         * {
@@ -33,26 +35,33 @@
 
         body {
             font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif;
-            background: var(--background);
+            background: linear-gradient(rgba(13, 28, 58, 0.9), rgba(13, 28, 58, 0.9)), 
+                        url('https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
             color: var(--text);
             line-height: 1.6;
+            min-height: 100vh;
         }
 
         .dashboard {
             display: grid;
             grid-template-columns: 280px 1fr;
             min-height: 100vh;
+            backdrop-filter: blur(10px);
         }
 
         .sidebar {
-            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+            background: rgba(26, 53, 104, 0.95);
             padding: 2rem 1rem;
             position: fixed;
             width: 280px;
             height: 100vh;
             overflow-y: auto;
             z-index: 100;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
         }
 
         .logo {
@@ -67,12 +76,12 @@
         .logo-icon {
             width: 48px;
             height: 48px;
-            background: white;
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            background: white;
             padding: 4px;
         }
 
@@ -156,7 +165,8 @@
             background: var(--surface);
             padding: 1.5rem;
             border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            border: 1px solid var(--border);
         }
 
         .header h1 {
@@ -165,7 +175,7 @@
             color: var(--primary);
         }
 
-        /* Statistics Cards - MMS Style */
+        /* Statistics Cards */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -174,7 +184,7 @@
         }
 
         .stat-card {
-            background: linear-gradient(135deg, var(--surface) 0%, #f8fafc 100%);
+            background: var(--surface);
             padding: 1.5rem;
             border-radius: 12px;
             border: 1px solid var(--border);
@@ -182,12 +192,12 @@
             overflow: hidden;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
         .stat-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 8px 25px rgba(26, 53, 104, 0.1);
+            box-shadow: 0 8px 25px rgba(26, 53, 104, 0.2);
             border-color: var(--primary);
         }
 
@@ -206,7 +216,6 @@
             font-weight: 800;
             color: var(--primary);
             margin-bottom: 0.5rem;
-            position: relative;
         }
 
         .stat-label {
@@ -221,19 +230,6 @@
             font-size: 0.85rem;
         }
 
-        .stat-details {
-            margin-top: 1rem;
-            font-size: 0.85rem;
-            color: var(--text-light);
-            display: none;
-            border-top: 1px solid var(--border);
-            padding-top: 1rem;
-        }
-
-        .stat-card:hover .stat-details {
-            display: block;
-        }
-
         /* Chart Container */
         .chart-container {
             background: var(--surface);
@@ -244,7 +240,7 @@
             height: 400px;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
 
         .chart-header {
@@ -268,122 +264,6 @@
             margin-top: 0.25rem;
         }
 
-        .chart-controls {
-            display: flex;
-            gap: 0.75rem;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .chart-type-selector {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        .chart-type-btn {
-            padding: 0.5rem 1rem;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            background: var(--background);
-            color: var(--text);
-            cursor: pointer;
-            font-size: 0.875rem;
-            transition: all 0.2s;
-        }
-
-        .chart-type-btn:hover {
-            border-color: var(--primary);
-            background: var(--surface);
-        }
-
-        .chart-type-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-
-        .custom-calendar {
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-        }
-
-        .date-input {
-            padding: 0.5rem;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            background: var(--surface);
-            font-family: inherit;
-            font-size: 0.875rem;
-        }
-
-        .date-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(26, 53, 104, 0.1);
-        }
-
-        /* Risk Assessment Matrix - MMS Colors */
-        .risk-matrix {
-            background: var(--surface);
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        .matrix-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        .matrix-cell {
-            padding: 1.5rem 1rem;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: 600;
-            font-size: 0.875rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            border: 2px solid transparent;
-        }
-
-        .matrix-cell:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        .risk-low { 
-            background: linear-gradient(135deg, #d4edda, #c3e6cb);
-            color: #155724; 
-            border-color: #b1dfbb;
-        }
-        .risk-medium { 
-            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
-            color: #856404; 
-            border-color: #ffec99;
-        }
-        .risk-high { 
-            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
-            color: #721c24; 
-            border-color: #f1b0b7;
-        }
-        .risk-very-high { 
-            background: linear-gradient(135deg, #f5c6cb, #f1b0b7);
-            color: #721c24; 
-            border-color: #ec858f;
-        }
-        .risk-extreme { 
-            background: linear-gradient(135deg, #e63946, #d00000);
-            color: white; 
-            border-color: #c1121f;
-        }
-
         /* Enhanced Tables */
         .data-table {
             width: 100%;
@@ -399,7 +279,7 @@
         }
 
         .data-table th {
-            background: #f8f9fa;
+            background: rgba(26, 53, 104, 0.1);
             font-weight: 600;
             color: var(--primary);
             position: sticky;
@@ -407,7 +287,7 @@
         }
 
         .data-table tbody tr:hover {
-            background: #f8f9fa;
+            background: rgba(26, 53, 104, 0.05);
         }
 
         .data-table td.editable {
@@ -417,7 +297,7 @@
         }
 
         .data-table td.editable:hover {
-            background: rgba(26, 53, 104, 0.05);
+            background: rgba(26, 53, 104, 0.1);
         }
 
         .data-table td.editing {
@@ -439,10 +319,6 @@
             outline: none;
         }
 
-        .edit-input:focus {
-            box-shadow: 0 0 0 3px rgba(26, 53, 104, 0.1);
-        }
-
         .edit-select {
             width: 100%;
             padding: 0.5rem;
@@ -455,7 +331,7 @@
             outline: none;
         }
 
-        /* Buttons - MMS Style */
+        /* Buttons */
         .btn {
             padding: 0.625rem 1.25rem;
             border-radius: 8px;
@@ -482,41 +358,7 @@
         .btn-primary:hover {
             background: linear-gradient(135deg, var(--primary-dark), var(--primary));
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(26, 53, 104, 0.2);
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--text);
-        }
-
-        .btn-outline:hover {
-            background: var(--background);
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: linear-gradient(135deg, #c0392b, #a93226);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.2);
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #27ae60, #219653);
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: linear-gradient(135deg, #219653, #1e874b);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.2);
+            box-shadow: 0 4px 12px rgba(26, 53, 104, 0.3);
         }
 
         /* Toast Notifications */
@@ -528,7 +370,7 @@
             border: 1px solid var(--border);
             border-radius: 8px;
             padding: 1rem;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
             display: flex;
             align-items: center;
             gap: 0.75rem;
@@ -544,113 +386,65 @@
             opacity: 1;
         }
 
-        .toast-success {
-            border-left: 4px solid var(--success);
-        }
-
-        .toast-error {
-            border-left: 4px solid var(--error);
-        }
-
-        .toast-warning {
-            border-left: 4px solid var(--warning);
-        }
-
-        .toast-icon {
-            font-size: 1.25rem;
-        }
-
-        .toast-success .toast-icon { color: var(--success); }
-        .toast-error .toast-icon { color: var(--error); }
-        .toast-warning .toast-icon { color: var(--warning); }
-
-        .toast-content {
-            flex: 1;
-        }
-
-        .toast-title {
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-
-        .toast-message {
-            font-size: 0.875rem;
-            color: var(--text-light);
-        }
-
-        .close-toast {
-            background: none;
-            border: none;
-            color: var(--text-light);
-            cursor: pointer;
-            font-size: 1.25rem;
-            padding: 0;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .close-toast:hover {
-            color: var(--text);
-        }
-
-        /* Confirm Dialog */
-        .confirm-dialog {
+        /* Modal Styles */
+        .modal {
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            overflow-y: auto;
         }
 
-        .confirm-dialog.show {
-            display: flex;
+        .modal-content {
+            background: var(--surface);
+            margin: 2% auto;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 900px;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
         }
 
-        .confirm-content {
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+            color: var(--text-light);
+            border-top: 1px solid var(--border);
+            font-size: 0.9rem;
             background: var(--surface);
             border-radius: 12px;
-            padding: 2rem;
-            max-width: 400px;
-            width: 90%;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
         }
 
-        .confirm-icon {
-            font-size: 3rem;
-            text-align: center;
-            margin-bottom: 1rem;
-            color: var(--error);
-        }
-
-        .confirm-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            text-align: center;
-            color: var(--primary);
-        }
-
-        .confirm-message {
-            color: var(--text-light);
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .confirm-buttons {
+        /* Country Filter */
+        .country-filter {
             display: flex;
-            gap: 1rem;
+            gap: 0.5rem;
+            margin-top: 1rem;
         }
 
-        .confirm-buttons .btn {
-            flex: 1;
+        .country-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--surface);
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .country-btn:hover, .country-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
         }
 
         /* Module Grid */
@@ -671,376 +465,28 @@
             text-decoration: none;
             color: inherit;
             display: block;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
         .module-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 8px 25px rgba(26, 53, 104, 0.1);
+            box-shadow: 0 8px 25px rgba(26, 53, 104, 0.2);
             border-color: var(--primary);
         }
 
-        .module-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.75rem;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-        }
-
-        .module-card h3 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--primary);
-        }
-
-        .module-card p {
-            color: var(--text-light);
-            font-size: 0.95rem;
-        }
-
-        /* Chart Canvas Container */
-        .chart-canvas-container {
-            flex: 1;
-            min-height: 0;
-            position: relative;
-            background: var(--background);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            overflow-y: auto;
-        }
-
-        .modal-content {
-            background: var(--surface);
-            margin: 2% auto;
-            padding: 2rem;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 900px;
-            position: relative;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .close-modal {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--text-light);
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: var(--primary);
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            background: var(--background);
-            font-family: inherit;
-            font-size: 0.95rem;
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        .form-row {
+        /* Settings Modal */
+        .settings-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
             margin-top: 2rem;
         }
 
-        .action-buttons .btn {
-            flex: 1;
-        }
-
-        .success-message {
-            background: #d4edda;
-            color: #155724;
-            padding: 1rem;
-            border-radius: 6px;
-            margin-bottom: 1rem;
-            display: none;
-            border-left: 4px solid #27ae60;
-        }
-
-        .error-message {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 1rem;
-            border-radius: 6px;
-            margin-bottom: 1rem;
-            display: none;
-            border-left: 4px solid #e74c3c;
-        }
-
-        .modal-header {
-            margin-bottom: 2rem;
-            border-bottom: 2px solid var(--border);
-            padding-bottom: 1rem;
-        }
-
-        .modal-header h2 {
-            margin-right: 2rem;
-            color: var(--primary);
-        }
-
-        .file-upload-area {
-            border: 2px dashed var(--border);
-            border-radius: 8px;
-            padding: 2rem;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-bottom: 1rem;
-        }
-
-        .file-upload-area:hover {
-            border-color: var(--primary);
-            background: var(--background);
-        }
-
-        .file-list {
-            margin-top: 1rem;
-        }
-
-        .file-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            margin-bottom: 0.5rem;
-            background: var(--background);
-        }
-
-        /* Standards Cards Grid */
-        .standards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .standard-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
+        .setting-card {
+            background: rgba(26, 53, 104, 0.1);
             padding: 1.5rem;
-            transition: all 0.3s ease;
-            position: relative;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        .standard-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(26, 53, 104, 0.1);
-            border-color: var(--primary);
-        }
-
-        .standard-badge {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        .badge-international {
-            background: #dbeafe;
-            color: #1e40af;
-            border: 1px solid #93c5fd;
-        }
-
-        .badge-national {
-            background: #dcfce7;
-            color: #166534;
-            border: 1px solid #86efac;
-        }
-
-        .standard-card h3 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--primary);
-            padding-right: 100px;
-        }
-
-        .standard-code {
-            font-size: 0.9rem;
-            color: var(--text-light);
-            margin-bottom: 0.5rem;
-            font-family: monospace;
-        }
-
-        .standard-industry {
-            display: inline-block;
-            padding: 0.25rem 0.5rem;
-            background: var(--background);
-            border-radius: 4px;
-            font-size: 0.75rem;
-            margin-bottom: 1rem;
-            color: var(--text);
-        }
-
-        .standard-status {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            margin-bottom: 1rem;
-        }
-
-        .status-compliant {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .status-noncompliant {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .status-pending {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .standard-actions {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }
-
-        /* Tab Container */
-        .tab-container {
-            margin-bottom: 2rem;
-        }
-
-        .tab-buttons {
-            display: flex;
-            border-bottom: 2px solid var(--border);
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-            overflow-x: auto;
-        }
-
-        .tab-button {
-            padding: 0.75rem 1.5rem;
-            background: none;
-            border: none;
-            border-bottom: 3px solid transparent;
-            cursor: pointer;
-            font-weight: 500;
-            color: var(--text-light);
-            white-space: nowrap;
-        }
-
-        .tab-button.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Country Badges */
-        .country-badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-right: 0.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .country-za {
-            background: #ffeaa7;
-            color: #8c7e0d;
-            border: 1px solid #fdcb6e;
-        }
-
-        .country-tz {
-            background: #a29bfe;
-            color: #2d1b8c;
-            border: 1px solid #6c5ce7;
-        }
-
-        .country-na {
-            background: #81ecec;
-            color: #006969;
-            border: 1px solid #00cec9;
-        }
-
-        .country-zm {
-            background: #fd79a8;
-            color: #8c0343;
-            border: 1px solid #e84393;
-        }
-
-        /* Footer */
-        .footer {
-            text-align: center;
-            padding: 2rem;
-            margin-top: 3rem;
-            color: var(--text-light);
-            border-top: 1px solid var(--border);
-            font-size: 0.9rem;
-            background: var(--surface);
-            border-radius: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
         }
 
         /* Responsive Design */
@@ -1055,15 +501,6 @@
                 margin-left: 0;
                 grid-column: 1;
             }
-            .matrix-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-            .standards-grid {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            }
         }
 
         @media (max-width: 768px) {
@@ -1076,24 +513,7 @@
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
-            .matrix-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .chart-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .chart-controls {
-                width: 100%;
-                flex-wrap: wrap;
-            }
-            .chart-container {
-                height: 400px;
-            }
             .module-grid {
-                grid-template-columns: 1fr;
-            }
-            .standards-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -1102,61 +522,41 @@
             .stats-grid {
                 grid-template-columns: 1fr;
             }
-            .matrix-grid {
-                grid-template-columns: 1fr;
-            }
-            .chart-container {
-                height: 350px;
-            }
-            .action-buttons {
-                flex-direction: column;
-            }
-            .action-buttons .btn {
-                width: 100%;
-            }
         }
     </style>
 </head>
 <body>
     <div class="dashboard">
         <nav class="sidebar">
-            <a href="#" class="logo">
+            <div class="logo">
                 <div class="logo-icon">
                     <!-- MMS Logo -->
-                    <div style="color: var(--primary); font-weight: bold; font-size: 1.2rem;">MMS</div>
+                    <img src="icon-192.png" alt="MMS Logo">
                 </div>
                 <div class="logo-text">
                     <h2>Metal Management Solutions</h2>
                     <p>Health & Safety System</p>
                 </div>
-            </a>
+            </div>
 
             <div class="nav-section">
                 <div class="nav-title">Navigation</div>
-                <a href="#" class="nav-item active">
+                <button class="nav-item active" onclick="showDashboard()">
                     <span class="nav-icon">📊</span>
-                    Safety Dashboard
-                </a>
-                <a href="#" class="nav-item">
+                    Dashboard
+                </button>
+                <button class="nav-item" onclick="openModal('employeeModal')">
                     <span class="nav-icon">👥</span>
                     Employee Management
-                </a>
-                <a href="#" class="nav-item">
-                    <span class="nav-icon">📋</span>
-                    Compliance
-                </a>
+                </button>
+                <button class="nav-item" onclick="openModal('incidentsModal')">
+                    <span class="nav-icon">🚨</span>
+                    Incidents
+                </button>
             </div>
 
             <div class="nav-section">
                 <div class="nav-title">Safety Management</div>
-                <button class="nav-item" onclick="openModal('incidentsModal')">
-                    <span class="nav-icon">🚨</span>
-                    Incident Management
-                </button>
-                <button class="nav-item" onclick="openModal('riskModal')">
-                    <span class="nav-icon">📊</span>
-                    Risk Assessment
-                </button>
                 <button class="nav-item" onclick="openModal('trainingModal')">
                     <span class="nav-icon">🎓</span>
                     Safety Training
@@ -1165,23 +565,39 @@
                     <span class="nav-icon">🥽</span>
                     PPE Management
                 </button>
+                <button class="nav-item" onclick="openModal('contractorModal')">
+                    <span class="nav-icon">👷</span>
+                    Contractor Safety
+                </button>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Compliance</div>
+                <button class="nav-item" onclick="openModal('auditModal')">
+                    <span class="nav-icon">🔍</span>
+                    Audit & Inspection
+                </button>
+                <button class="nav-item" onclick="openModal('standardsModal')">
+                    <span class="nav-icon">📋</span>
+                    Standards & Compliance
+                </button>
             </div>
 
             <div class="nav-section">
                 <div class="nav-title">Regional Operations</div>
-                <button class="nav-item" onclick="filterByCountry('ZA')">
+                <button class="nav-item" onclick="filterData('South Africa')">
                     <span class="nav-icon">🇿🇦</span>
                     South Africa
                 </button>
-                <button class="nav-item" onclick="filterByCountry('TZ')">
+                <button class="nav-item" onclick="filterData('Tanzania')">
                     <span class="nav-icon">🇹🇿</span>
                     Tanzania
                 </button>
-                <button class="nav-item" onclick="filterByCountry('NA')">
+                <button class="nav-item" onclick="filterData('Namibia')">
                     <span class="nav-icon">🇳🇦</span>
                     Namibia
                 </button>
-                <button class="nav-item" onclick="filterByCountry('ZM')">
+                <button class="nav-item" onclick="filterData('Zambia')">
                     <span class="nav-icon">🇿🇲</span>
                     Zambia
                 </button>
@@ -1189,33 +605,30 @@
 
             <div class="nav-section">
                 <div class="nav-title">System</div>
-                <button class="nav-item" onclick="exportData()">
+                <button class="nav-item" onclick="exportPDF()">
                     <span class="nav-icon">📤</span>
-                    Export Data
+                    Export PDF
                 </button>
-                <button class="nav-item" onclick="showBackup()">
-                    <span class="nav-icon">💾</span>
-                    Backup
-                </button>
-                <button class="nav-item" onclick="showSettings()">
+                <button class="nav-item" onclick="openModal('settingsModal')">
                     <span class="nav-icon">⚙️</span>
                     Settings
                 </button>
             </div>
         </nav>
 
-        <main class="main-content">
+        <main class="main-content" id="mainContent">
             <div class="header">
                 <div>
                     <h1>MMS Health & Safety Management</h1>
                     <div style="color: var(--text-light); margin-top: 0.5rem;">
                         Comprehensive safety monitoring across 16 facilities in 4 countries
                     </div>
-                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-                        <span class="country-badge country-za">South Africa</span>
-                        <span class="country-badge country-tz">Tanzania</span>
-                        <span class="country-badge country-na">Namibia</span>
-                        <span class="country-badge country-zm">Zambia</span>
+                    <div class="country-filter" id="countryFilter">
+                        <button class="country-btn" onclick="filterData('All')">All Countries</button>
+                        <button class="country-btn" onclick="filterData('South Africa')">South Africa</button>
+                        <button class="country-btn" onclick="filterData('Tanzania')">Tanzania</button>
+                        <button class="country-btn" onclick="filterData('Namibia')">Namibia</button>
+                        <button class="country-btn" onclick="filterData('Zambia')">Zambia</button>
                     </div>
                 </div>
                 <div>
@@ -1227,79 +640,47 @@
 
             <!-- Statistics Cards -->
             <div class="stats-grid">
-                <div class="stat-card" onclick="openModal('incidentsModal')">
+                <div class="stat-card" onclick="openModal('employeeModal')">
                     <div class="stat-number" id="totalEmployees">34</div>
                     <div class="stat-label">Total Employees</div>
                     <div class="stat-subtitle">Across 16 locations in 4 countries</div>
-                    <div class="stat-details">
-                        <div>🇿🇦 South Africa: 2</div>
-                        <div>🇹🇿 Tanzania: 2</div>
-                        <div>🇳🇦 Namibia: 3</div>
-                        <div>🇿🇲 Zambia: 27</div>
-                    </div>
                 </div>
                 <div class="stat-card" onclick="openModal('incidentsModal')">
                     <div class="stat-number" id="lostTimeInjuries">0</div>
                     <div class="stat-label">Lost Time Injuries</div>
                     <div class="stat-subtitle">365 days incident-free</div>
-                    <div class="stat-details">
-                        Last incident: None reported
-                        <br>Target: Zero LTI for 2024
-                    </div>
                 </div>
                 <div class="stat-card" onclick="openModal('trainingModal')">
                     <div class="stat-number" id="safetyTrainings">156</div>
                     <div class="stat-label">Safety Trainings</div>
                     <div class="stat-subtitle">Completed this year</div>
-                    <div class="stat-details">
-                        <div>🟢 Completed: 132</div>
-                        <div>🟡 Pending: 24</div>
-                        <div>📈 Compliance: 85%</div>
-                    </div>
                 </div>
                 <div class="stat-card" onclick="openModal('standardsModal')">
                     <div class="stat-number" id="complianceRate">100%</div>
                     <div class="stat-label">Compliance Rate</div>
                     <div class="stat-subtitle">Based on 45 standards</div>
-                    <div class="stat-details">
-                        <div>✅ International: 12/12</div>
-                        <div>✅ National: 33/33</div>
-                        <div>📅 Next audit: 2024-04-15</div>
-                    </div>
                 </div>
             </div>
 
-            <!-- Incident Trends Chart -->
+            <!-- Chart -->
             <div class="chart-container">
                 <div class="chart-header">
                     <div>
                         <div class="chart-title">Safety Performance Trends</div>
                         <div class="chart-subtitle">Incident monitoring across MMS facilities</div>
                     </div>
-                    <div class="chart-controls">
-                        <div class="chart-type-selector">
-                            <button class="chart-type-btn active" onclick="changeChartType('line')">📈 Line</button>
-                            <button class="chart-type-btn" onclick="changeChartType('bar')">📊 Bar</button>
-                            <button class="chart-type-btn" onclick="changeChartType('pie')">🥧 Pie</button>
-                        </div>
-                        <div class="custom-calendar">
-                            <input type="date" id="startDate" class="date-input" onchange="updateChartWithCustomRange()">
-                            <span>to</span>
-                            <input type="date" id="endDate" class="date-input" onchange="updateChartWithCustomRange()">
-                        </div>
-                    </div>
                 </div>
-                <div class="chart-canvas-container">
-                    <canvas id="incidentTrendChart"></canvas>
+                <div style="flex: 1; position: relative;">
+                    <canvas id="safetyChart"></canvas>
                 </div>
             </div>
 
-            <!-- Incident Management System -->
-            <div class="incident-management">
+            <!-- Recent Incidents -->
+            <div class="chart-container">
                 <div class="chart-header">
                     <div>
-                        <div class="chart-title">Recent Safety Incidents</div>
-                        <div class="chart-subtitle">Click on any cell to edit, hover for actions</div>
+                        <div class="chart-title">Recent Incidents</div>
+                        <div class="chart-subtitle">Last 30 days - Click to edit</div>
                     </div>
                     <div>
                         <button class="btn btn-primary" onclick="openModal('reportIncidentModal')">
@@ -1321,65 +702,49 @@
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="allIncidentsTableBody">
-                            <!-- Incidents will be loaded here -->
+                        <tbody id="recentIncidentsTable">
+                            <!-- Will be populated by JavaScript -->
                         </tbody>
                     </table>
-                </div>
-            </div>
-
-            <!-- Risk Assessment Matrix -->
-            <div class="risk-matrix">
-                <div class="chart-header">
-                    <div>
-                        <div class="chart-title">Facility Risk Assessment Matrix</div>
-                        <div class="chart-subtitle">Risk levels across MMS locations</div>
-                    </div>
-                    <div>
-                        <button class="btn btn-success" onclick="saveRiskMatrix()">💾 Save Matrix</button>
-                    </div>
-                </div>
-                <div class="matrix-grid" id="riskMatrix">
-                    <!-- Matrix cells will be populated by JavaScript -->
                 </div>
             </div>
 
             <!-- Safety Management Modules -->
             <div class="module-grid">
                 <div class="module-card" onclick="openModal('incidentsModal')">
-                    <div class="module-icon">🚨</div>
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🚨</div>
                     <h3>Incident Management</h3>
-                    <p>Report, track, and investigate workplace incidents with full documentation across all MMS facilities</p>
+                    <p>Report, track, and investigate workplace incidents</p>
                 </div>
 
                 <div class="module-card" onclick="openModal('ppeModal')">
-                    <div class="module-icon">🥽</div>
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🥽</div>
                     <h3>PPE Management</h3>
-                    <p>Track personal protective equipment issuance, maintenance, and compliance for all employees</p>
+                    <p>Track personal protective equipment</p>
                 </div>
 
                 <div class="module-card" onclick="openModal('employeeModal')">
-                    <div class="module-icon">👥</div>
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">👥</div>
                     <h3>Employee Safety</h3>
-                    <p>Manage employee safety records, training, and certifications across 4 countries</p>
+                    <p>Manage employee safety records and training</p>
                 </div>
 
                 <div class="module-card" onclick="openModal('contractorModal')">
-                    <div class="module-icon">👷</div>
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">👷</div>
                     <h3>Contractor Safety</h3>
-                    <p>Manage contractor safety compliance, permits, and site-specific inductions</p>
+                    <p>Manage contractor safety compliance</p>
                 </div>
 
                 <div class="module-card" onclick="openModal('auditModal')">
-                    <div class="module-icon">🔍</div>
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🔍</div>
                     <h3>Audit & Inspection</h3>
-                    <p>Schedule and conduct safety audits, inspections, and compliance verifications</p>
+                    <p>Schedule and conduct safety audits</p>
                 </div>
 
                 <div class="module-card" onclick="openModal('standardsModal')">
-                    <div class="module-icon">📋</div>
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">📋</div>
                     <h3>Standards Compliance</h3>
-                    <p>Manage international and national safety standards compliance for MMS</p>
+                    <p>Manage international and national standards</p>
                 </div>
             </div>
 
@@ -1388,10 +753,10 @@
                     Metal Management Solutions
                 </div>
                 <div style="margin-bottom: 1rem; color: var(--text-light);">
-                    Health & Safety Management System | Version 2.4
+                    Health & Safety Management System
                 </div>
                 <div style="font-size: 0.8rem; color: var(--text-light);">
-                    Copyright © 2024 Metal Management Solutions. All rights reserved.
+                    Copyright © 2026 Metal Management Solutions. All rights reserved.
                     <br>Operating in South Africa, Tanzania, Namibia, and Zambia
                 </div>
             </div>
@@ -1400,25 +765,12 @@
 
     <!-- Toast Notification -->
     <div class="toast" id="toast">
-        <div class="toast-icon"></div>
+        <div class="toast-icon" id="toastIcon"></div>
         <div class="toast-content">
-            <div class="toast-title"></div>
-            <div class="toast-message"></div>
+            <div class="toast-title" id="toastTitle"></div>
+            <div class="toast-message" id="toastMessage"></div>
         </div>
         <button class="close-toast" onclick="hideToast()">×</button>
-    </div>
-
-    <!-- Confirm Dialog -->
-    <div class="confirm-dialog" id="confirmDialog">
-        <div class="confirm-content">
-            <div class="confirm-icon">⚠️</div>
-            <div class="confirm-title" id="confirmTitle">Confirm Delete</div>
-            <div class="confirm-message" id="confirmMessage">Are you sure you want to delete this item? This action cannot be undone.</div>
-            <div class="confirm-buttons">
-                <button class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
-                <button class="btn btn-outline" onclick="hideConfirmDialog()">Cancel</button>
-            </div>
-        </div>
     </div>
 
     <!-- Report Incident Modal -->
@@ -1429,25 +781,23 @@
                 <h2>Report Safety Incident</h2>
             </div>
             
-            <div class="success-message" id="reportSuccess">Incident reported successfully!</div>
-            <div class="error-message" id="reportError">Please fill all required fields.</div>
+            <div class="success-message" id="reportSuccess" style="display: none;">Incident reported successfully!</div>
+            <div class="error-message" id="reportError" style="display: none;">Please fill all required fields.</div>
             
-            <div class="form-row">
-                <div class="form-group">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                <div>
                     <label>Incident Type *</label>
-                    <select id="incidentType" required>
+                    <select id="incidentType" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text);">
                         <option value="">Select type</option>
                         <option value="Near Miss">Near Miss</option>
                         <option value="First Aid">First Aid</option>
                         <option value="Medical Treatment">Medical Treatment</option>
                         <option value="Lost Time Injury">Lost Time Injury</option>
-                        <option value="Property Damage">Property Damage</option>
-                        <option value="Environmental Incident">Environmental Incident</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label>Severity Level *</label>
-                    <select id="incidentSeverity" required>
+                <div>
+                    <label>Severity *</label>
+                    <select id="incidentSeverity" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text);">
                         <option value="">Select severity</option>
                         <option value="Minor">Minor</option>
                         <option value="Moderate">Moderate</option>
@@ -1457,10 +807,10 @@
                 </div>
             </div>
             
-            <div class="form-row">
-                <div class="form-group">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                <div>
                     <label>Country *</label>
-                    <select id="incidentCountry" required onchange="updateLocations()">
+                    <select id="incidentCountry" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text);">
                         <option value="">Select country</option>
                         <option value="South Africa">South Africa</option>
                         <option value="Tanzania">Tanzania</option>
@@ -1468,46 +818,27 @@
                         <option value="Zambia">Zambia</option>
                     </select>
                 </div>
-                <div class="form-group">
+                <div>
                     <label>Location *</label>
-                    <select id="incidentLocation" required>
-                        <option value="">Select location</option>
-                    </select>
+                    <input type="text" id="incidentLocation" placeholder="Enter location" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text);">
                 </div>
             </div>
             
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Date & Time *</label>
-                    <input type="datetime-local" id="incidentDateTime" required>
-                </div>
-                <div class="form-group">
-                    <label>Reported By *</label>
-                    <select id="reportedBy" required>
-                        <option value="">Select employee</option>
-                        <!-- Employees will be populated by JavaScript -->
-                    </select>
-                </div>
+            <div style="margin-bottom: 1.5rem;">
+                <label>Reported By *</label>
+                <select id="reportedBy" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text);">
+                    <option value="">Select employee</option>
+                </select>
             </div>
             
-            <div class="form-group">
+            <div style="margin-bottom: 1.5rem;">
                 <label>Description *</label>
-                <textarea id="incidentDescription" rows="4" placeholder="Provide detailed description" required></textarea>
+                <textarea id="incidentDescription" rows="4" placeholder="Provide detailed description" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text);"></textarea>
             </div>
             
-            <div class="form-group">
-                <label>Immediate Actions Taken</label>
-                <textarea id="immediateActions" rows="3" placeholder="Describe immediate response actions"></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label>Proposed Recommendations/Comments</label>
-                <textarea id="recommendations" rows="3" placeholder="Enter recommendations or comments"></textarea>
-            </div>
-            
-            <div class="action-buttons">
-                <button class="btn btn-primary" onclick="submitIncidentReport()">Submit Report</button>
-                <button class="btn btn-outline" onclick="closeModal('reportIncidentModal')">Cancel</button>
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button class="btn btn-primary" onclick="submitIncident()" style="flex: 1;">Submit Report</button>
+                <button class="btn" onclick="closeModal('reportIncidentModal')" style="flex: 1; background: var(--border);">Cancel</button>
             </div>
         </div>
     </div>
@@ -1518,128 +849,31 @@
             <button class="close-modal" onclick="closeModal('employeeModal')">×</button>
             <div class="modal-header">
                 <h2>MMS Employee Management</h2>
-                <p>Click on any cell to edit employee information</p>
             </div>
             
-            <div class="tab-container">
-                <div class="tab-buttons">
-                    <button class="tab-button active" onclick="switchEmployeeTab('allEmployees')">All Employees</button>
-                    <button class="tab-button" onclick="switchEmployeeTab('byCountry')">By Country</button>
-                    <button class="tab-button" onclick="switchEmployeeTab('addEmployee')">Add Employee</button>
-                </div>
-                
-                <div class="tab-content active" id="allEmployeesTab">
-                    <div style="overflow-x: auto; margin-top: 1rem;">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Employee ID</th>
-                                    <th>Name</th>
-                                    <th>Position</th>
-                                    <th>Country</th>
-                                    <th>Location</th>
-                                    <th>Safety Training</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="employeeTableBody">
-                                <!-- Employees will be loaded here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <div class="tab-content" id="byCountryTab">
-                    <div class="form-group">
-                        <label>Filter by Country</label>
-                        <select id="countryFilter" onchange="filterEmployeesByCountry()">
-                            <option value="">All Countries</option>
-                            <option value="South Africa">South Africa</option>
-                            <option value="Tanzania">Tanzania</option>
-                            <option value="Namibia">Namibia</option>
-                            <option value="Zambia">Zambia</option>
-                        </select>
-                    </div>
-                    <div style="overflow-x: auto; margin-top: 1rem;">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Employee ID</th>
-                                    <th>Name</th>
-                                    <th>Position</th>
-                                    <th>Location</th>
-                                    <th>Safety Training</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="filteredEmployeeTable">
-                                <!-- Filtered employees will be loaded here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <div class="tab-content" id="addEmployeeTab">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Employee Name *</label>
-                            <input type="text" id="newEmployeeName" placeholder="Enter full name" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Employee ID *</label>
-                            <input type="text" id="newEmployeeId" placeholder="Enter employee ID" required>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Country *</label>
-                            <select id="newEmployeeCountry" required>
-                                <option value="">Select country</option>
-                                <option value="South Africa">South Africa</option>
-                                <option value="Tanzania">Tanzania</option>
-                                <option value="Namibia">Namibia</option>
-                                <option value="Zambia">Zambia</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Location *</label>
-                            <select id="newEmployeeLocation" required>
-                                <option value="">Select location</option>
-                                <!-- Locations will be populated based on country -->
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Position</label>
-                            <input type="text" id="newEmployeePosition" placeholder="Enter position">
-                        </div>
-                        <div class="form-group">
-                            <label>Department</label>
-                            <select id="newEmployeeDepartment">
-                                <option value="">Select department</option>
-                                <option value="Operations">Operations</option>
-                                <option value="Inventory Control">Inventory Control</option>
-                                <option value="Safety">Safety</option>
-                                <option value="Management">Management</option>
-                                <option value="Logistics">Logistics</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="action-buttons">
-                        <button class="btn btn-success" onclick="addNewEmployee()">Add Employee</button>
-                        <button class="btn btn-outline" onclick="switchEmployeeTab('allEmployees')">Cancel</button>
-                    </div>
-                </div>
+            <div style="margin-bottom: 1.5rem;">
+                <button class="btn btn-primary" onclick="addEmployee()">+ Add Employee</button>
+                <button class="btn" onclick="exportEmployeePDF()" style="margin-left: 1rem;">📄 Export PDF</button>
             </div>
             
-            <div class="action-buttons" style="margin-top: 2rem;">
-                <button class="btn btn-outline" onclick="closeModal('employeeModal')">Close</button>
-                <button class="btn btn-primary" onclick="exportEmployeeData()">Export Data</button>
+            <div style="overflow-x: auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Position</th>
+                            <th>Country</th>
+                            <th>Location</th>
+                            <th>Safety Training</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="employeeTable">
+                        <!-- Will be populated by JavaScript -->
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -1650,10 +884,14 @@
             <button class="close-modal" onclick="closeModal('incidentsModal')">×</button>
             <div class="modal-header">
                 <h2>Incident Management System</h2>
-                <p>All MMS Incidents - Click on any cell to edit, hover for actions</p>
             </div>
             
-            <div style="overflow-x: auto; margin-top: 1rem;">
+            <div style="margin-bottom: 1.5rem;">
+                <button class="btn btn-primary" onclick="openModal('reportIncidentModal')">+ Report Incident</button>
+                <button class="btn" onclick="exportIncidentsPDF()" style="margin-left: 1rem;">📄 Export PDF</button>
+            </div>
+            
+            <div style="overflow-x: auto;">
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -1669,29 +907,28 @@
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="modalIncidentsTableBody">
-                        <!-- Incidents will be loaded here -->
+                    <tbody id="incidentsTable">
+                        <!-- Will be populated by JavaScript -->
                     </tbody>
                 </table>
-            </div>
-            
-            <div class="action-buttons" style="margin-top: 2rem;">
-                <button class="btn btn-outline" onclick="closeModal('incidentsModal')">Close</button>
-                <button class="btn btn-primary" onclick="openModal('reportIncidentModal')">+ Report New Incident</button>
             </div>
         </div>
     </div>
 
-    <!-- Training Management Modal -->
+    <!-- Safety Training Modal -->
     <div id="trainingModal" class="modal">
         <div class="modal-content">
             <button class="close-modal" onclick="closeModal('trainingModal')">×</button>
             <div class="modal-header">
                 <h2>Safety Training Management</h2>
-                <p>Click on any cell to edit training records</p>
             </div>
             
-            <div style="overflow-x: auto; margin-top: 1rem;">
+            <div style="margin-bottom: 1.5rem;">
+                <button class="btn btn-primary" onclick="addTraining()">+ Add Training</button>
+                <button class="btn" onclick="exportTrainingPDF()" style="margin-left: 1rem;">📄 Export PDF</button>
+            </div>
+            
+            <div style="overflow-x: auto;">
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -1702,18 +939,14 @@
                             <th>Date</th>
                             <th>Status</th>
                             <th>Certificate</th>
+                            <th>Attachments</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="trainingTableBody">
-                        <!-- Training records will be loaded here -->
+                    <tbody id="trainingTable">
+                        <!-- Will be populated by JavaScript -->
                     </tbody>
                 </table>
-            </div>
-            
-            <div class="action-buttons" style="margin-top: 2rem;">
-                <button class="btn btn-outline" onclick="addTrainingRecord()">+ Add Training</button>
-                <button class="btn btn-outline" onclick="closeModal('trainingModal')">Close</button>
             </div>
         </div>
     </div>
@@ -1724,10 +957,14 @@
             <button class="close-modal" onclick="closeModal('ppeModal')">×</button>
             <div class="modal-header">
                 <h2>PPE Management System</h2>
-                <p>Personal Protective Equipment Management</p>
             </div>
             
-            <div style="overflow-x: auto; margin-top: 1rem;">
+            <div style="margin-bottom: 1.5rem;">
+                <button class="btn btn-primary" onclick="addPPE()">+ Add PPE Item</button>
+                <button class="btn" onclick="exportPPEPDF()" style="margin-left: 1rem;">📄 Export PDF</button>
+            </div>
+            
+            <div style="overflow-x: auto;">
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -1742,190 +979,293 @@
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="ppeTableBody">
-                        <!-- PPE items will be loaded here -->
+                    <tbody id="ppeTable">
+                        <!-- Will be populated by JavaScript -->
                     </tbody>
                 </table>
-            </div>
-            
-            <div class="action-buttons" style="margin-top: 2rem;">
-                <button class="btn btn-outline" onclick="addPPEItem()">+ Add PPE Item</button>
-                <button class="btn btn-outline" onclick="closeModal('ppeModal')">Close</button>
             </div>
         </div>
     </div>
 
-    <!-- Standards Compliance Modal -->
+    <!-- Contractor Safety Modal -->
+    <div id="contractorModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal('contractorModal')">×</button>
+            <div class="modal-header">
+                <h2>Contractor Safety Management</h2>
+            </div>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <button class="btn btn-primary" onclick="addContractor()">+ Add Contractor</button>
+                <button class="btn" onclick="exportContractorPDF()" style="margin-left: 1rem;">📄 Export PDF</button>
+            </div>
+            
+            <div style="overflow-x: auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Contractor ID</th>
+                            <th>Company</th>
+                            <th>Contact Person</th>
+                            <th>Country</th>
+                            <th>Work Type</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Safety Rating</th>
+                            <th>Attachments</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="contractorTable">
+                        <!-- Will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audit & Inspection Modal -->
+    <div id="auditModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal('auditModal')">×</button>
+            <div class="modal-header">
+                <h2>Audit & Inspection Management</h2>
+            </div>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <button class="btn btn-primary" onclick="addAudit()">+ Schedule Audit</button>
+                <button class="btn" onclick="exportAuditPDF()" style="margin-left: 1rem;">📄 Export PDF</button>
+            </div>
+            
+            <div style="overflow-x: auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Audit ID</th>
+                            <th>Type</th>
+                            <th>Country</th>
+                            <th>Location</th>
+                            <th>Audit Date</th>
+                            <th>Auditor</th>
+                            <th>Score</th>
+                            <th>Status</th>
+                            <th>Findings</th>
+                            <th>Attachments</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="auditTable">
+                        <!-- Will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Standards & Compliance Modal -->
     <div id="standardsModal" class="modal">
         <div class="modal-content">
             <button class="close-modal" onclick="closeModal('standardsModal')">×</button>
             <div class="modal-header">
                 <h2>Standards & Compliance Management</h2>
-                <p>Manage International and National Safety Standards for MMS</p>
             </div>
             
-            <div class="action-buttons" style="margin-bottom: 2rem;">
+            <div style="margin-bottom: 1.5rem;">
                 <button class="btn btn-primary" onclick="addStandard()">+ Add Standard</button>
+                <button class="btn" onclick="exportStandardsPDF()" style="margin-left: 1rem;">📄 Export PDF</button>
             </div>
             
-            <div class="standards-grid" id="standardsGrid">
-                <!-- Standards cards will be loaded here -->
+            <div style="overflow-x: auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Standard ID</th>
+                            <th>Name</th>
+                            <th>Code</th>
+                            <th>Type</th>
+                            <th>Industry</th>
+                            <th>Status</th>
+                            <th>Effective Date</th>
+                            <th>Remarks</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="standardsTable">
+                        <!-- Will be populated by JavaScript -->
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 
-    <!-- Risk Assessment Modal -->
-    <div id="riskModal" class="modal">
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
         <div class="modal-content">
-            <button class="close-modal" onclick="closeModal('riskModal')">×</button>
+            <button class="close-modal" onclick="closeModal('settingsModal')">×</button>
             <div class="modal-header">
-                <h2>Risk Assessment Management</h2>
-                <p>Click on any risk cell to edit details</p>
+                <h2>System Settings</h2>
             </div>
             
-            <div class="risk-matrix">
-                <div class="chart-header">
-                    <div>
-                        <div class="chart-title">MMS Facility Risk Matrix</div>
-                        <div class="chart-subtitle">Edit risk levels for each location</div>
+            <div class="settings-grid">
+                <div class="setting-card">
+                    <h3 style="margin-bottom: 1rem; color: var(--primary);">Data Management</h3>
+                    <button class="btn" onclick="backupData()" style="width: 100%; margin-bottom: 0.5rem;">💾 Backup Data</button>
+                    <button class="btn" onclick="restoreData()" style="width: 100%; margin-bottom: 0.5rem;">📥 Restore Data</button>
+                    <button class="btn" onclick="resetData()" style="width: 100%; background: var(--error); color: white;">🔄 Reset All Data</button>
+                </div>
+                
+                <div class="setting-card">
+                    <h3 style="margin-bottom: 1rem; color: var(--primary);">System Configuration</h3>
+                    <div style="margin-bottom: 1rem;">
+                        <label>Theme Color</label>
+                        <select id="themeColor" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text);">
+                            <option value="dark">Dark Theme</option>
+                            <option value="light">Light Theme</option>
+                        </select>
                     </div>
-                    <div>
-                        <button class="btn btn-success" onclick="saveRiskMatrix()">💾 Save Matrix</button>
+                    <div style="margin-bottom: 1rem;">
+                        <label>Language</label>
+                        <select style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text);">
+                            <option>English</option>
+                            <option>Swahili</option>
+                            <option>Afrikaans</option>
+                        </select>
                     </div>
                 </div>
-                <div class="matrix-grid" id="modalRiskMatrix">
-                    <!-- Matrix cells will be loaded here -->
+                
+                <div class="setting-card">
+                    <h3 style="margin-bottom: 1rem; color: var(--primary);">Notifications</h3>
+                    <div style="margin-bottom: 1rem;">
+                        <input type="checkbox" id="emailNotifications" checked>
+                        <label for="emailNotifications">Email Notifications</label>
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <input type="checkbox" id="pushNotifications" checked>
+                        <label for="pushNotifications">Push Notifications</label>
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <input type="checkbox" id="reportReminders" checked>
+                        <label for="reportReminders">Report Reminders</label>
+                    </div>
+                </div>
+                
+                <div class="setting-card">
+                    <h3 style="margin-bottom: 1rem; color: var(--primary);">Export Settings</h3>
+                    <div style="margin-bottom: 1rem;">
+                        <label>Default Export Format</label>
+                        <select style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text);">
+                            <option>PDF</option>
+                            <option>Excel</option>
+                            <option>CSV</option>
+                        </select>
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <label>Include in Export</label>
+                        <div>
+                            <input type="checkbox" id="exportEmployees" checked> <label for="exportEmployees">Employees</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="exportIncidents" checked> <label for="exportIncidents">Incidents</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="exportTrainings" checked> <label for="exportTrainings">Trainings</label>
+                        </div>
+                    </div>
                 </div>
             </div>
             
-            <div class="action-buttons" style="margin-top: 2rem;">
-                <button class="btn btn-outline" onclick="closeModal('riskModal')">Close</button>
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button class="btn btn-primary" onclick="saveSettings()" style="flex: 1;">Save Settings</button>
+                <button class="btn" onclick="closeModal('settingsModal')" style="flex: 1; background: var(--border);">Cancel</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Global Variables for MMS
+        // Global Variables
         let employees = [];
         let incidents = [];
-        let ppeItems = [];
         let trainings = [];
+        let ppeItems = [];
+        let contractors = [];
+        let audits = [];
         let standards = [];
-        let riskMatrix = [];
-        let incidentTrendChart = null;
+        let currentFilter = 'All';
         let editingCell = null;
-        let itemToDelete = null;
-        let editingStandardIndex = -1;
-        let currentChartType = 'line';
-
-        // MMS Locations by Country
-        const mmsLocations = {
-            'South Africa': ['Cape Town (HQ)', 'Cosco Durban', 'AGL Durban'],
-            'Tanzania': ['Impala Dar', 'Polytra Dar', 'Access Dar'],
-            'Namibia': ['WBCT Bulk Shed', 'WBCT Quay Side Shed', 'Bridge Walvis Bay', 'Pindulo Walvis Bay'],
-            'Zambia': ['Reload Giga Terminal', 'AGL Chingola Hub', 'Polytra Kitwe', 'Impala Ndola', 'SLS Ndola', 'Poseidon Zambia', 'Polytra Kapiri Mposhi']
-        };
 
         // Initialize Application
         document.addEventListener('DOMContentLoaded', function() {
-            initializeApp();
-        });
-
-        function initializeApp() {
             loadAllData();
             initializeCharts();
             loadAllTables();
-            loadStandards();
-            setupRiskMatrix();
-            populateEmployeeDropdown();
-            setupEventListeners();
             updateStatistics();
-            
-            // Set default dates for chart
-            const endDate = new Date();
-            const startDate = new Date();
-            startDate.setMonth(startDate.getMonth() - 6);
-            
-            document.getElementById('startDate').valueAsDate = startDate;
-            document.getElementById('endDate').valueAsDate = endDate;
-            
-            // Set current date/time for incident report
-            const now = new Date();
-            const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
-                .toISOString()
-                .slice(0, 16);
-            document.getElementById('incidentDateTime').value = localDateTime;
-        }
+            setupEventListeners();
+        });
 
         function loadAllData() {
-            // Load employees
-            const savedEmployees = localStorage.getItem('mms_employees');
-            employees = savedEmployees ? JSON.parse(savedEmployees) : getDefaultEmployees();
-            
-            // Load incidents
-            const savedIncidents = localStorage.getItem('mms_incidents');
-            incidents = savedIncidents ? JSON.parse(savedIncidents) : getDefaultIncidents();
-            
-            // Load PPE items
-            const savedPPE = localStorage.getItem('mms_ppe');
-            ppeItems = savedPPE ? JSON.parse(savedPPE) : getDefaultPPE();
-            
-            // Load trainings
-            const savedTrainings = localStorage.getItem('mms_trainings');
-            trainings = savedTrainings ? JSON.parse(savedTrainings) : getDefaultTrainings();
-            
-            // Load standards
-            const savedStandards = localStorage.getItem('mms_standards');
-            standards = savedStandards ? JSON.parse(savedStandards) : getDefaultStandards();
-            
-            // Load risk matrix
-            const savedRiskMatrix = localStorage.getItem('mms_risk_matrix');
-            riskMatrix = savedRiskMatrix ? JSON.parse(savedRiskMatrix) : getDefaultRiskMatrix();
+            // Load from localStorage or use default data
+            employees = JSON.parse(localStorage.getItem('mms_employees')) || getDefaultEmployees();
+            incidents = JSON.parse(localStorage.getItem('mms_incidents')) || getDefaultIncidents();
+            trainings = JSON.parse(localStorage.getItem('mms_trainings')) || getDefaultTrainings();
+            ppeItems = JSON.parse(localStorage.getItem('mms_ppe')) || getDefaultPPE();
+            contractors = JSON.parse(localStorage.getItem('mms_contractors')) || getDefaultContractors();
+            audits = JSON.parse(localStorage.getItem('mms_audits')) || getDefaultAudits();
+            standards = JSON.parse(localStorage.getItem('mms_standards')) || getDefaultStandards();
+        }
+
+        function saveAllData() {
+            localStorage.setItem('mms_employees', JSON.stringify(employees));
+            localStorage.setItem('mms_incidents', JSON.stringify(incidents));
+            localStorage.setItem('mms_trainings', JSON.stringify(trainings));
+            localStorage.setItem('mms_ppe', JSON.stringify(ppeItems));
+            localStorage.setItem('mms_contractors', JSON.stringify(contractors));
+            localStorage.setItem('mms_audits', JSON.stringify(audits));
+            localStorage.setItem('mms_standards', JSON.stringify(standards));
         }
 
         function getDefaultEmployees() {
             return [
                 // Tanzania
-                { id: 'TZ-001', name: 'Cephas Gideon Mkama', position: 'Inventory Control Specialist', country: 'Tanzania', location: 'Impala Dar', status: 'Active', department: 'Inventory Control', training: 'Completed' },
-                { id: 'TZ-002', name: 'Salman Esmail', position: 'Inventory Control Specialist', country: 'Tanzania', location: 'Polytra Dar', status: 'Active', department: 'Inventory Control', training: 'Completed' },
+                { id: 'TZ-001', name: 'Cephas Gideon Mkama', position: 'Inventory Control Specialist', country: 'Tanzania', location: 'Impala Dar', status: 'Active', training: 'Completed' },
+                { id: 'TZ-002', name: 'Salman Esmail', position: 'Inventory Control Specialist', country: 'Tanzania', location: 'Polytra Dar', status: 'Active', training: 'Pending' },
                 
                 // Namibia
-                { id: 'NA-001', name: 'Leon Fourie', position: 'Inventory Control Specialist', country: 'Namibia', location: 'WBCT Bulk Shed', status: 'Active', department: 'Inventory Control', training: 'Completed' },
-                { id: 'NA-002', name: 'Salomon Iyambo', position: 'Inventory Control Specialist', country: 'Namibia', location: 'WBCT Quay Side Shed', status: 'Active', department: 'Inventory Control', training: 'Completed' },
-                { id: 'NA-003', name: 'Sakeus Iyambo', position: 'Inventory Control Specialist', country: 'Namibia', location: 'Bridge Walvis Bay', status: 'Active', department: 'Inventory Control', training: 'Completed' },
+                { id: 'NA-001', name: 'Leon Fourie', position: 'Inventory Control Specialist', country: 'Namibia', location: 'WBCT Bulk Shed', status: 'Active', training: 'Completed' },
+                { id: 'NA-002', name: 'Salomon Iyambo', position: 'Inventory Control Specialist', country: 'Namibia', location: 'WBCT Quay Side Shed', status: 'Active', training: 'Completed' },
+                { id: 'NA-003', name: 'Sakeus Iyambo', position: 'Inventory Control Specialist', country: 'Namibia', location: 'Bridge Walvis Bay', status: 'Active', training: 'Pending' },
                 
                 // South Africa
-                { id: 'SA-001', name: 'Katlego Matsane', position: 'Inventory Control Specialist', country: 'South Africa', location: 'Cape Town (HQ)', status: 'Active', department: 'Inventory Control', training: 'Completed' },
-                { id: 'SA-002', name: 'Bonnie Sibande', position: 'Inventory Control Specialist', country: 'South Africa', location: 'Cape Town (HQ)', status: 'Active', department: 'Inventory Control', training: 'Completed' },
+                { id: 'SA-001', name: 'Katlego Matsane', position: 'Inventory Control Specialist', country: 'South Africa', location: 'Cape Town (HQ)', status: 'Active', training: 'Completed' },
+                { id: 'SA-002', name: 'Bonnie Sibande', position: 'Inventory Control Specialist', country: 'South Africa', location: 'Durban', status: 'Active', training: 'Completed' },
                 
-                // Zambia (27 employees)
-                { id: 'ZM-001', name: 'Alick Banda', position: '', country: 'Zambia', location: 'Reload Giga Terminal', status: 'Active', department: '', training: 'Pending' },
-                { id: 'ZM-002', name: 'Alinaswe Mwanamoonga', position: '', country: 'Zambia', location: 'AGL Chingola Hub', status: 'Active', department: '', training: 'Pending' },
-                { id: 'ZM-003', name: 'Caleb Simpanzye', position: '', country: 'Zambia', location: 'Polytra Kitwe', status: 'Active', department: '', training: 'Pending' },
-                { id: 'ZM-004', name: 'Cephas Phiri', position: '', country: 'Zambia', location: 'Impala Ndola', status: 'Active', department: '', training: 'Pending' },
-                { id: 'ZM-005', name: 'Changwa Sikombe', position: '', country: 'Zambia', location: 'SLS Ndola', status: 'Active', department: '', training: 'Pending' },
-                { id: 'ZM-006', name: 'Chiti Mwamba', position: '', country: 'Zambia', location: 'Poseidon Zambia', status: 'Active', department: '', training: 'Pending' },
-                { id: 'ZM-007', name: 'Edward Vyande', position: '', country: 'Zambia', location: 'Polytra Kapiri Mposhi', status: 'Active', department: '', training: 'Pending' },
-                { id: 'ZM-008', name: 'Given Phiri', position: '', country: 'Zambia', location: 'AGL Chingola Hub', status: 'Active', department: '', training: 'Pending' },
-                { id: 'ZM-009', name: 'Happie M\'gode', position: '', country: 'Zambia', location: 'Polytra Kitwe', status: 'Active', department: '', training: 'Pending' },
-                { id: 'ZM-010', name: 'Ivan Mbewe', position: '', country: 'Zambia', location: 'Impala Ndola', status: 'Active', department: '', training: 'Pending' },
-                { id: 'ZM-011', name: 'Joseph Banda', position: '', country: 'Zambia', location: 'SLS Ndola', status: 'Active', department: '', training: 'Pending' },
-                { id: 'ZM-012', name: 'Julius Makambwe', position: '', country: 'Zambia', location: 'Poseidon Zambia', status: 'Active', department: '', training: 'Pending' },
-                { id: 'ZM-013', name: 'Malambo Kozi', position: '', country: 'Zambia', location: 'Polytra Kapiri Mposhi', status: 'Active', department: '', training: 'Pending' },
-                { id: 'ZM-014', name: 'Miles Kaweche', position: '', country: 'Zambia', location: 'Reload Giga Terminal', status: 'Active', department: '', training: 'Pending' },
-                { id: 'ZM-015', name: 'Zachariah Musonda', position: '', country: 'Zambia', location: 'AGL Chingola Hub', status: 'Active', department: '', training: 'Pending' },
-                { id: 'ZM-016', name: 'Mutandi Kalaluka', position: '', country: 'Zambia', location: 'Polytra Kitwe', status: 'Active', department: '', training: 'Pending' },
-                { id: 'ZM-017', name: 'Natasha Tembo', position: '', country: 'Zambia', location: 'Impala Ndola', status: 'Active', department: '', training: 'Pending' },
-                { id: 'ZM-018', name: 'Patrick Mwale', position: '', country: 'Zambia', location: 'SLS Ndola', status: 'Active', department: '', training: 'Pending' },
-                { id: 'ZM-019', name: 'Phius Mweene', position: '', country: 'Zambia', location: 'Poseidon Zambia', status: 'Active', department: '', training: 'Pending' },
-                { id: 'ZM-020', name: 'Richard Phiri', position: '', country: 'Zambia', location: 'Polytra Kapiri Mposhi', status: 'Active', department: '', training: 'Pending' },
-                { id: 'ZM-021', name: 'Gerald Mwale', position: '', country: 'Zambia', location: 'Reload Giga Terminal', status: 'Active', department: '', training: 'Pending' },
-                { id: 'ZM-022', name: 'Jackson Chola', position: '', country: 'Zambia', location: 'AGL Chingola Hub', status: 'Active', department: '', training: 'Pending' },
-                { id: 'ZM-023', name: 'Michael Mwate', position: '', country: 'Zambia', location: 'Polytra Kitwe', status: 'Active', department: '', training: 'Pending' },
-                { id: 'ZM-024', name: 'Mfula Mighty', position: '', country: 'Zambia', location: 'Impala Ndola', status: 'Active', department: '', training: 'Pending' },
-                { id: 'ZM-025', name: 'Richard Mwaba', position: '', country: 'Zambia', location: 'SLS Ndola', status: 'Active', department: '', training: 'Pending' },
-                { id: 'ZM-026', name: 'David Muzeka', position: '', country: 'Zambia', location: 'Poseidon Zambia', status: 'Active', department: '', training: 'Pending' },
-                { id: 'ZM-027', name: 'Yamba Yamba', position: '', country: 'Zambia', location: 'Polytra Kapiri Mposhi', status: 'Active', department: '', training: 'Pending' }
+                // Zambia - All 27 employees
+                { id: 'ZM-001', name: 'Alick Banda', position: '', country: 'Zambia', location: 'Reload Giga Terminal', status: 'Active', training: 'Pending' },
+                { id: 'ZM-002', name: 'Alinaswe Mwanamoonga', position: '', country: 'Zambia', location: 'AGL Chingola Hub', status: 'Active', training: 'Pending' },
+                { id: 'ZM-003', name: 'Caleb Simpanzye', position: '', country: 'Zambia', location: 'Polytra Kitwe', status: 'Active', training: 'Pending' },
+                { id: 'ZM-004', name: 'Cephas Phiri', position: '', country: 'Zambia', location: 'Impala Ndola', status: 'Active', training: 'Pending' },
+                { id: 'ZM-005', name: 'Changwa Sikombe', position: '', country: 'Zambia', location: 'SLS Ndola', status: 'Active', training: 'Pending' },
+                { id: 'ZM-006', name: 'Chiti Mwamba', position: '', country: 'Zambia', location: 'Poseidon Zambia', status: 'Active', training: 'Pending' },
+                { id: 'ZM-007', name: 'Edward Vyande', position: '', country: 'Zambia', location: 'Polytra Kapiri Mposhi', status: 'Active', training: 'Pending' },
+                { id: 'ZM-008', name: 'Given Phiri', position: '', country: 'Zambia', location: 'AGL Chingola Hub', status: 'Active', training: 'Pending' },
+                { id: 'ZM-009', name: 'Happie M\'gode', position: '', country: 'Zambia', location: 'Polytra Kitwe', status: 'Active', training: 'Pending' },
+                { id: 'ZM-010', name: 'Ivan Mbewe', position: '', country: 'Zambia', location: 'Impala Ndola', status: 'Active', training: 'Pending' },
+                { id: 'ZM-011', name: 'Joseph Banda', position: '', country: 'Zambia', location: 'SLS Ndola', status: 'Active', training: 'Pending' },
+                { id: 'ZM-012', name: 'Julius Makambwe', position: '', country: 'Zambia', location: 'Poseidon Zambia', status: 'Active', training: 'Pending' },
+                { id: 'ZM-013', name: 'Malambo Kozi', position: '', country: 'Zambia', location: 'Polytra Kapiri Mposhi', status: 'Active', training: 'Pending' },
+                { id: 'ZM-014', name: 'Miles Kaweche', position: '', country: 'Zambia', location: 'Reload Giga Terminal', status: 'Active', training: 'Pending' },
+                { id: 'ZM-015', name: 'Zachariah Musonda', position: '', country: 'Zambia', location: 'AGL Chingola Hub', status: 'Active', training: 'Pending' },
+                { id: 'ZM-016', name: 'Mutandi Kalaluka', position: '', country: 'Zambia', location: 'Polytra Kitwe', status: 'Active', training: 'Pending' },
+                { id: 'ZM-017', name: 'Natasha Tembo', position: '', country: 'Zambia', location: 'Impala Ndola', status: 'Active', training: 'Pending' },
+                { id: 'ZM-018', name: 'Patrick Mwale', position: '', country: 'Zambia', location: 'SLS Ndola', status: 'Active', training: 'Pending' },
+                { id: 'ZM-019', name: 'Phius Mweene', position: '', country: 'Zambia', location: 'Poseidon Zambia', status: 'Active', training: 'Pending' },
+                { id: 'ZM-020', name: 'Richard Phiri', position: '', country: 'Zambia', location: 'Polytra Kapiri Mposhi', status: 'Active', training: 'Pending' },
+                { id: 'ZM-021', name: 'Gerald Mwale', position: '', country: 'Zambia', location: 'Reload Giga Terminal', status: 'Active', training: 'Pending' },
+                { id: 'ZM-022', name: 'Jackson Chola', position: '', country: 'Zambia', location: 'AGL Chingola Hub', status: 'Active', training: 'Pending' },
+                { id: 'ZM-023', name: 'Michael Mwate', position: '', country: 'Zambia', location: 'Polytra Kitwe', status: 'Active', training: 'Pending' },
+                { id: 'ZM-024', name: 'Mfula Mighty', position: '', country: 'Zambia', location: 'Impala Ndola', status: 'Active', training: 'Pending' },
+                { id: 'ZM-025', name: 'Richard Mwaba', position: '', country: 'Zambia', location: 'SLS Ndola', status: 'Active', training: 'Pending' },
+                { id: 'ZM-026', name: 'David Muzeka', position: '', country: 'Zambia', location: 'Poseidon Zambia', status: 'Active', training: 'Pending' },
+                { id: 'ZM-027', name: 'Yamba Yamba', position: '', country: 'Zambia', location: 'Polytra Kapiri Mposhi', status: 'Active', training: 'Pending' }
             ];
         }
 
@@ -1937,37 +1277,10 @@
                     severity: 'Minor',
                     location: 'Cape Town (HQ)',
                     country: 'South Africa',
-                    reportedBy: 'Katlego Matsane',
-                    date: '2024-01-15T10:30',
-                    status: 'Under Investigation',
-                    description: 'Forklift almost collided with pedestrian in warehouse.',
-                    actions: 'Area cordoned off, investigation started.',
-                    recommendations: 'Improve pedestrian walkway markings.'
-                }
-            ];
-        }
-
-        function getDefaultPPE() {
-            return [
-                {
-                    id: 'PPE-001',
-                    type: 'Safety Helmet',
-                    assignedTo: 'Katlego Matsane',
-                    country: 'South Africa',
-                    issueDate: '2024-01-15',
-                    expiryDate: '2025-01-15',
-                    status: 'Active',
-                    condition: 'Good'
-                },
-                {
-                    id: 'PPE-002',
-                    type: 'Safety Boots',
-                    assignedTo: 'Cephas Gideon Mkama',
-                    country: 'Tanzania',
-                    issueDate: '2024-02-01',
-                    expiryDate: '2025-02-01',
-                    status: 'Active',
-                    condition: 'Good'
+                    reportedBy: 'SA-001',
+                    date: '2024-01-15',
+                    status: 'Resolved',
+                    description: 'Forklift almost collided with pedestrian.'
                 }
             ];
         }
@@ -1978,28 +1291,72 @@
                     id: 'TRN-001',
                     course: 'NOSHC 1 & 2 - OSHA Tanzania',
                     employee: 'Cephas Gideon Mkama',
+                    employeeId: 'TZ-001',
                     country: 'Tanzania',
                     date: '2024-01-15',
                     status: 'Completed',
-                    certificate: 'Yes'
+                    certificate: 'Yes',
+                    attachments: ['certificate.pdf']
                 },
                 {
                     id: 'TRN-002',
                     course: 'NEBOSH International General Certificate',
                     employee: 'Cephas Gideon Mkama',
+                    employeeId: 'TZ-001',
                     country: 'Tanzania',
                     date: '2024-03-01',
                     status: 'In Progress',
-                    certificate: 'No'
-                },
+                    certificate: 'No',
+                    attachments: []
+                }
+            ];
+        }
+
+        function getDefaultPPE() {
+            return [
                 {
-                    id: 'TRN-003',
-                    course: 'Basic Safety Induction',
-                    employee: 'Alick Banda',
-                    country: 'Zambia',
-                    date: '2024-02-15',
-                    status: 'Pending',
-                    certificate: 'No'
+                    id: 'PPE-001',
+                    type: 'Safety Helmet',
+                    assignedTo: 'Cephas Gideon Mkama',
+                    assignedToId: 'TZ-001',
+                    country: 'Tanzania',
+                    issueDate: '2024-01-15',
+                    expiryDate: '2025-01-15',
+                    status: 'Active',
+                    condition: 'Good'
+                }
+            ];
+        }
+
+        function getDefaultContractors() {
+            return [
+                {
+                    id: 'CTR-001',
+                    company: 'ABC Construction Ltd',
+                    contactPerson: 'John Doe',
+                    country: 'South Africa',
+                    workType: 'Building Maintenance',
+                    startDate: '2024-01-01',
+                    endDate: '2024-12-31',
+                    safetyRating: 'A',
+                    attachments: ['contract.pdf', 'certificates.zip']
+                }
+            ];
+        }
+
+        function getDefaultAudits() {
+            return [
+                {
+                    id: 'AUD-001',
+                    type: 'Safety Audit',
+                    country: 'South Africa',
+                    location: 'Cape Town (HQ)',
+                    auditDate: '2024-02-15',
+                    auditor: 'Safety Officer',
+                    score: '92%',
+                    status: 'Completed',
+                    findings: 'Minor issues identified',
+                    attachments: ['audit_report.pdf']
                 }
             ];
         }
@@ -2012,283 +1369,38 @@
                     code: 'ISO45001',
                     type: 'International',
                     industry: 'General Industry',
-                    description: 'Occupational health and safety management systems - Requirements with guidance for use.',
                     status: 'Compliant',
                     effectiveDate: '2024-01-01',
-                    remarks: 'Fully implemented across all MMS facilities'
-                },
-                {
-                    id: 'STD-002',
-                    name: 'OSHA Regulations',
-                    code: 'OSHA-29CFR',
-                    type: 'National',
-                    industry: 'General Industry',
-                    description: 'Occupational Safety and Health Administration regulations for workplace safety.',
-                    status: 'Compliant',
-                    effectiveDate: '2024-01-01',
-                    remarks: 'Regular audits conducted'
-                },
-                {
-                    id: 'STD-003',
-                    name: 'Mines and Quarries Act',
-                    code: 'MQA-1972',
-                    type: 'National',
-                    industry: 'Mining',
-                    description: 'Safety regulations for mining and quarry operations.',
-                    status: 'Compliant',
-                    effectiveDate: '2024-01-01',
-                    remarks: 'Applicable to Zambia operations'
+                    remarks: 'Fully implemented'
                 }
             ];
         }
 
-        function getDefaultRiskMatrix() {
-            const locations = [];
-            for (const [country, locs] of Object.entries(mmsLocations)) {
-                locs.forEach(location => {
-                    locations.push({
-                        location: location,
-                        country: country,
-                        riskLevel: 'Low Risk',
-                        riskClass: 'risk-low',
-                        department: 'Operations'
-                    });
-                });
-            }
-            return locations;
-        }
-
-        function saveAllData() {
-            localStorage.setItem('mms_employees', JSON.stringify(employees));
-            localStorage.setItem('mms_incidents', JSON.stringify(incidents));
-            localStorage.setItem('mms_ppe', JSON.stringify(ppeItems));
-            localStorage.setItem('mms_trainings', JSON.stringify(trainings));
-            localStorage.setItem('mms_standards', JSON.stringify(standards));
-            localStorage.setItem('mms_risk_matrix', JSON.stringify(riskMatrix));
-        }
-
         function updateStatistics() {
-            // Update employee count
-            document.getElementById('totalEmployees').textContent = employees.length;
+            let filteredEmployees = currentFilter === 'All' ? employees : employees.filter(e => e.country === currentFilter);
+            let filteredIncidents = currentFilter === 'All' ? incidents : incidents.filter(i => i.country === currentFilter);
+            let filteredTrainings = currentFilter === 'All' ? trainings : trainings.filter(t => t.country === currentFilter);
             
-            // Update LTI count
-            const ltiCount = incidents.filter(i => i.type === 'Lost Time Injury').length;
-            document.getElementById('lostTimeInjuries').textContent = ltiCount;
-            
-            // Update training count
-            const completedTrainings = trainings.filter(t => t.status === 'Completed').length;
-            document.getElementById('safetyTrainings').textContent = completedTrainings;
-            
-            // Update compliance rate
-            const compliantStandards = standards.filter(s => s.status === 'Compliant').length;
-            const complianceRate = standards.length > 0 ? Math.round((compliantStandards / standards.length) * 100) : 0;
-            document.getElementById('complianceRate').textContent = complianceRate + '%';
+            document.getElementById('totalEmployees').textContent = filteredEmployees.length;
+            document.getElementById('lostTimeInjuries').textContent = filteredIncidents.filter(i => i.type === 'Lost Time Injury').length;
+            document.getElementById('safetyTrainings').textContent = filteredTrainings.filter(t => t.status === 'Completed').length;
+            document.getElementById('complianceRate').textContent = '100%';
         }
 
-        function populateEmployeeDropdown() {
-            const select = document.getElementById('reportedBy');
-            if (!select) return;
-            
-            select.innerHTML = '<option value="">Select employee</option>';
-            employees.forEach(employee => {
-                const option = document.createElement('option');
-                option.value = employee.id;
-                option.textContent = `${employee.name} (${employee.id})`;
-                select.appendChild(option);
-            });
-        }
-
-        function updateLocations() {
-            const countrySelect = document.getElementById('incidentCountry');
-            const locationSelect = document.getElementById('incidentLocation');
-            const newEmployeeCountrySelect = document.getElementById('newEmployeeCountry');
-            const newEmployeeLocationSelect = document.getElementById('newEmployeeLocation');
-            
-            const selects = [locationSelect, newEmployeeLocationSelect];
-            selects.forEach(select => {
-                if (!select) return;
-                
-                const country = select === locationSelect ? countrySelect.value : newEmployeeCountrySelect.value;
-                select.innerHTML = '<option value="">Select location</option>';
-                
-                if (country && mmsLocations[country]) {
-                    mmsLocations[country].forEach(location => {
-                        const option = document.createElement('option');
-                        option.value = location;
-                        option.textContent = location;
-                        select.appendChild(option);
-                    });
-                }
-            });
-        }
-
-        function setupRiskMatrix() {
-            const matrixContainer = document.getElementById('riskMatrix');
-            if (!matrixContainer) return;
-            
-            matrixContainer.innerHTML = '';
-            
-            // Get unique locations from risk matrix
-            const uniqueLocations = riskMatrix.reduce((acc, item) => {
-                if (!acc.find(loc => loc.location === item.location && loc.country === item.country)) {
-                    acc.push(item);
-                }
-                return acc;
-            }, []);
-            
-            // Take first 5 locations for display
-            const displayLocations = uniqueLocations.slice(0, 5);
-            
-            displayLocations.forEach(item => {
-                const cell = document.createElement('div');
-                cell.className = `matrix-cell ${item.riskClass}`;
-                cell.innerHTML = `
-                    <div>${item.location}</div>
-                    <div>${item.country}</div>
-                `;
-                cell.onclick = function() { editRiskCell(this, item); };
-                matrixContainer.appendChild(cell);
-            });
-        }
-
-        function editRiskCell(cell, item) {
-            if (editingCell) return;
-            
-            editingCell = cell;
-            const originalContent = cell.innerHTML;
-            
-            // Create edit form
-            cell.innerHTML = `
-                <input type="text" class="edit-input mb-1" value="${item.location}" placeholder="Location">
-                <input type="text" class="edit-input mb-1" value="${item.country}" placeholder="Country">
-                <select class="edit-select mb-1" id="riskColor">
-                    <option value="risk-low" ${item.riskClass === 'risk-low' ? 'selected' : ''}>Low Risk</option>
-                    <option value="risk-medium" ${item.riskClass === 'risk-medium' ? 'selected' : ''}>Medium Risk</option>
-                    <option value="risk-high" ${item.riskClass === 'risk-high' ? 'selected' : ''}>High Risk</option>
-                    <option value="risk-very-high" ${item.riskClass === 'risk-very-high' ? 'selected' : ''}>Very High Risk</option>
-                    <option value="risk-extreme" ${item.riskClass === 'risk-extreme' ? 'selected' : ''}>Extreme Risk</option>
-                </select>
-                <div class="mt-1">
-                    <button class="btn btn-sm btn-success" onclick="saveRiskCellEdit(this, '${item.location}', '${item.country}')">Save</button>
-                    <button class="btn btn-sm btn-outline" onclick="cancelRiskCellEdit(this, '${originalContent.replace(/'/g, "\\'")}')">Cancel</button>
-                </div>
-            `;
-            
-            cell.classList.add('editing');
-            cell.querySelector('input').focus();
-        }
-
-        function saveRiskCellEdit(button, oldLocation, oldCountry) {
-            const cell = button.closest('.matrix-cell');
-            const inputs = cell.querySelectorAll('input, select');
-            
-            const location = inputs[0].value;
-            const country = inputs[1].value;
-            const colorClass = inputs[2].value;
-            
-            // Update in risk matrix
-            const index = riskMatrix.findIndex(item => item.location === oldLocation && item.country === oldCountry);
-            if (index !== -1) {
-                riskMatrix[index] = {
-                    location: location,
-                    country: country,
-                    riskLevel: colorClass.replace('risk-', '').replace('-', ' ').toUpperCase(),
-                    riskClass: colorClass,
-                    department: riskMatrix[index].department
-                };
-            }
-            
-            // Update cell
-            cell.className = `matrix-cell ${colorClass}`;
-            cell.innerHTML = `
-                <div>${location}</div>
-                <div>${country}</div>
-            `;
-            
-            // Restore click handler
-            cell.onclick = function() { editRiskCell(this, riskMatrix[index]); };
-            
-            editingCell = null;
-            saveAllData();
-            showToast('Success', 'Risk cell updated!', 'success');
-        }
-
-        function cancelRiskCellEdit(button, originalContent) {
-            const cell = button.closest('.matrix-cell');
-            cell.innerHTML = originalContent;
-            cell.classList.remove('editing');
-            const location = cell.textContent.split('\n')[0].trim();
-            const country = cell.textContent.split('\n')[1].trim();
-            const item = riskMatrix.find(item => item.location === location && item.country === country);
-            if (item) {
-                cell.onclick = function() { editRiskCell(this, item); };
-            }
-            editingCell = null;
-        }
-
-        function saveRiskMatrix() {
-            saveAllData();
-            showToast('Success', 'Risk matrix saved successfully!', 'success');
-        }
-
-        // Chart Functions
         function initializeCharts() {
-            const ctx = document.getElementById('incidentTrendChart').getContext('2d');
-            
-            // Generate data for the last 6 months
-            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-            const incidentData = [2, 1, 0, 1, 0, 0];
-            const nearMissData = [5, 3, 2, 4, 1, 2];
-            const firstAidData = [1, 2, 1, 0, 1, 0];
-            
-            incidentTrendChart = new Chart(ctx, {
-                type: currentChartType,
+            const ctx = document.getElementById('safetyChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
                 data: {
-                    labels: months,
-                    datasets: [
-                        {
-                            label: 'Incidents',
-                            data: incidentData,
-                            borderColor: '#e74c3c',
-                            backgroundColor: currentChartType === 'line' ? 'rgba(231, 76, 60, 0.1)' : '#e74c3c',
-                            borderWidth: 2,
-                            tension: 0.3,
-                            fill: currentChartType === 'line',
-                            pointBackgroundColor: '#e74c3c',
-                            pointBorderColor: '#ffffff',
-                            pointBorderWidth: 2,
-                            pointRadius: 4,
-                            pointHoverRadius: 6
-                        },
-                        {
-                            label: 'Near Misses',
-                            data: nearMissData,
-                            borderColor: '#f39c12',
-                            backgroundColor: currentChartType === 'line' ? 'rgba(243, 156, 18, 0.1)' : '#f39c12',
-                            borderWidth: 2,
-                            tension: 0.3,
-                            fill: currentChartType === 'line',
-                            pointBackgroundColor: '#f39c12',
-                            pointBorderColor: '#ffffff',
-                            pointBorderWidth: 2,
-                            pointRadius: 4,
-                            pointHoverRadius: 6
-                        },
-                        {
-                            label: 'First Aid Cases',
-                            data: firstAidData,
-                            borderColor: '#27ae60',
-                            backgroundColor: currentChartType === 'line' ? 'rgba(39, 174, 96, 0.1)' : '#27ae60',
-                            borderWidth: 2,
-                            tension: 0.3,
-                            fill: currentChartType === 'line',
-                            pointBackgroundColor: '#27ae60',
-                            pointBorderColor: '#ffffff',
-                            pointBorderWidth: 2,
-                            pointRadius: 4,
-                            pointHoverRadius: 6
-                        }
-                    ]
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Incidents',
+                        data: [2, 1, 0, 1, 0, 0],
+                        borderColor: '#e74c3c',
+                        backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.3
+                    }]
                 },
                 options: {
                     responsive: true,
@@ -2296,139 +1408,131 @@
                     plugins: {
                         legend: {
                             position: 'top',
-                            labels: {
-                                usePointStyle: true,
-                                padding: 10
-                            }
                         }
                     },
                     scales: {
                         y: {
-                            beginAtZero: true,
-                            grid: {
-                                drawBorder: false
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            }
+                            beginAtZero: true
                         }
                     }
                 }
             });
         }
 
-        function changeChartType(type) {
-            currentChartType = type;
-            
-            // Update button states
-            document.querySelectorAll('.chart-type-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            
-            // Update chart type
-            incidentTrendChart.destroy();
-            initializeCharts();
-        }
-
-        function updateChartWithCustomRange() {
-            showToast('Info', 'Chart date range updated', 'warning');
-        }
-
-        // Table Loading Functions
         function loadAllTables() {
-            loadIncidentsTable();
             loadEmployeeTable();
+            loadIncidentsTable();
             loadTrainingTable();
             loadPPETable();
-        }
-
-        function loadIncidentsTable() {
-            const mainTable = document.getElementById('allIncidentsTableBody');
-            const modalTable = document.getElementById('modalIncidentsTableBody');
-            
-            const tables = [mainTable, modalTable].filter(table => table);
-            
-            tables.forEach(table => {
-                table.innerHTML = '';
-                
-                if (incidents.length === 0) {
-                    table.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 2rem; color: var(--text-light);">No incidents reported yet</td></tr>';
-                    return;
-                }
-                
-                incidents.forEach((incident, index) => {
-                    const row = document.createElement('tr');
-                    const date = new Date(incident.date);
-                    const formattedDate = date.toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric'
-                    });
-                    
-                    row.innerHTML = `
-                        <td>${incident.id}</td>
-                        <td class="editable" onclick="editTableCell(this, 'incidents', ${index}, 'type')">${incident.type}</td>
-                        <td>${formattedDate}</td>
-                        <td>${incident.location}</td>
-                        <td>${incident.country}</td>
-                        <td>${incident.reportedBy}</td>
-                        <td class="editable" onclick="editTableCell(this, 'incidents', ${index}, 'severity')">${incident.severity}</td>
-                        <td class="editable" onclick="editTableCell(this, 'incidents', ${index}, 'status')">${incident.status}</td>
-                        <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">${incident.description}</td>
-                        <td>
-                            <button class="btn btn-sm btn-outline" onclick="deleteItem('incidents', ${index})">Delete</button>
-                        </td>
-                    `;
-                    table.appendChild(row);
-                });
-            });
+            loadContractorTable();
+            loadAuditTable();
+            loadStandardsTable();
+            loadRecentIncidents();
+            populateEmployeeDropdown();
         }
 
         function loadEmployeeTable() {
-            const table = document.getElementById('employeeTableBody');
+            const table = document.getElementById('employeeTable');
             if (!table) return;
             
-            table.innerHTML = '';
+            let filteredEmployees = currentFilter === 'All' ? employees : employees.filter(e => e.country === currentFilter);
             
-            employees.forEach((employee, index) => {
+            table.innerHTML = '';
+            filteredEmployees.forEach((emp, index) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${employee.id}</td>
-                    <td class="editable" onclick="editTableCell(this, 'employees', ${index}, 'name')">${employee.name}</td>
-                    <td class="editable" onclick="editTableCell(this, 'employees', ${index}, 'position')">${employee.position}</td>
-                    <td>${employee.country}</td>
-                    <td>${employee.location}</td>
-                    <td class="editable" onclick="editTableCell(this, 'employees', ${index}, 'training')">${employee.training}</td>
-                    <td><span style="color: ${employee.status === 'Active' ? '#27ae60' : '#e74c3c'}">${employee.status}</span></td>
+                    <td>${emp.id}</td>
+                    <td class="editable" onclick="editCell(this, 'employees', ${index}, 'name')">${emp.name}</td>
+                    <td class="editable" onclick="editCell(this, 'employees', ${index}, 'position')">${emp.position || ''}</td>
+                    <td class="editable" onclick="editCell(this, 'employees', ${index}, 'country')">${emp.country}</td>
+                    <td class="editable" onclick="editCell(this, 'employees', ${index}, 'location')">${emp.location}</td>
+                    <td class="editable" onclick="editCell(this, 'employees', ${index}, 'training')">${emp.training}</td>
+                    <td><span style="color: ${emp.status === 'Active' ? '#27ae60' : '#e74c3c'}">${emp.status}</span></td>
                     <td>
-                        <button class="btn btn-sm btn-outline" onclick="deleteItem('employees', ${index})">Delete</button>
+                        <button class="btn-sm" onclick="deleteEmployee(${index})" style="background: #e74c3c; color: white;">Delete</button>
                     </td>
                 `;
                 table.appendChild(row);
             });
         }
 
+        function loadIncidentsTable() {
+            const table = document.getElementById('incidentsTable');
+            const recentTable = document.getElementById('recentIncidentsTable');
+            
+            let filteredIncidents = currentFilter === 'All' ? incidents : incidents.filter(i => i.country === currentFilter);
+            
+            // Main incidents table
+            if (table) {
+                table.innerHTML = '';
+                filteredIncidents.forEach((inc, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${inc.id}</td>
+                        <td class="editable" onclick="editCell(this, 'incidents', ${index}, 'type')">${inc.type}</td>
+                        <td>${inc.date}</td>
+                        <td class="editable" onclick="editCell(this, 'incidents', ${index}, 'location')">${inc.location}</td>
+                        <td class="editable" onclick="editCell(this, 'incidents', ${index}, 'country')">${inc.country}</td>
+                        <td>${getEmployeeName(inc.reportedBy)}</td>
+                        <td class="editable" onclick="editCell(this, 'incidents', ${index}, 'severity')">${inc.severity}</td>
+                        <td class="editable" onclick="editCell(this, 'incidents', ${index}, 'status')">${inc.status}</td>
+                        <td class="editable" onclick="editCell(this, 'incidents', ${index}, 'description')">${inc.description}</td>
+                        <td>
+                            <button class="btn-sm" onclick="deleteIncident(${index})" style="background: #e74c3c; color: white;">Delete</button>
+                        </td>
+                    `;
+                    table.appendChild(row);
+                });
+            }
+            
+            // Recent incidents table (last 30 days)
+            if (recentTable) {
+                recentTable.innerHTML = '';
+                const thirtyDaysAgo = new Date();
+                thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                
+                const recentIncidents = filteredIncidents.filter(inc => new Date(inc.date) >= thirtyDaysAgo);
+                
+                recentIncidents.forEach((inc, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${inc.id}</td>
+                        <td>${inc.type}</td>
+                        <td>${inc.date}</td>
+                        <td>${inc.location}</td>
+                        <td>${inc.country}</td>
+                        <td>${inc.severity}</td>
+                        <td>${inc.status}</td>
+                        <td>
+                            <button class="btn-sm" onclick="deleteIncident(${index})" style="background: #e74c3c; color: white;">Delete</button>
+                        </td>
+                    `;
+                    recentTable.appendChild(row);
+                });
+            }
+        }
+
         function loadTrainingTable() {
-            const table = document.getElementById('trainingTableBody');
+            const table = document.getElementById('trainingTable');
             if (!table) return;
             
-            table.innerHTML = '';
+            let filteredTrainings = currentFilter === 'All' ? trainings : trainings.filter(t => t.country === currentFilter);
             
-            trainings.forEach((training, index) => {
+            table.innerHTML = '';
+            filteredTrainings.forEach((training, index) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${training.id}</td>
-                    <td class="editable" onclick="editTableCell(this, 'trainings', ${index}, 'course')">${training.course}</td>
-                    <td>${training.employee}</td>
-                    <td>${training.country}</td>
-                    <td>${training.date}</td>
-                    <td><span style="color: ${training.status === 'Completed' ? '#27ae60' : training.status === 'In Progress' ? '#f39c12' : '#e74c3c'}">${training.status}</span></td>
-                    <td>${training.certificate}</td>
+                    <td class="editable" onclick="editCell(this, 'trainings', ${index}, 'course')">${training.course}</td>
+                    <td class="editable" onclick="editCell(this, 'trainings', ${index}, 'employee')">${training.employee}</td>
+                    <td class="editable" onclick="editCell(this, 'trainings', ${index}, 'country')">${training.country}</td>
+                    <td class="editable" onclick="editCell(this, 'trainings', ${index}, 'date')">${training.date}</td>
+                    <td class="editable" onclick="editCell(this, 'trainings', ${index}, 'status')">${training.status}</td>
+                    <td class="editable" onclick="editCell(this, 'trainings', ${index}, 'certificate')">${training.certificate}</td>
+                    <td>${training.attachments ? training.attachments.length : 0} files</td>
                     <td>
-                        <button class="btn btn-sm btn-outline" onclick="deleteItem('trainings', ${index})">Delete</button>
+                        <button class="btn-sm" onclick="uploadTrainingAttachment(${index})" style="margin-right: 0.5rem;">📎</button>
+                        <button class="btn-sm" onclick="deleteTraining(${index})" style="background: #e74c3c; color: white;">Delete</button>
                     </td>
                 `;
                 table.appendChild(row);
@@ -2436,34 +1540,134 @@
         }
 
         function loadPPETable() {
-            const table = document.getElementById('ppeTableBody');
+            const table = document.getElementById('ppeTable');
             if (!table) return;
             
-            table.innerHTML = '';
+            let filteredPPE = currentFilter === 'All' ? ppeItems : ppeItems.filter(p => p.country === currentFilter);
             
-            ppeItems.forEach((item, index) => {
+            table.innerHTML = '';
+            filteredPPE.forEach((item, index) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${item.id}</td>
-                    <td class="editable" onclick="editTableCell(this, 'ppeItems', ${index}, 'type')">${item.type}</td>
-                    <td>${item.assignedTo}</td>
-                    <td>${item.country}</td>
-                    <td>${item.issueDate}</td>
-                    <td>${item.expiryDate}</td>
-                    <td>${item.status}</td>
-                    <td>${item.condition}</td>
+                    <td class="editable" onclick="editCell(this, 'ppeItems', ${index}, 'type')">${item.type}</td>
+                    <td class="editable" onclick="editCell(this, 'ppeItems', ${index}, 'assignedTo')">${item.assignedTo}</td>
+                    <td class="editable" onclick="editCell(this, 'ppeItems', ${index}, 'country')">${item.country}</td>
+                    <td class="editable" onclick="editCell(this, 'ppeItems', ${index}, 'issueDate')">${item.issueDate}</td>
+                    <td class="editable" onclick="editCell(this, 'ppeItems', ${index}, 'expiryDate')">${item.expiryDate}</td>
+                    <td class="editable" onclick="editCell(this, 'ppeItems', ${index}, 'status')">${item.status}</td>
+                    <td class="editable" onclick="editCell(this, 'ppeItems', ${index}, 'condition')">${item.condition}</td>
                     <td>
-                        <button class="btn btn-sm btn-outline" onclick="deleteItem('ppeItems', ${index})">Delete</button>
+                        <button class="btn-sm" onclick="deletePPE(${index})" style="background: #e74c3c; color: white;">Delete</button>
                     </td>
                 `;
                 table.appendChild(row);
             });
         }
 
-        function editTableCell(cell, dataType, index, field) {
+        function loadContractorTable() {
+            const table = document.getElementById('contractorTable');
+            if (!table) return;
+            
+            let filteredContractors = currentFilter === 'All' ? contractors : contractors.filter(c => c.country === currentFilter);
+            
+            table.innerHTML = '';
+            filteredContractors.forEach((contractor, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${contractor.id}</td>
+                    <td class="editable" onclick="editCell(this, 'contractors', ${index}, 'company')">${contractor.company}</td>
+                    <td class="editable" onclick="editCell(this, 'contractors', ${index}, 'contactPerson')">${contractor.contactPerson}</td>
+                    <td class="editable" onclick="editCell(this, 'contractors', ${index}, 'country')">${contractor.country}</td>
+                    <td class="editable" onclick="editCell(this, 'contractors', ${index}, 'workType')">${contractor.workType}</td>
+                    <td class="editable" onclick="editCell(this, 'contractors', ${index}, 'startDate')">${contractor.startDate}</td>
+                    <td class="editable" onclick="editCell(this, 'contractors', ${index}, 'endDate')">${contractor.endDate}</td>
+                    <td class="editable" onclick="editCell(this, 'contractors', ${index}, 'safetyRating')">${contractor.safetyRating}</td>
+                    <td>${contractor.attachments ? contractor.attachments.length : 0} files</td>
+                    <td>
+                        <button class="btn-sm" onclick="uploadContractorAttachment(${index})" style="margin-right: 0.5rem;">📎</button>
+                        <button class="btn-sm" onclick="deleteContractor(${index})" style="background: #e74c3c; color: white;">Delete</button>
+                    </td>
+                `;
+                table.appendChild(row);
+            });
+        }
+
+        function loadAuditTable() {
+            const table = document.getElementById('auditTable');
+            if (!table) return;
+            
+            let filteredAudits = currentFilter === 'All' ? audits : audits.filter(a => a.country === currentFilter);
+            
+            table.innerHTML = '';
+            filteredAudits.forEach((audit, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${audit.id}</td>
+                    <td class="editable" onclick="editCell(this, 'audits', ${index}, 'type')">${audit.type}</td>
+                    <td class="editable" onclick="editCell(this, 'audits', ${index}, 'country')">${audit.country}</td>
+                    <td class="editable" onclick="editCell(this, 'audits', ${index}, 'location')">${audit.location}</td>
+                    <td class="editable" onclick="editCell(this, 'audits', ${index}, 'auditDate')">${audit.auditDate}</td>
+                    <td class="editable" onclick="editCell(this, 'audits', ${index}, 'auditor')">${audit.auditor}</td>
+                    <td class="editable" onclick="editCell(this, 'audits', ${index}, 'score')">${audit.score}</td>
+                    <td class="editable" onclick="editCell(this, 'audits', ${index}, 'status')">${audit.status}</td>
+                    <td class="editable" onclick="editCell(this, 'audits', ${index}, 'findings')">${audit.findings}</td>
+                    <td>${audit.attachments ? audit.attachments.length : 0} files</td>
+                    <td>
+                        <button class="btn-sm" onclick="uploadAuditAttachment(${index})" style="margin-right: 0.5rem;">📎</button>
+                        <button class="btn-sm" onclick="deleteAudit(${index})" style="background: #e74c3c; color: white;">Delete</button>
+                    </td>
+                `;
+                table.appendChild(row);
+            });
+        }
+
+        function loadStandardsTable() {
+            const table = document.getElementById('standardsTable');
+            if (!table) return;
+            
+            table.innerHTML = '';
+            standards.forEach((standard, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${standard.id}</td>
+                    <td class="editable" onclick="editCell(this, 'standards', ${index}, 'name')">${standard.name}</td>
+                    <td class="editable" onclick="editCell(this, 'standards', ${index}, 'code')">${standard.code}</td>
+                    <td class="editable" onclick="editCell(this, 'standards', ${index}, 'type')">${standard.type}</td>
+                    <td class="editable" onclick="editCell(this, 'standards', ${index}, 'industry')">${standard.industry}</td>
+                    <td class="editable" onclick="editCell(this, 'standards', ${index}, 'status')">${standard.status}</td>
+                    <td class="editable" onclick="editCell(this, 'standards', ${index}, 'effectiveDate')">${standard.effectiveDate}</td>
+                    <td class="editable" onclick="editCell(this, 'standards', ${index}, 'remarks')">${standard.remarks}</td>
+                    <td>
+                        <button class="btn-sm" onclick="deleteStandard(${index})" style="background: #e74c3c; color: white;">Delete</button>
+                    </td>
+                `;
+                table.appendChild(row);
+            });
+        }
+
+        function populateEmployeeDropdown() {
+            const select = document.getElementById('reportedBy');
+            if (!select) return;
+            
+            select.innerHTML = '<option value="">Select employee</option>';
+            employees.forEach(emp => {
+                const option = document.createElement('option');
+                option.value = emp.id;
+                option.textContent = `${emp.name} (${emp.id})`;
+                select.appendChild(option);
+            });
+        }
+
+        function getEmployeeName(employeeId) {
+            const employee = employees.find(e => e.id === employeeId);
+            return employee ? employee.name : employeeId;
+        }
+
+        function editCell(cell, dataType, index, field) {
             if (editingCell) return;
             
-            editingCell = cell;
+            editingCell = {cell, dataType, index, field};
             const originalValue = cell.textContent;
             
             const input = document.createElement('input');
@@ -2473,12 +1677,12 @@
             input.style.width = '100%';
             
             input.onblur = function() {
-                saveTableCell(dataType, index, field, this.value, cell);
+                saveCellEdit(this.value);
             };
             
             input.onkeypress = function(e) {
                 if (e.key === 'Enter') {
-                    saveTableCell(dataType, index, field, this.value, cell);
+                    saveCellEdit(this.value);
                 }
             };
             
@@ -2488,259 +1692,218 @@
             input.select();
         }
 
-        function saveTableCell(dataType, index, field, value, cell) {
+        function saveCellEdit(value) {
+            if (!editingCell) return;
+            
+            const {cell, dataType, index, field} = editingCell;
+            
             let dataArray;
             switch(dataType) {
-                case 'incidents': dataArray = incidents; break;
                 case 'employees': dataArray = employees; break;
+                case 'incidents': dataArray = incidents; break;
                 case 'trainings': dataArray = trainings; break;
                 case 'ppeItems': dataArray = ppeItems; break;
+                case 'contractors': dataArray = contractors; break;
+                case 'audits': dataArray = audits; break;
+                case 'standards': dataArray = standards; break;
                 default: return;
             }
             
             if (dataArray[index]) {
                 dataArray[index][field] = value;
                 cell.textContent = value;
-                cell.classList.remove('editing');
-                
                 saveAllData();
+                updateStatistics();
                 showToast('Success', `${field} updated successfully!`, 'success');
             }
             
             editingCell = null;
         }
 
-        function deleteItem(dataType, index) {
-            showConfirmDialog('Delete Item', 'Are you sure you want to delete this item?', function() {
-                let dataArray;
-                switch(dataType) {
-                    case 'incidents': dataArray = incidents; break;
-                    case 'employees': dataArray = employees; break;
-                    case 'trainings': dataArray = trainings; break;
-                    case 'ppeItems': dataArray = ppeItems; break;
-                    default: return;
-                }
-                
-                dataArray.splice(index, 1);
-                saveAllData();
-                loadAllTables();
-                updateStatistics();
-                showToast('Deleted', 'Item deleted successfully!', 'success');
+        // Filter Functions
+        function filterData(country) {
+            currentFilter = country;
+            
+            // Update active button
+            document.querySelectorAll('.country-btn').forEach(btn => {
+                btn.classList.remove('active');
             });
-        }
-
-        // Incident Reporting
-        function submitIncidentReport() {
-            const type = document.getElementById('incidentType').value;
-            const severity = document.getElementById('incidentSeverity').value;
-            const country = document.getElementById('incidentCountry').value;
-            const location = document.getElementById('incidentLocation').value;
-            const reportedById = document.getElementById('reportedBy').value;
-            const dateTime = document.getElementById('incidentDateTime').value;
-            const description = document.getElementById('incidentDescription').value;
-            const actions = document.getElementById('immediateActions').value;
-            const recommendations = document.getElementById('recommendations').value;
+            event?.target?.classList?.add('active');
             
-            if (!type || !severity || !country || !location || !reportedById || !dateTime || !description) {
-                document.getElementById('reportError').style.display = 'block';
-                setTimeout(() => {
-                    document.getElementById('reportError').style.display = 'none';
-                }, 3000);
-                return;
-            }
-            
-            const reportedBy = employees.find(emp => emp.id === reportedById)?.name || reportedById;
-            
-            const newIncident = {
-                id: `INC-${new Date().getFullYear()}-${(incidents.length + 1).toString().padStart(3, '0')}`,
-                type: type,
-                severity: severity,
-                country: country,
-                location: location,
-                reportedBy: reportedBy,
-                date: dateTime,
-                status: 'Reported',
-                description: description,
-                actions: actions,
-                recommendations: recommendations
-            };
-            
-            incidents.unshift(newIncident);
-            saveAllData();
-            
-            // Show success
-            document.getElementById('reportSuccess').style.display = 'block';
-            
-            // Clear form
-            document.getElementById('incidentType').value = '';
-            document.getElementById('incidentSeverity').value = '';
-            document.getElementById('incidentCountry').value = '';
-            document.getElementById('incidentLocation').value = '';
-            document.getElementById('reportedBy').value = '';
-            document.getElementById('incidentDateTime').value = '';
-            document.getElementById('incidentDescription').value = '';
-            document.getElementById('immediateActions').value = '';
-            document.getElementById('recommendations').value = '';
-            
-            // Update UI
             loadAllTables();
             updateStatistics();
             
-            // Close modal
-            setTimeout(() => {
-                closeModal('reportIncidentModal');
-                document.getElementById('reportSuccess').style.display = 'none';
-            }, 2000);
-        }
-
-        // Employee Management
-        function switchEmployeeTab(tabName) {
-            document.querySelectorAll('#employeeModal .tab-button').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            
-            document.getElementById('allEmployeesTab').classList.remove('active');
-            document.getElementById('byCountryTab').classList.remove('active');
-            document.getElementById('addEmployeeTab').classList.remove('active');
-            
-            document.getElementById(tabName + 'Tab').classList.add('active');
-        }
-
-        function filterEmployeesByCountry() {
-            const country = document.getElementById('countryFilter').value;
-            const table = document.getElementById('filteredEmployeeTable');
-            
-            table.innerHTML = '';
-            
-            const filteredEmployees = country ? 
-                employees.filter(emp => emp.country === country) : 
-                employees;
-            
-            filteredEmployees.forEach(employee => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${employee.id}</td>
-                    <td>${employee.name}</td>
-                    <td>${employee.position}</td>
-                    <td>${employee.location}</td>
-                    <td>${employee.training}</td>
-                    <td><span style="color: ${employee.status === 'Active' ? '#27ae60' : '#e74c3c'}">${employee.status}</span></td>
-                `;
-                table.appendChild(row);
-            });
-        }
-
-        function addNewEmployee() {
-            const name = document.getElementById('newEmployeeName').value;
-            const id = document.getElementById('newEmployeeId').value;
-            const country = document.getElementById('newEmployeeCountry').value;
-            const location = document.getElementById('newEmployeeLocation').value;
-            const position = document.getElementById('newEmployeePosition').value;
-            const department = document.getElementById('newEmployeeDepartment').value;
-            
-            if (!name || !id || !country || !location) {
-                alert('Please fill all required fields');
-                return;
+            if (country !== 'All') {
+                showToast('Filter Applied', `Showing data for ${country}`, 'warning');
             }
-            
-            const newEmployee = {
-                id: id,
-                name: name,
-                position: position,
-                country: country,
-                location: location,
-                department: department,
+        }
+
+        // Add New Items Functions
+        function addEmployee() {
+            const newId = `EMP-${new Date().getFullYear()}-${(employees.length + 1).toString().padStart(3, '0')}`;
+            employees.push({
+                id: newId,
+                name: 'New Employee',
+                position: '',
+                country: 'South Africa',
+                location: '',
                 status: 'Active',
                 training: 'Pending'
-            };
-            
-            employees.push(newEmployee);
+            });
             saveAllData();
             loadEmployeeTable();
             populateEmployeeDropdown();
             updateStatistics();
-            
-            // Clear form
-            document.getElementById('newEmployeeName').value = '';
-            document.getElementById('newEmployeeId').value = '';
-            document.getElementById('newEmployeeCountry').value = '';
-            document.getElementById('newEmployeeLocation').value = '';
-            document.getElementById('newEmployeePosition').value = '';
-            document.getElementById('newEmployeeDepartment').value = '';
-            
             showToast('Success', 'Employee added successfully!', 'success');
-            switchEmployeeTab('allEmployees');
         }
 
-        // Standards Management
-        function loadStandards() {
-            const grid = document.getElementById('standardsGrid');
-            if (!grid) return;
-            
-            grid.innerHTML = '';
-            
-            standards.forEach((standard, index) => {
-                const card = document.createElement('div');
-                card.className = 'standard-card';
-                
-                const statusClass = standard.status === 'Compliant' ? 'status-compliant' : 
-                                  standard.status === 'Non-Compliant' ? 'status-noncompliant' : 'status-pending';
-                
-                card.innerHTML = `
-                    <div class="standard-badge ${standard.type === 'International' ? 'badge-international' : 'badge-national'}">
-                        ${standard.type}
-                    </div>
-                    <h3>${standard.name}</h3>
-                    <div class="standard-code">${standard.code}</div>
-                    <div class="standard-industry">${standard.industry}</div>
-                    <div class="standard-status ${statusClass}">${standard.status}</div>
-                    <p style="font-size: 0.9rem; margin-bottom: 1rem; color: var(--text-light);">
-                        ${standard.description}
-                    </p>
-                    <div style="font-size: 0.8rem; color: var(--text-light); margin-bottom: 1rem;">
-                        <strong>Effective:</strong> ${standard.effectiveDate || 'N/A'}
-                    </div>
-                    <div style="font-size: 0.8rem; color: var(--text-light); margin-bottom: 1rem;">
-                        <strong>Remarks:</strong> ${standard.remarks || 'No remarks'}
-                    </div>
-                    <div class="standard-actions">
-                        <button class="btn btn-sm btn-outline" onclick="editStandard(${index})">Edit</button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteStandard(${index})">Delete</button>
-                    </div>
-                `;
-                grid.appendChild(card);
+        function addTraining() {
+            const newId = `TRN-${new Date().getFullYear()}-${(trainings.length + 1).toString().padStart(3, '0')}`;
+            trainings.push({
+                id: newId,
+                course: 'New Safety Training',
+                employee: 'Select Employee',
+                employeeId: '',
+                country: 'South Africa',
+                date: new Date().toISOString().split('T')[0],
+                status: 'Pending',
+                certificate: 'No',
+                attachments: []
             });
+            saveAllData();
+            loadTrainingTable();
+            updateStatistics();
+            showToast('Success', 'Training added successfully!', 'success');
+        }
+
+        function addPPE() {
+            const newId = `PPE-${new Date().getFullYear()}-${(ppeItems.length + 1).toString().padStart(3, '0')}`;
+            ppeItems.push({
+                id: newId,
+                type: 'New Equipment',
+                assignedTo: 'Select Employee',
+                assignedToId: '',
+                country: 'South Africa',
+                issueDate: new Date().toISOString().split('T')[0],
+                expiryDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
+                status: 'Active',
+                condition: 'Good'
+            });
+            saveAllData();
+            loadPPETable();
+            showToast('Success', 'PPE item added successfully!', 'success');
+        }
+
+        function addContractor() {
+            const newId = `CTR-${new Date().getFullYear()}-${(contractors.length + 1).toString().padStart(3, '0')}`;
+            contractors.push({
+                id: newId,
+                company: 'New Contractor',
+                contactPerson: '',
+                country: 'South Africa',
+                workType: '',
+                startDate: new Date().toISOString().split('T')[0],
+                endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
+                safetyRating: 'A',
+                attachments: []
+            });
+            saveAllData();
+            loadContractorTable();
+            showToast('Success', 'Contractor added successfully!', 'success');
+        }
+
+        function addAudit() {
+            const newId = `AUD-${new Date().getFullYear()}-${(audits.length + 1).toString().padStart(3, '0')}`;
+            audits.push({
+                id: newId,
+                type: 'Safety Audit',
+                country: 'South Africa',
+                location: '',
+                auditDate: new Date().toISOString().split('T')[0],
+                auditor: '',
+                score: '0%',
+                status: 'Scheduled',
+                findings: '',
+                attachments: []
+            });
+            saveAllData();
+            loadAuditTable();
+            showToast('Success', 'Audit scheduled successfully!', 'success');
         }
 
         function addStandard() {
-            editingStandardIndex = -1;
-            
-            const newStandard = {
-                id: `STD-${new Date().getFullYear()}-${(standards.length + 1).toString().padStart(3, '0')}`,
+            const newId = `STD-${new Date().getFullYear()}-${(standards.length + 1).toString().padStart(3, '0')}`;
+            standards.push({
+                id: newId,
                 name: 'New Standard',
                 code: 'NEW-STD',
                 type: 'International',
                 industry: 'General Industry',
-                description: 'Description of the new standard',
-                status: 'Pending Review',
+                status: 'Pending',
                 effectiveDate: new Date().toISOString().split('T')[0],
-                remarks: 'New standard added'
-            };
-            
-            standards.push(newStandard);
+                remarks: ''
+            });
             saveAllData();
-            loadStandards();
-            showToast('Success', 'New standard added!', 'success');
+            loadStandardsTable();
+            showToast('Success', 'Standard added successfully!', 'success');
         }
 
-        function editStandard(index) {
-            const newName = prompt('Enter new standard name:', standards[index].name);
-            if (newName !== null) {
-                standards[index].name = newName;
+        // Delete Functions
+        function deleteEmployee(index) {
+            if (confirm('Delete this employee?')) {
+                employees.splice(index, 1);
                 saveAllData();
-                loadStandards();
-                showToast('Success', 'Standard updated!', 'success');
+                loadEmployeeTable();
+                populateEmployeeDropdown();
+                updateStatistics();
+                showToast('Deleted', 'Employee deleted successfully!', 'success');
+            }
+        }
+
+        function deleteIncident(index) {
+            if (confirm('Delete this incident?')) {
+                incidents.splice(index, 1);
+                saveAllData();
+                loadIncidentsTable();
+                updateStatistics();
+                showToast('Deleted', 'Incident deleted successfully!', 'success');
+            }
+        }
+
+        function deleteTraining(index) {
+            if (confirm('Delete this training record?')) {
+                trainings.splice(index, 1);
+                saveAllData();
+                loadTrainingTable();
+                updateStatistics();
+                showToast('Deleted', 'Training deleted successfully!', 'success');
+            }
+        }
+
+        function deletePPE(index) {
+            if (confirm('Delete this PPE item?')) {
+                ppeItems.splice(index, 1);
+                saveAllData();
+                loadPPETable();
+                showToast('Deleted', 'PPE item deleted successfully!', 'success');
+            }
+        }
+
+        function deleteContractor(index) {
+            if (confirm('Delete this contractor?')) {
+                contractors.splice(index, 1);
+                saveAllData();
+                loadContractorTable();
+                showToast('Deleted', 'Contractor deleted successfully!', 'success');
+            }
+        }
+
+        function deleteAudit(index) {
+            if (confirm('Delete this audit?')) {
+                audits.splice(index, 1);
+                saveAllData();
+                loadAuditTable();
+                showToast('Deleted', 'Audit deleted successfully!', 'success');
             }
         }
 
@@ -2748,103 +1911,269 @@
             if (confirm('Delete this standard?')) {
                 standards.splice(index, 1);
                 saveAllData();
-                loadStandards();
-                updateStatistics();
-                showToast('Deleted', 'Standard deleted!', 'success');
+                loadStandardsTable();
+                showToast('Deleted', 'Standard deleted successfully!', 'success');
             }
         }
 
-        // Add New Items
-        function addTrainingRecord() {
-            const newTraining = {
-                id: `TRN-${new Date().getFullYear()}-${(trainings.length + 1).toString().padStart(3, '0')}`,
-                course: 'New Safety Training',
-                employee: 'Select Employee',
-                country: 'Zambia',
+        // Upload Functions
+        function uploadTrainingAttachment(index) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.multiple = true;
+            input.onchange = function(e) {
+                const files = e.target.files;
+                if (!trainings[index].attachments) {
+                    trainings[index].attachments = [];
+                }
+                for (let file of files) {
+                    trainings[index].attachments.push(file.name);
+                }
+                saveAllData();
+                loadTrainingTable();
+                showToast('Success', 'Attachment(s) uploaded successfully!', 'success');
+            };
+            input.click();
+        }
+
+        function uploadContractorAttachment(index) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.multiple = true;
+            input.onchange = function(e) {
+                const files = e.target.files;
+                if (!contractors[index].attachments) {
+                    contractors[index].attachments = [];
+                }
+                for (let file of files) {
+                    contractors[index].attachments.push(file.name);
+                }
+                saveAllData();
+                loadContractorTable();
+                showToast('Success', 'Attachment(s) uploaded successfully!', 'success');
+            };
+            input.click();
+        }
+
+        function uploadAuditAttachment(index) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.multiple = true;
+            input.onchange = function(e) {
+                const files = e.target.files;
+                if (!audits[index].attachments) {
+                    audits[index].attachments = [];
+                }
+                for (let file of files) {
+                    audits[index].attachments.push(file.name);
+                }
+                saveAllData();
+                loadAuditTable();
+                showToast('Success', 'Attachment(s) uploaded successfully!', 'success');
+            };
+            input.click();
+        }
+
+        // Incident Reporting
+        function submitIncident() {
+            const type = document.getElementById('incidentType').value;
+            const severity = document.getElementById('incidentSeverity').value;
+            const country = document.getElementById('incidentCountry').value;
+            const location = document.getElementById('incidentLocation').value;
+            const reportedBy = document.getElementById('reportedBy').value;
+            const description = document.getElementById('incidentDescription').value;
+            
+            if (!type || !severity || !country || !location || !reportedBy || !description) {
+                showToast('Error', 'Please fill all required fields!', 'error');
+                return;
+            }
+            
+            const newId = `INC-${new Date().getFullYear()}-${(incidents.length + 1).toString().padStart(3, '0')}`;
+            incidents.push({
+                id: newId,
+                type: type,
+                severity: severity,
+                country: country,
+                location: location,
+                reportedBy: reportedBy,
                 date: new Date().toISOString().split('T')[0],
-                status: 'Pending',
-                certificate: 'No'
-            };
+                status: 'Reported',
+                description: description
+            });
             
-            trainings.push(newTraining);
             saveAllData();
-            loadTrainingTable();
-            showToast('Success', 'New training record added!', 'success');
+            loadIncidentsTable();
+            updateStatistics();
+            
+            // Clear form
+            document.getElementById('incidentType').value = '';
+            document.getElementById('incidentSeverity').value = '';
+            document.getElementById('incidentCountry').value = '';
+            document.getElementById('incidentLocation').value = '';
+            document.getElementById('reportedBy').value = '';
+            document.getElementById('incidentDescription').value = '';
+            
+            closeModal('reportIncidentModal');
+            showToast('Success', 'Incident reported successfully!', 'success');
         }
 
-        function addPPEItem() {
-            const newItem = {
-                id: `PPE-${new Date().getFullYear()}-${(ppeItems.length + 1).toString().padStart(3, '0')}`,
-                type: 'New Equipment',
-                assignedTo: 'Select Employee',
-                country: 'South Africa',
-                issueDate: new Date().toISOString().split('T')[0],
-                expiryDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
-                status: 'Active',
-                condition: 'Good'
+        // Settings Functions
+        function saveSettings() {
+            // Save settings to localStorage
+            const settings = {
+                theme: document.getElementById('themeColor').value,
+                emailNotifications: document.getElementById('emailNotifications').checked,
+                pushNotifications: document.getElementById('pushNotifications').checked,
+                reportReminders: document.getElementById('reportReminders').checked
             };
+            localStorage.setItem('mms_settings', JSON.stringify(settings));
             
-            ppeItems.push(newItem);
-            saveAllData();
-            loadPPETable();
-            showToast('Success', 'New PPE item added!', 'success');
+            showToast('Success', 'Settings saved successfully!', 'success');
+            closeModal('settingsModal');
         }
 
-        // Filter by Country
-        function filterByCountry(countryCode) {
-            let countryName = '';
-            switch(countryCode) {
-                case 'ZA': countryName = 'South Africa'; break;
-                case 'TZ': countryName = 'Tanzania'; break;
-                case 'NA': countryName = 'Namibia'; break;
-                case 'ZM': countryName = 'Zambia'; break;
-            }
-            
-            const filteredEmployees = employees.filter(emp => emp.country === countryName);
-            const filteredIncidents = incidents.filter(inc => inc.country === countryName);
-            
-            let message = `Showing data for ${countryName}: `;
-            message += `${filteredEmployees.length} employees, `;
-            message += `${filteredIncidents.length} incidents`;
-            
-            showToast('Filter Applied', message, 'warning');
-        }
-
-        // Export Data
-        function exportData() {
-            const data = {
+        function backupData() {
+            const backup = {
                 employees: employees,
                 incidents: incidents,
                 trainings: trainings,
                 ppeItems: ppeItems,
+                contractors: contractors,
+                audits: audits,
                 standards: standards,
-                exportDate: new Date().toISOString()
+                backupDate: new Date().toISOString()
             };
             
-            const dataStr = JSON.stringify(data, null, 2);
+            const dataStr = JSON.stringify(backup, null, 2);
             const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-            
-            const exportFileDefaultName = `mms-safety-data-${new Date().toISOString().split('T')[0]}.json`;
             
             const linkElement = document.createElement('a');
             linkElement.setAttribute('href', dataUri);
-            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.setAttribute('download', `mms-backup-${new Date().toISOString().split('T')[0]}.json`);
             linkElement.click();
             
-            showToast('Export Complete', 'Data exported successfully', 'success');
+            showToast('Success', 'Backup created successfully!', 'success');
+        }
+
+        function restoreData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const backup = JSON.parse(e.target.result);
+                        employees = backup.employees || [];
+                        incidents = backup.incidents || [];
+                        trainings = backup.trainings || [];
+                        ppeItems = backup.ppeItems || [];
+                        contractors = backup.contractors || [];
+                        audits = backup.audits || [];
+                        standards = backup.standards || [];
+                        
+                        saveAllData();
+                        loadAllTables();
+                        updateStatistics();
+                        showToast('Success', 'Data restored successfully!', 'success');
+                    } catch (error) {
+                        showToast('Error', 'Invalid backup file!', 'error');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function resetData() {
+            if (confirm('This will reset all data to default values. Are you sure?')) {
+                localStorage.clear();
+                loadAllData();
+                loadAllTables();
+                updateStatistics();
+                showToast('Success', 'All data reset to default!', 'success');
+            }
+        }
+
+        // PDF Export Functions
+        function exportPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Title
+            doc.setFontSize(20);
+            doc.text('MMS Health & Safety Report', 20, 20);
+            doc.setFontSize(12);
+            doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 30);
+            doc.text(`Filter: ${currentFilter}`, 20, 40);
+            
+            // Summary Statistics
+            doc.setFontSize(16);
+            doc.text('Summary Statistics', 20, 60);
+            doc.setFontSize(12);
+            doc.text(`Total Employees: ${employees.filter(e => currentFilter === 'All' || e.country === currentFilter).length}`, 20, 70);
+            doc.text(`Lost Time Injuries: ${incidents.filter(i => (currentFilter === 'All' || i.country === currentFilter) && i.type === 'Lost Time Injury').length}`, 20, 80);
+            doc.text(`Completed Trainings: ${trainings.filter(t => (currentFilter === 'All' || t.country === currentFilter) && t.status === 'Completed').length}`, 20, 90);
+            
+            // Export each table
+            exportTableToPDF(doc, 'Employees', employees.filter(e => currentFilter === 'All' || e.country === currentFilter), 110);
+            exportTableToPDF(doc, 'Incidents', incidents.filter(i => currentFilter === 'All' || i.country === currentFilter), 110 + 40);
+            
+            // Save PDF
+            doc.save(`mms-safety-report-${new Date().toISOString().split('T')[0]}.pdf`);
+            showToast('Success', 'PDF exported successfully!', 'success');
+        }
+
+        function exportTableToPDF(doc, title, data, yPosition) {
+            if (data.length === 0) return yPosition;
+            
+            doc.addPage();
+            doc.setFontSize(16);
+            doc.text(title, 20, 20);
+            
+            const headers = Object.keys(data[0]);
+            const rows = data.map(item => headers.map(header => item[header]));
+            
+            doc.autoTable({
+                head: [headers],
+                body: rows,
+                startY: 30,
+                theme: 'striped',
+                headStyles: { fillColor: [26, 53, 104] }
+            });
+            
+            return doc.lastAutoTable.finalY + 10;
+        }
+
+        // Modal Functions
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function showDashboard() {
+            // Reload all data
+            loadAllTables();
+            updateStatistics();
         }
 
         // Toast Notification Functions
         function showToast(title, message, type) {
             const toast = document.getElementById('toast');
-            const toastTitle = toast.querySelector('.toast-title');
-            const toastMessage = toast.querySelector('.toast-message');
-            const toastIcon = toast.querySelector('.toast-icon');
+            const toastTitle = document.getElementById('toastTitle');
+            const toastMessage = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
             
-            toast.className = `toast toast-${type}`;
             toastTitle.textContent = title;
             toastMessage.textContent = message;
             toastIcon.textContent = type === 'success' ? '✅' : type === 'error' ? '❌' : '⚠️';
+            toast.style.borderLeftColor = type === 'success' ? '#27ae60' : type === 'error' ? '#e74c3c' : '#f39c12';
             
             toast.classList.add('show');
             
@@ -2858,74 +2187,7 @@
             toast.classList.remove('show');
         }
 
-        // Confirm Dialog Functions
-        function showConfirmDialog(title, message, onConfirm) {
-            const dialog = document.getElementById('confirmDialog');
-            const dialogTitle = document.getElementById('confirmTitle');
-            const dialogMessage = document.getElementById('confirmMessage');
-            const confirmBtn = document.getElementById('confirmDeleteBtn');
-            
-            dialogTitle.textContent = title;
-            dialogMessage.textContent = message;
-            
-            confirmBtn.onclick = function() {
-                hideConfirmDialog();
-                if (onConfirm) onConfirm();
-            };
-            
-            dialog.classList.add('show');
-        }
-
-        function hideConfirmDialog() {
-            const dialog = document.getElementById('confirmDialog');
-            dialog.classList.remove('show');
-        }
-
-        // Modal Functions
-        function openModal(modalId) {
-            document.getElementById(modalId).style.display = 'block';
-            document.body.style.overflow = 'hidden';
-            
-            // Reload data for specific modals
-            if (modalId === 'employeeModal') {
-                loadEmployeeTable();
-            } else if (modalId === 'incidentsModal') {
-                loadIncidentsTable();
-            } else if (modalId === 'trainingModal') {
-                loadTrainingTable();
-            } else if (modalId === 'ppeModal') {
-                loadPPETable();
-            } else if (modalId === 'riskModal') {
-                loadModalRiskMatrix();
-            } else if (modalId === 'standardsModal') {
-                loadStandards();
-            }
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
-
-        function loadModalRiskMatrix() {
-            const matrixContainer = document.getElementById('modalRiskMatrix');
-            if (!matrixContainer) return;
-            
-            matrixContainer.innerHTML = '';
-            
-            riskMatrix.forEach(item => {
-                const cell = document.createElement('div');
-                cell.className = `matrix-cell ${item.riskClass}`;
-                cell.innerHTML = `
-                    <div>${item.location}</div>
-                    <div>${item.country}</div>
-                `;
-                cell.onclick = function() { editRiskCell(this, item); };
-                matrixContainer.appendChild(cell);
-            });
-        }
-
-        // Setup event listeners
+        // Event Listeners
         function setupEventListeners() {
             window.onclick = function(event) {
                 if (event.target.classList.contains('modal')) {
@@ -2945,41 +2207,6 @@
                     });
                 }
             });
-            
-            document.addEventListener('click', function(e) {
-                if (editingCell && !editingCell.contains(e.target)) {
-                    editingCell = null;
-                }
-            });
-        }
-
-        // Placeholder functions for navigation
-        function showBackup() {
-            showToast('Info', 'Backup functionality coming soon', 'warning');
-        }
-
-        function showSettings() {
-            showToast('Info', 'Settings functionality coming soon', 'warning');
-        }
-
-        function exportEmployeeData() {
-            const employeeData = employees.map(emp => ({
-                'Employee ID': emp.id,
-                'Name': emp.name,
-                'Position': emp.position,
-                'Country': emp.country,
-                'Location': emp.location,
-                'Department': emp.department,
-                'Status': emp.status,
-                'Safety Training': emp.training
-            }));
-            
-            const ws = XLSX.utils.json_to_sheet(employeeData);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'MMS Employees');
-            XLSX.writeFile(wb, `mms-employees-${new Date().toISOString().split('T')[0]}.xlsx`);
-            
-            showToast('Export Complete', 'Employee data exported to Excel', 'success');
         }
     </script>
 </body>

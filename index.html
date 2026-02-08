@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Metal Management Solutions Health & Safety Management System">
+    <meta name="theme-color" content="#2563eb">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MMS Safety">
+    <link rel="apple-touch-icon" href="images/logo-192x192.png">
+    
+    <link rel="manifest" href="manifest.json">
+    <title>MMS Safety Dashboard</title>
+    
+    <!-- External Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    
+    <!-- Local Styles and Scripts -->
+    <link rel="stylesheet" href="style.css">
+    <script src="pwa-init.js" defer></script>
+    <script src="app.js" defer></script>
+    
+    <!-- Preconnect for external resources -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+</head>
+<body>
+    <div class="dashboard">
+        <nav class="sidebar">
+            <!-- Company Logo and Name -->
+            <div class="logo">
+                <div class="logo-icon">MMS</div>
+                <div>
+                    <div style="font-weight: 700; font-size: 1.25rem;">Metal Management</div>
+                    <div style="font-size: 0.875rem; color: var(--text-light);">Safety Dashboard</div>
+                </div>
+            </div>
+
+            <!-- Navigation Sections -->
+            <div class="nav-section">
+                <div class="nav-title">Navigation</div>
+                <button class="nav-item active" onclick="showSection('dashboard')">
+                    <span class="nav-icon">🏠</span>
+                    Dashboard
+                </button>
+                <button class="nav-item" onclick="showSection('employees')">
+                    <span class="nav-icon">👥</span>
+                    Employee Management
+                </button>
+                <button class="nav-item" onclick="showSection('incidents')">
+                    <span class="nav-icon">🚨</span>
+                    Incidents
+                </button>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Safety Management</div>
+                <button class="nav-item" onclick="openModal('incidentsModal')">
+                    <span class="nav-icon">📊</span>
+                    Risk Assessment
+                </button>
+                <button class="nav-item" onclick="openModal('trainingModal')">
+                    <span class="nav-icon">🎓</span>
+                    Safety Training
+                </button>
+                <button class="nav-item" onclick="openModal('ppeModal')">
+                    <span class="nav-icon">🥽</span>
+                    PPE Management
+                </button>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Compliance</div>
+                <button class="nav-item" onclick="openModal('auditModal')">
+                    <span class="nav-icon">🔍</span>
+                    Audit & Inspection
+                </button>
+                <button class="nav-item" onclick="openModal('standardsModal')">
+                    <span class="nav-icon">📋</span>
+                    Standards Compliance
+                </button>
+            </div>
+
+            <!-- Country Operations -->
+            <div class="nav-section">
+                <div class="nav-title">Operations</div>
+                <button class="nav-item" onclick="showCountry('south-africa')">
+                    <span class="nav-icon">🇿🇦</span>
+                    South Africa
+                </button>
+                <button class="nav-item" onclick="showCountry('zambia')">
+                    <span class="nav-icon">🇿🇲</span>
+                    Zambia
+                </button>
+                <button class="nav-item" onclick="showCountry('namibia')">
+                    <span class="nav-icon">🇳🇦</span>
+                    Namibia
+                </button>
+                <button class="nav-item" onclick="showCountry('tanzania')">
+                    <span class="nav-icon">🇹🇿</span>
+                    Tanzania
+                </button>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <!-- Header with Install Button -->
+            <div class="header">
+                <div>
+                    <h1>MMS Safety Dashboard</h1>
+                    <div style="color: var(--text-light); margin-top: 0.5rem;">
+                        Occupational Health & Safety Management System
+                    </div>
+                </div>
+                <div>
+                    <button class="btn btn-primary" onclick="openModal('reportIncidentModal')">
+                        🚨 Report Incident
+                    </button>
+                    <button class="btn btn-success" id="installBtn">
+                        ⬇️ Install App
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dashboard Section (Default) -->
+            <div id="dashboard-section" class="content-section active">
+                <!-- Statistics Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card" onclick="openModal('incidentsModal')">
+                        <div class="stat-number" id="lostTimeInjuries">0</div>
+                        <div class="stat-label">Lost Time Injuries</div>
+                        <div class="stat-details">
+                            Last 30 days: 0 incidents
+                        </div>
+                    </div>
+                    <div class="stat-card" onclick="showSection('employees')">
+                        <div class="stat-number" id="totalEmployees">0</div>
+                        <div class="stat-label">Total Employees</div>
+                        <div class="stat-details">
+                            Across all locations
+                        </div>
+                    </div>
+                    <div class="stat-card" onclick="openModal('standardsModal')">
+                        <div class="stat-number" id="complianceRate">98%</div>
+                        <div class="stat-label">Compliance Rate</div>
+                        <div class="stat-details">
+                            Based on 45 standards
+                        </div>
+                    </div>
+                    <div class="stat-card" onclick="openModal('auditModal')">
+                        <div class="stat-number" id="activeAudits">12</div>
+                        <div class="stat-label">Active Audits</div>
+                        <div class="stat-details">
+                            8 internal, 4 external
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Incident Trends Chart -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Safety Performance</div>
+                            <div class="chart-subtitle">Incident trends across all locations</div>
+                        </div>
+                        <div class="chart-controls">
+                            <div class="chart-type-selector">
+                                <button class="chart-type-btn active" onclick="changeChartType('line')">📈 Line</button>
+                                <button class="chart-type-btn" onclick="changeChartType('bar')">📊 Bar</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-canvas-container">
+                        <canvas id="safetyChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="module-grid">
+                    <div class="module-card" onclick="openModal('reportIncidentModal')">
+                        <div class="module-icon">🚨</div>
+                        <h3>Report Incident</h3>
+                        <p>Report new safety incidents immediately</p>
+                    </div>
+                    <div class="module-card" onclick="showSection('employees')">
+                        <div class="module-icon">👥</div>
+                        <h3>Employee Management</h3>
+                        <p>Manage employee safety records and training</p>
+                    </div>
+                    <div class="module-card" onclick="openModal('ppeModal')">
+                        <div class="module-icon">🥽</div>
+                        <h3>PPE Inventory</h3>
+                        <p>Track protective equipment distribution</p>
+                    </div>
+                    <div class="module-card" onclick="openModal('trainingModal')">
+                        <div class="module-icon">🎓</div>
+                        <h3>Training Schedule</h3>
+                        <p>View upcoming safety training sessions</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Employee Management Section -->
+            <div id="employees-section" class="content-section">
+                <div class="section-header">
+                    <h2>Employee Management</h2>
+                    <button class="btn btn-primary" onclick="addEmployee()">
+                        + Add Employee
+                    </button>
+                </div>
+                
+                <!-- Country Tabs -->
+                <div class="country-tabs">
+                    <button class="country-tab active" onclick="showCountryTab('all')">All</button>
+                    <button class="country-tab" onclick="showCountryTab('south-africa')">South Africa</button>
+                    <button class="country-tab" onclick="showCountryTab('zambia')">Zambia</button>
+                    <button class="country-tab" onclick="showCountryTab('namibia')">Namibia</button>
+                    <button class="country-tab" onclick="showCountryTab('tanzania')">Tanzania</button>
+                </div>
+                
+                <div id="employees-table-container">
+                    <!-- Employee table will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Country Specific Sections -->
+            <div id="south-africa-section" class="content-section country-section">
+                <div class="section-header">
+                    <h2>🇿🇦 South Africa Operations</h2>
+                    <div class="location-tags">
+                        <span class="location-tag">Cape Town (HQ)</span>
+                        <span class="location-tag">Cosco Durban</span>
+                        <span class="location-tag">AGL Durban</span>
+                    </div>
+                </div>
+                <div id="south-africa-employees">
+                    <!-- South Africa employees will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Similar sections for Zambia, Namibia, Tanzania -->
+
+            <!-- Footer -->
+            <div class="footer">
+                <div class="footer-content">
+                    <div class="footer-logo">MMS</div>
+                    <div class="footer-info">
+                        <h3>Metal Management Solutions</h3>
+                        <p>Health & Safety Management System</p>
+                        <p>© 2024 Metal Management Solutions. All rights reserved.</p>
+                        <p><a href="https://www.metalmanagementsolutions.com" style="color: var(--primary);">www.metalmanagementsolutions.com</a></p>
+                    </div>
+                    <div class="footer-locations">
+                        <h4>Operational Locations</h4>
+                        <p>South Africa | Zambia | Namibia | Tanzania</p>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <p>PWA Version 2.0.0 | Last Updated: <span id="last-updated"></span></p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals and other components will be inserted by app.js -->
+    
+    <!-- Initialize PWA -->
+    <script>
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('sw.js')
+                    .then(function(registration) {
+                        console.log('ServiceWorker registration successful:', registration);
+                    })
+                    .catch(function(error) {
+                        console.log('ServiceWorker registration failed:', error);
+                    });
+            });
+        }
+        
+        // Check if app is running in standalone mode
+        function isRunningStandalone() {
+            return window.matchMedia('(display-mode: standalone)').matches || 
+                   window.navigator.standalone;
+        }
+        
+        // Set last updated date
+        document.getElementById('last-updated').textContent = new Date().toLocaleDateString();
+    </script>
+</body>
+</html>

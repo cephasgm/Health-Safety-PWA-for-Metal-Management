@@ -4,67 +4,708 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Metal Management Solutions Health & Safety Management System">
-    <meta name="theme-color" content="#2563eb">
-    
-    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#0d4d9c">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="MMS Safety">
-    <link rel="apple-touch-icon" href="images/logo-192x192.png">
-    
     <link rel="manifest" href="manifest.json">
     <title>MMS Safety Dashboard</title>
     
-    <!-- External Libraries -->
+    <!-- Charts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
     
-    <!-- Local Styles and Scripts -->
-    <link rel="stylesheet" href="style.css">
-    <script src="pwa-init.js" defer></script>
-    <script src="app.js" defer></script>
-    
-    <!-- Preconnect for external resources -->
-    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <style>
+        :root {
+            --primary: #0d4d9c;
+            --primary-dark: #083872;
+            --secondary: #1e6ec8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 2rem 1rem;
+            position: fixed;
+            width: 280px;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+            padding: 0 1rem;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-weight: bold;
+            font-size: 1.25rem;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .logo-text {
+            flex: 1;
+        }
+
+        .logo-text div:first-child {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: white;
+        }
+
+        .logo-text div:last-child {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.8);
+            margin-top: 0.25rem;
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 1rem;
+            padding: 0 1rem;
+            letter-spacing: 1px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            transition: all 0.2s;
+            margin-bottom: 0.25rem;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255,255,255,0.15);
+            color: white;
+        }
+
+        .nav-icon {
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            grid-column: 2;
+            padding: 2rem;
+            margin-left: 280px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header h1 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .header-subtitle {
+            color: var(--text-light);
+            margin-top: 0.5rem;
+            font-size: 1rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border-color: var(--primary);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            background: var(--surface);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 2rem;
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .chart-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .chart-subtitle {
+            color: var(--text-light);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .chart-type-selector {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .chart-type-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--background);
+            color: var(--text);
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .chart-type-btn:hover {
+            border-color: var(--primary);
+            background: var(--surface);
+        }
+
+        .chart-type-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .chart-canvas-container {
+            flex: 1;
+            min-height: 0;
+            position: relative;
+            background: var(--background);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        /* Risk Matrix */
+        .risk-matrix {
+            background: var(--surface);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .matrix-cell {
+            padding: 1.5rem 1rem;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .matrix-cell:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .risk-low { 
+            background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+            color: #166534; 
+            border-color: #86efac;
+        }
+        .risk-medium { 
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            color: #92400e; 
+            border-color: #fcd34d;
+        }
+        .risk-high { 
+            background: linear-gradient(135deg, #fed7aa, #fdba74);
+            color: #9a3412; 
+            border-color: #fb923c;
+        }
+        .risk-very-high { 
+            background: linear-gradient(135deg, #fecaca, #fca5a5);
+            color: #991b1b; 
+            border-color: #f87171;
+        }
+        .risk-extreme { 
+            background: linear-gradient(135deg, #fca5a5, #f87171);
+            color: #7f1d1d; 
+            border-color: #ef4444;
+        }
+
+        /* Module Grid */
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .module-card {
+            background: var(--surface);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .module-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border-color: var(--primary);
+        }
+
+        .module-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .module-card h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        .module-card p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.5rem 1.25rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(13, 77, 156, 0.2);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .btn-outline:hover {
+            background: var(--background);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background: var(--surface);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .data-table th {
+            background: var(--background);
+            font-weight: 600;
+            color: var(--text);
+            position: sticky;
+            top: 0;
+        }
+
+        .data-table tbody tr:hover {
+            background: var(--background);
+        }
+
+        .data-table td.editable {
+            cursor: pointer;
+            position: relative;
+            transition: background-color 0.2s;
+        }
+
+        .data-table td.editable:hover {
+            background: rgba(13, 77, 156, 0.05);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+            color: var(--text-light);
+            border-top: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+
+        .footer-logo {
+            color: var(--primary);
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: var(--surface);
+            margin: 2% auto;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--background);
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            z-index: 1000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+                grid-column: 1;
+                padding: 1rem;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .module-grid {
+                grid-template-columns: 1fr;
+            }
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .chart-container {
+                height: 300px;
+            }
+        }
+
+        /* Animation */
+        @keyframes slideIn {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="dashboard">
+        <!-- Sidebar -->
         <nav class="sidebar">
-            <!-- Company Logo and Name -->
             <div class="logo">
                 <div class="logo-icon">MMS</div>
-                <div>
-                    <div style="font-weight: 700; font-size: 1.25rem;">Metal Management</div>
-                    <div style="font-size: 0.875rem; color: var(--text-light);">Safety Dashboard</div>
+                <div class="logo-text">
+                    <div>Metal Management Solutions</div>
+                    <div>Safety Dashboard</div>
                 </div>
             </div>
 
-            <!-- Navigation Sections -->
             <div class="nav-section">
                 <div class="nav-title">Navigation</div>
                 <button class="nav-item active" onclick="showSection('dashboard')">
-                    <span class="nav-icon">🏠</span>
+                    <span class="nav-icon">📊</span>
                     Dashboard
                 </button>
-                <button class="nav-item" onclick="showSection('employees')">
+                <button class="nav-item" onclick="openModal('employeesModal')">
                     <span class="nav-icon">👥</span>
                     Employee Management
-                </button>
-                <button class="nav-item" onclick="showSection('incidents')">
-                    <span class="nav-icon">🚨</span>
-                    Incidents
                 </button>
             </div>
 
             <div class="nav-section">
                 <div class="nav-title">Safety Management</div>
                 <button class="nav-item" onclick="openModal('incidentsModal')">
-                    <span class="nav-icon">📊</span>
-                    Risk Assessment
+                    <span class="nav-icon">🚨</span>
+                    Incident Management
                 </button>
-                <button class="nav-item" onclick="openModal('trainingModal')">
-                    <span class="nav-icon">🎓</span>
-                    Safety Training
+                <button class="nav-item" onclick="openModal('riskModal')">
+                    <span class="nav-icon">📈</span>
+                    Risk Assessment
                 </button>
                 <button class="nav-item" onclick="openModal('ppeModal')">
                     <span class="nav-icon">🥽</span>
@@ -83,35 +724,14 @@
                     Standards Compliance
                 </button>
             </div>
-
-            <!-- Country Operations -->
-            <div class="nav-section">
-                <div class="nav-title">Operations</div>
-                <button class="nav-item" onclick="showCountry('south-africa')">
-                    <span class="nav-icon">🇿🇦</span>
-                    South Africa
-                </button>
-                <button class="nav-item" onclick="showCountry('zambia')">
-                    <span class="nav-icon">🇿🇲</span>
-                    Zambia
-                </button>
-                <button class="nav-item" onclick="showCountry('namibia')">
-                    <span class="nav-icon">🇳🇦</span>
-                    Namibia
-                </button>
-                <button class="nav-item" onclick="showCountry('tanzania')">
-                    <span class="nav-icon">🇹🇿</span>
-                    Tanzania
-                </button>
-            </div>
         </nav>
 
+        <!-- Main Content -->
         <main class="main-content">
-            <!-- Header with Install Button -->
             <div class="header">
                 <div>
                     <h1>MMS Safety Dashboard</h1>
-                    <div style="color: var(--text-light); margin-top: 0.5rem;">
+                    <div class="header-subtitle">
                         Occupational Health & Safety Management System
                     </div>
                 </div>
@@ -119,177 +739,715 @@
                     <button class="btn btn-primary" onclick="openModal('reportIncidentModal')">
                         🚨 Report Incident
                     </button>
-                    <button class="btn btn-success" id="installBtn">
-                        ⬇️ Install App
-                    </button>
+                    <!-- Install button will be added by pwa-init.js -->
                 </div>
             </div>
 
-            <!-- Dashboard Section (Default) -->
-            <div id="dashboard-section" class="content-section active">
-                <!-- Statistics Cards -->
-                <div class="stats-grid">
-                    <div class="stat-card" onclick="openModal('incidentsModal')">
-                        <div class="stat-number" id="lostTimeInjuries">0</div>
-                        <div class="stat-label">Lost Time Injuries</div>
-                        <div class="stat-details">
-                            Last 30 days: 0 incidents
-                        </div>
+            <!-- Statistics Cards -->
+            <div class="stats-grid">
+                <div class="stat-card" onclick="openModal('incidentsModal')">
+                    <div class="stat-number" id="lostTimeInjuries">0</div>
+                    <div class="stat-label">Lost Time Injuries</div>
+                    <div class="stat-details">Last 30 days: 0 incidents</div>
+                </div>
+                <div class="stat-card" onclick="openModal('employeesModal')">
+                    <div class="stat-number" id="totalEmployees">0</div>
+                    <div class="stat-label">Total Employees</div>
+                    <div class="stat-details">Across all locations</div>
+                </div>
+                <div class="stat-card" onclick="openModal('standardsModal')">
+                    <div class="stat-number" id="complianceRate">98%</div>
+                    <div class="stat-label">Compliance Rate</div>
+                    <div class="stat-details">Based on 45 standards</div>
+                </div>
+                <div class="stat-card" onclick="openModal('auditModal')">
+                    <div class="stat-number" id="activeAudits">12</div>
+                    <div class="stat-label">Active Audits</div>
+                    <div class="stat-details">8 internal, 4 external</div>
+                </div>
+            </div>
+
+            <!-- Incident Trends Chart -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <div>
+                        <div class="chart-title">Safety Performance</div>
+                        <div class="chart-subtitle">Incident trends across all locations</div>
                     </div>
-                    <div class="stat-card" onclick="showSection('employees')">
-                        <div class="stat-number" id="totalEmployees">0</div>
-                        <div class="stat-label">Total Employees</div>
-                        <div class="stat-details">
-                            Across all locations
-                        </div>
-                    </div>
-                    <div class="stat-card" onclick="openModal('standardsModal')">
-                        <div class="stat-number" id="complianceRate">98%</div>
-                        <div class="stat-label">Compliance Rate</div>
-                        <div class="stat-details">
-                            Based on 45 standards
-                        </div>
-                    </div>
-                    <div class="stat-card" onclick="openModal('auditModal')">
-                        <div class="stat-number" id="activeAudits">12</div>
-                        <div class="stat-label">Active Audits</div>
-                        <div class="stat-details">
-                            8 internal, 4 external
+                    <div class="chart-controls">
+                        <div class="chart-type-selector">
+                            <button class="chart-type-btn active" onclick="changeChartType('line')">📈 Line</button>
+                            <button class="chart-type-btn" onclick="changeChartType('bar')">📊 Bar</button>
                         </div>
                     </div>
                 </div>
+                <div class="chart-canvas-container">
+                    <canvas id="incidentTrendChart"></canvas>
+                </div>
+            </div>
 
-                <!-- Incident Trends Chart -->
-                <div class="chart-container">
-                    <div class="chart-header">
-                        <div>
-                            <div class="chart-title">Safety Performance</div>
-                            <div class="chart-subtitle">Incident trends across all locations</div>
-                        </div>
-                        <div class="chart-controls">
-                            <div class="chart-type-selector">
-                                <button class="chart-type-btn active" onclick="changeChartType('line')">📈 Line</button>
-                                <button class="chart-type-btn" onclick="changeChartType('bar')">📊 Bar</button>
-                            </div>
-                        </div>
+            <!-- Risk Assessment Matrix -->
+            <div class="risk-matrix">
+                <div class="chart-header">
+                    <div>
+                        <div class="chart-title">Risk Assessment Matrix</div>
+                        <div class="chart-subtitle">Current workplace risk assessment status</div>
                     </div>
-                    <div class="chart-canvas-container">
-                        <canvas id="safetyChart"></canvas>
+                    <div>
+                        <button class="btn btn-success" onclick="saveRiskMatrix()">💾 Save Matrix</button>
                     </div>
                 </div>
-
-                <!-- Quick Actions -->
-                <div class="module-grid">
-                    <div class="module-card" onclick="openModal('reportIncidentModal')">
-                        <div class="module-icon">🚨</div>
-                        <h3>Report Incident</h3>
-                        <p>Report new safety incidents immediately</p>
+                <div class="matrix-grid" id="riskMatrix">
+                    <div class="matrix-cell risk-low" onclick="editRiskCell(this)">
+                        <div>Low Risk</div>
+                        <div>Admin</div>
                     </div>
-                    <div class="module-card" onclick="showSection('employees')">
-                        <div class="module-icon">👥</div>
-                        <h3>Employee Management</h3>
-                        <p>Manage employee safety records and training</p>
+                    <div class="matrix-cell risk-medium" onclick="editRiskCell(this)">
+                        <div>Medium Risk</div>
+                        <div>Sales</div>
                     </div>
-                    <div class="module-card" onclick="openModal('ppeModal')">
-                        <div class="module-icon">🥽</div>
-                        <h3>PPE Inventory</h3>
-                        <p>Track protective equipment distribution</p>
+                    <div class="matrix-cell risk-high" onclick="editRiskCell(this)">
+                        <div>High Risk</div>
+                        <div>Warehouse</div>
                     </div>
-                    <div class="module-card" onclick="openModal('trainingModal')">
-                        <div class="module-icon">🎓</div>
-                        <h3>Training Schedule</h3>
-                        <p>View upcoming safety training sessions</p>
+                    <div class="matrix-cell risk-very-high" onclick="editRiskCell(this)">
+                        <div>Very High Risk</div>
+                        <div>Manufacturing</div>
+                    </div>
+                    <div class="matrix-cell risk-extreme" onclick="editRiskCell(this)">
+                        <div>Extreme Risk</div>
+                        <div>Construction</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Employee Management Section -->
-            <div id="employees-section" class="content-section">
-                <div class="section-header">
-                    <h2>Employee Management</h2>
-                    <button class="btn btn-primary" onclick="addEmployee()">
-                        + Add Employee
-                    </button>
+            <!-- OHS Management Modules -->
+            <div class="module-grid">
+                <div class="module-card" onclick="openModal('incidentsModal')">
+                    <div class="module-icon">🚨</div>
+                    <h3>Incident Management</h3>
+                    <p>Report, track, and investigate workplace incidents with full documentation</p>
                 </div>
-                
-                <!-- Country Tabs -->
-                <div class="country-tabs">
-                    <button class="country-tab active" onclick="showCountryTab('all')">All</button>
-                    <button class="country-tab" onclick="showCountryTab('south-africa')">South Africa</button>
-                    <button class="country-tab" onclick="showCountryTab('zambia')">Zambia</button>
-                    <button class="country-tab" onclick="showCountryTab('namibia')">Namibia</button>
-                    <button class="country-tab" onclick="showCountryTab('tanzania')">Tanzania</button>
+                <div class="module-card" onclick="openModal('ppeModal')">
+                    <div class="module-icon">🥽</div>
+                    <h3>PPE Management</h3>
+                    <p>Track personal protective equipment issuance, maintenance, and compliance</p>
                 </div>
-                
-                <div id="employees-table-container">
-                    <!-- Employee table will be loaded here -->
+                <div class="module-card" onclick="openModal('auditModal')">
+                    <div class="module-icon">🔍</div>
+                    <h3>Audit & Inspection</h3>
+                    <p>Schedule and conduct safety audits, inspections, and compliance verifications</p>
                 </div>
-            </div>
-
-            <!-- Country Specific Sections -->
-            <div id="south-africa-section" class="content-section country-section">
-                <div class="section-header">
-                    <h2>🇿🇦 South Africa Operations</h2>
-                    <div class="location-tags">
-                        <span class="location-tag">Cape Town (HQ)</span>
-                        <span class="location-tag">Cosco Durban</span>
-                        <span class="location-tag">AGL Durban</span>
-                    </div>
-                </div>
-                <div id="south-africa-employees">
-                    <!-- South Africa employees will be loaded here -->
+                <div class="module-card" onclick="openModal('standardsModal')">
+                    <div class="module-icon">📋</div>
+                    <h3>Standards Compliance</h3>
+                    <p>Manage international and national safety standards compliance</p>
                 </div>
             </div>
-
-            <!-- Similar sections for Zambia, Namibia, Tanzania -->
 
             <!-- Footer -->
             <div class="footer">
-                <div class="footer-content">
-                    <div class="footer-logo">MMS</div>
-                    <div class="footer-info">
-                        <h3>Metal Management Solutions</h3>
-                        <p>Health & Safety Management System</p>
-                        <p>© 2024 Metal Management Solutions. All rights reserved.</p>
-                        <p><a href="https://www.metalmanagementsolutions.com" style="color: var(--primary);">www.metalmanagementsolutions.com</a></p>
-                    </div>
-                    <div class="footer-locations">
-                        <h4>Operational Locations</h4>
-                        <p>South Africa | Zambia | Namibia | Tanzania</p>
-                    </div>
-                </div>
-                <div class="footer-bottom">
-                    <p>PWA Version 2.0.0 | Last Updated: <span id="last-updated"></span></p>
-                </div>
+                <div class="footer-logo">Metal Management Solutions</div>
+                <div>Health & Safety Management System</div>
+                <div>© 2024 Metal Management Solutions. All rights reserved.</div>
+                <div><a href="https://www.metalmanagementsolutions.com" style="color: var(--primary); text-decoration: none;">www.metalmanagementsolutions.com</a></div>
             </div>
         </main>
     </div>
 
-    <!-- Modals and other components will be inserted by app.js -->
-    
-    <!-- Initialize PWA -->
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <div class="toast-icon"></div>
+        <div class="toast-content">
+            <div class="toast-title"></div>
+            <div class="toast-message"></div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="reportIncidentModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal('reportIncidentModal')">×</button>
+            <div style="margin-bottom: 2rem;">
+                <h2 style="color: var(--primary);">Report Safety Incident</h2>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Incident Type *</label>
+                    <select id="incidentType">
+                        <option value="">Select type</option>
+                        <option value="Near Miss">Near Miss</option>
+                        <option value="First Aid">First Aid</option>
+                        <option value="Medical Treatment">Medical Treatment</option>
+                        <option value="Lost Time Injury">Lost Time Injury</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Severity Level *</label>
+                    <select id="incidentSeverity">
+                        <option value="">Select severity</option>
+                        <option value="Minor">Minor</option>
+                        <option value="Moderate">Moderate</option>
+                        <option value="Serious">Serious</option>
+                        <option value="Critical">Critical</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Date & Time *</label>
+                    <input type="datetime-local" id="incidentDateTime">
+                </div>
+                <div class="form-group">
+                    <label>Location *</label>
+                    <input type="text" id="incidentLocation" placeholder="Enter location">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Reported By *</label>
+                <input type="text" id="reportedBy" placeholder="Your name">
+            </div>
+            
+            <div class="form-group">
+                <label>Description *</label>
+                <textarea id="incidentDescription" rows="4" placeholder="Provide detailed description"></textarea>
+            </div>
+            
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button class="btn btn-primary" onclick="submitIncidentReport()" style="flex: 1;">Submit Report</button>
+                <button class="btn btn-outline" onclick="closeModal('reportIncidentModal')" style="flex: 1;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Employee Management Modal -->
+    <div id="employeesModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal('employeesModal')">×</button>
+            <div style="margin-bottom: 2rem;">
+                <h2 style="color: var(--primary);">Employee Management</h2>
+                <p style="color: var(--text-light); margin-top: 0.5rem;">Click on any cell to edit, hover for actions</p>
+            </div>
+            
+            <div style="overflow-x: auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Position</th>
+                            <th>Country</th>
+                            <th>Location</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="employeesTableBody">
+                        <!-- Employees will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button class="btn btn-primary" onclick="addEmployee()" style="flex: 1;">+ Add Employee</button>
+                <button class="btn btn-outline" onclick="closeModal('employeesModal')" style="flex: 1;">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
     <script>
-        // Register service worker
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('sw.js')
-                    .then(function(registration) {
-                        console.log('ServiceWorker registration successful:', registration);
-                    })
-                    .catch(function(error) {
-                        console.log('ServiceWorker registration failed:', error);
-                    });
+        // Global Variables
+        let incidents = [];
+        let employees = [];
+        let ppeItems = [];
+        let audits = [];
+        let standards = [];
+        let incidentTrendChart = null;
+        let currentChartType = 'line';
+
+        // Initialize Application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+        });
+
+        function initializeApp() {
+            loadAllData();
+            initializeCharts();
+            updateStatistics();
+            
+            // Set current date/time for incident report
+            const now = new Date();
+            const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+                .toISOString()
+                .slice(0, 16);
+            document.getElementById('incidentDateTime').value = localDateTime;
+        }
+
+        function loadAllData() {
+            // Load incidents
+            const savedIncidents = localStorage.getItem('mms_incidents');
+            incidents = savedIncidents ? JSON.parse(savedIncidents) : getDefaultIncidents();
+            
+            // Load employees
+            const savedEmployees = localStorage.getItem('mms_employees');
+            employees = savedEmployees ? JSON.parse(savedEmployees) : getDefaultEmployees();
+            
+            // Load PPE items
+            const savedPPE = localStorage.getItem('mms_ppe');
+            ppeItems = savedPPE ? JSON.parse(savedPPE) : [];
+            
+            // Load audits
+            const savedAudits = localStorage.getItem('mms_audits');
+            audits = savedAudits ? JSON.parse(savedAudits) : [];
+            
+            // Load standards
+            const savedStandards = localStorage.getItem('mms_standards');
+            standards = savedStandards ? JSON.parse(savedStandards) : getDefaultStandards();
+            
+            updateEmployeeCount();
+        }
+
+        function getDefaultIncidents() {
+            return [
+                {
+                    id: 'INC-2024-001',
+                    type: 'Near Miss',
+                    severity: 'Minor',
+                    location: 'Warehouse B',
+                    reportedBy: 'John Mwita',
+                    date: '2024-01-15T10:30',
+                    status: 'Under Investigation',
+                    description: 'Forklift almost collided with pedestrian.'
+                }
+            ];
+        }
+
+        function getDefaultEmployees() {
+            return [
+                // Tanzania
+                {
+                    id: 'TZ-001',
+                    name: 'Cephas Gideon Mkama',
+                    position: 'Inventory Control Specialist',
+                    country: 'Tanzania',
+                    location: 'Impala Dar',
+                    status: 'Active'
+                },
+                {
+                    id: 'TZ-002',
+                    name: 'Salman Esmail',
+                    position: 'Inventory Control Specialist',
+                    country: 'Tanzania',
+                    location: 'Polytra Dar',
+                    status: 'Active'
+                },
+                // Namibia
+                {
+                    id: 'NA-001',
+                    name: 'Leon Fourie',
+                    position: 'Inventory Control Specialist',
+                    country: 'Namibia',
+                    location: 'WBCT Bulk Shed',
+                    status: 'Active'
+                },
+                {
+                    id: 'NA-002',
+                    name: 'Salomon Iyambo',
+                    position: 'Inventory Control Specialist',
+                    country: 'Namibia',
+                    location: 'WBCT Quay Side Shed',
+                    status: 'Active'
+                },
+                {
+                    id: 'NA-003',
+                    name: 'Sakeus Iyambo',
+                    position: 'Inventory Control Specialist',
+                    country: 'Namibia',
+                    location: 'Bridge Walvis Bay',
+                    status: 'Active'
+                },
+                // South Africa
+                {
+                    id: 'SA-001',
+                    name: 'Katlego Matsane',
+                    position: 'Inventory Control Specialist',
+                    country: 'South Africa',
+                    location: 'Cape Town (HQ)',
+                    status: 'Active'
+                },
+                {
+                    id: 'SA-002',
+                    name: 'Bonnie Sibande',
+                    position: 'Inventory Control Specialist',
+                    country: 'South Africa',
+                    location: 'Cape Town (HQ)',
+                    status: 'Active'
+                },
+                // Zambia - First few examples
+                {
+                    id: 'ZM-001',
+                    name: 'Alick Banda',
+                    position: 'Inventory Control Specialist',
+                    country: 'Zambia',
+                    location: 'AGL Chingola Hub',
+                    status: 'Active'
+                },
+                {
+                    id: 'ZM-002',
+                    name: 'Alinaswe Mwanamoonga',
+                    position: 'Inventory Control Specialist',
+                    country: 'Zambia',
+                    location: 'Polytra Kitwe',
+                    status: 'Active'
+                }
+            ];
+        }
+
+        function getDefaultStandards() {
+            return [
+                {
+                    id: 'STD-001',
+                    name: 'ISO 45001:2018',
+                    code: 'ISO45001',
+                    type: 'International',
+                    status: 'Compliant'
+                },
+                {
+                    id: 'STD-002',
+                    name: 'OSHA Regulations',
+                    code: 'OSHA-29CFR',
+                    type: 'National',
+                    status: 'Compliant'
+                }
+            ];
+        }
+
+        function updateEmployeeCount() {
+            document.getElementById('totalEmployees').textContent = employees.length;
+        }
+
+        function updateStatistics() {
+            // Update Lost Time Injuries
+            const ltiCount = incidents.filter(i => i.type === 'Lost Time Injury').length;
+            document.getElementById('lostTimeInjuries').textContent = ltiCount;
+            
+            // Update Compliance Rate
+            const compliantStandards = standards.filter(s => s.status === 'Compliant').length;
+            const complianceRate = standards.length > 0 ? 
+                Math.round((compliantStandards / standards.length) * 100) : 100;
+            document.getElementById('complianceRate').textContent = complianceRate + '%';
+            
+            // Update Active Audits
+            const activeAuditsCount = audits.filter(a => a.status === 'In Progress').length;
+            document.getElementById('activeAudits').textContent = activeAuditsCount || 12;
+            
+            updateEmployeeCount();
+        }
+
+        function saveAllData() {
+            localStorage.setItem('mms_incidents', JSON.stringify(incidents));
+            localStorage.setItem('mms_employees', JSON.stringify(employees));
+            localStorage.setItem('mms_ppe', JSON.stringify(ppeItems));
+            localStorage.setItem('mms_audits', JSON.stringify(audits));
+            localStorage.setItem('mms_standards', JSON.stringify(standards));
+        }
+
+        // Chart Functions
+        function initializeCharts() {
+            const ctx = document.getElementById('incidentTrendChart').getContext('2d');
+            
+            // Generate data for the last 6 months
+            const months = [];
+            const incidentData = [];
+            const nearMissData = [];
+            const firstAidData = [];
+            
+            for (let i = 5; i >= 0; i--) {
+                const date = new Date();
+                date.setMonth(date.getMonth() - i);
+                months.push(date.toLocaleString('default', { month: 'short' }));
+                
+                incidentData.push(Math.floor(Math.random() * 5) + 1);
+                nearMissData.push(Math.floor(Math.random() * 8) + 3);
+                firstAidData.push(Math.floor(Math.random() * 4) + 1);
+            }
+            
+            incidentTrendChart = new Chart(ctx, {
+                type: currentChartType,
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: 'Incidents',
+                            data: incidentData,
+                            borderColor: '#ef4444',
+                            backgroundColor: currentChartType === 'line' ? 'rgba(239, 68, 68, 0.1)' : '#ef4444',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: currentChartType === 'line'
+                        },
+                        {
+                            label: 'Near Misses',
+                            data: nearMissData,
+                            borderColor: '#f59e0b',
+                            backgroundColor: currentChartType === 'line' ? 'rgba(245, 158, 11, 0.1)' : '#f59e0b',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: currentChartType === 'line'
+                        },
+                        {
+                            label: 'First Aid Cases',
+                            data: firstAidData,
+                            borderColor: '#10b981',
+                            backgroundColor: currentChartType === 'line' ? 'rgba(16, 185, 129, 0.1)' : '#10b981',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: currentChartType === 'line'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    }
+                }
             });
         }
-        
-        // Check if app is running in standalone mode
-        function isRunningStandalone() {
-            return window.matchMedia('(display-mode: standalone)').matches || 
-                   window.navigator.standalone;
+
+        function changeChartType(type) {
+            currentChartType = type;
+            
+            // Update button states
+            document.querySelectorAll('.chart-type-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update chart type
+            incidentTrendChart.destroy();
+            initializeCharts();
         }
-        
-        // Set last updated date
-        document.getElementById('last-updated').textContent = new Date().toLocaleDateString();
+
+        // Risk Matrix Functions
+        function editRiskCell(cell) {
+            const originalContent = cell.innerHTML;
+            const lines = cell.textContent.split('\n').map(line => line.trim()).filter(line => line);
+            const riskLevel = lines[0] || 'Low Risk';
+            const department = lines[1] || 'Department';
+            
+            cell.innerHTML = `
+                <input type="text" class="edit-input" value="${riskLevel}" placeholder="Risk Level" style="margin-bottom: 0.5rem; width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px;">
+                <input type="text" class="edit-input" value="${department}" placeholder="Department" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px;">
+                <div style="margin-top: 0.5rem; display: flex; gap: 0.5rem;">
+                    <button class="btn btn-sm btn-success" onclick="saveRiskCellEdit(this)">Save</button>
+                    <button class="btn btn-sm btn-outline" onclick="cancelRiskCellEdit(this, '${originalContent.replace(/'/g, "\\'")}')">Cancel</button>
+                </div>
+            `;
+            
+            cell.style.padding = '1rem';
+        }
+
+        function saveRiskCellEdit(button) {
+            const cell = button.closest('.matrix-cell');
+            const inputs = cell.querySelectorAll('input');
+            const riskLevel = inputs[0].value;
+            const department = inputs[1].value;
+            
+            cell.innerHTML = `
+                <div>${riskLevel}</div>
+                <div>${department}</div>
+            `;
+            cell.style.padding = '1.5rem 1rem';
+            cell.onclick = function() { editRiskCell(this); };
+            
+            showToast('Success', 'Risk cell updated!', 'success');
+        }
+
+        function cancelRiskCellEdit(button, originalContent) {
+            const cell = button.closest('.matrix-cell');
+            cell.innerHTML = originalContent;
+            cell.style.padding = '1.5rem 1rem';
+            cell.onclick = function() { editRiskCell(this); };
+        }
+
+        function saveRiskMatrix() {
+            showToast('Success', 'Risk matrix saved successfully!', 'success');
+        }
+
+        // Employee Functions
+        function loadEmployeesTable() {
+            const table = document.getElementById('employeesTableBody');
+            if (!table) return;
+            
+            table.innerHTML = '';
+            
+            employees.forEach((employee, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${employee.id}</td>
+                    <td class="editable" onclick="editEmployeeCell(this, ${index}, 'name')">${employee.name}</td>
+                    <td class="editable" onclick="editEmployeeCell(this, ${index}, 'position')">${employee.position}</td>
+                    <td>${employee.country}</td>
+                    <td class="editable" onclick="editEmployeeCell(this, ${index}, 'location')">${employee.location}</td>
+                    <td><span style="color: var(--success); font-weight: 500;">${employee.status}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline" onclick="deleteEmployee(${index})">Delete</button>
+                    </td>
+                `;
+                table.appendChild(row);
+            });
+        }
+
+        function editEmployeeCell(cell, index, field) {
+            const employee = employees[index];
+            const originalValue = employee[field];
+            
+            cell.innerHTML = `<input type="text" value="${originalValue}" style="width: 100%; padding: 0.5rem; border: 1px solid var(--primary); border-radius: 4px;">`;
+            const input = cell.querySelector('input');
+            
+            input.focus();
+            input.select();
+            
+            const saveEdit = () => {
+                employee[field] = input.value;
+                cell.textContent = input.value;
+                saveAllData();
+                showToast('Success', 'Employee updated!', 'success');
+            };
+            
+            input.addEventListener('blur', saveEdit);
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') saveEdit();
+            });
+        }
+
+        function addEmployee() {
+            const newEmployee = {
+                id: `EMP-${Date.now().toString().slice(-6)}`,
+                name: 'New Employee',
+                position: 'Inventory Control Specialist',
+                country: 'South Africa',
+                location: 'Cape Town (HQ)',
+                status: 'Active'
+            };
+            
+            employees.push(newEmployee);
+            saveAllData();
+            loadEmployeesTable();
+            updateEmployeeCount();
+            showToast('Success', 'Employee added!', 'success');
+        }
+
+        function deleteEmployee(index) {
+            if (confirm('Are you sure you want to delete this employee?')) {
+                employees.splice(index, 1);
+                saveAllData();
+                loadEmployeesTable();
+                updateEmployeeCount();
+                showToast('Success', 'Employee deleted!', 'success');
+            }
+        }
+
+        // Incident Report Function
+        function submitIncidentReport() {
+            const type = document.getElementById('incidentType').value;
+            const severity = document.getElementById('incidentSeverity').value;
+            const dateTime = document.getElementById('incidentDateTime').value;
+            const location = document.getElementById('incidentLocation').value;
+            const reportedBy = document.getElementById('reportedBy').value;
+            const description = document.getElementById('incidentDescription').value;
+            
+            if (!type || !severity || !dateTime || !location || !reportedBy || !description) {
+                showToast('Error', 'Please fill all required fields', 'error');
+                return;
+            }
+            
+            const newIncident = {
+                id: `INC-${new Date().getFullYear()}-${(incidents.length + 1).toString().padStart(3, '0')}`,
+                type: type,
+                severity: severity,
+                location: location,
+                reportedBy: reportedBy,
+                date: dateTime,
+                status: 'Reported',
+                description: description,
+                createdAt: new Date().toISOString()
+            };
+            
+            incidents.unshift(newIncident);
+            saveAllData();
+            
+            // Clear form
+            document.getElementById('incidentType').value = '';
+            document.getElementById('incidentSeverity').value = '';
+            document.getElementById('incidentDateTime').value = '';
+            document.getElementById('incidentLocation').value = '';
+            document.getElementById('reportedBy').value = '';
+            document.getElementById('incidentDescription').value = '';
+            
+            closeModal('reportIncidentModal');
+            updateStatistics();
+            showToast('Success', 'Incident reported successfully!', 'success');
+        }
+
+        // Modal Functions
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            
+            // Load data for specific modals
+            if (modalId === 'employeesModal') {
+                loadEmployeesTable();
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Toast Notification
+        function showToast(title, message, type = 'info') {
+            const toast = document.getElementById('toast');
+            const toastTitle = toast.querySelector('.toast-title');
+            const toastMessage = toast.querySelector('.toast-message');
+            const toastIcon = toast.querySelector('.toast-icon');
+            
+            toast.className = `toast toast-${type}`;
+            toastTitle.textContent = title;
+            toastMessage.textContent = message;
+            toastIcon.textContent = type === 'success' ? '✅' : type === 'error' ? '❌' : '⚠️';
+            
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                hideToast();
+            }, 3000);
+        }
+
+        function hideToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.remove('show');
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        };
     </script>
+
+    <!-- PWA Initialization -->
+    <script src="pwa-init.js"></script>
 </body>
 </html>

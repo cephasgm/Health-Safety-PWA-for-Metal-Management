@@ -1089,1183 +1089,1235 @@
     </style>
 </head>
 <body>
-    <div class="dashboard">
-        <nav class="sidebar">
-            <div class="logo">
-                <div class="logo-icon"></div>
-                <div>
-                    <div style="font-weight: 700; font-size: 1.25rem;">Metal Management</div>
-                    <div style="font-size: 0.875rem; color: var(--text-light);">Health & Safety System</div>
-                </div>
-            </div>
+    <!-- MMS Safety Login Screen -->
+    <div id="loginScreen" style="display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); z-index: 10000; align-items: center; justify-content: center; font-family: 'Segoe UI', system-ui, sans-serif;">
+      <div style="background: white; padding: 3rem; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); width: 90%; max-width: 400px; text-align: center; border-top: 6px solid #dc2626;">
+        <!-- Logo -->
+        <div style="width: 80px; height: 80px; background: #dc2626; border-radius: 16px; margin: 0 auto 1.5rem; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1.8rem; box-shadow: 0 10px 25px rgba(220, 38, 38, 0.4);">MMS</div>
+        
+        <h1 style="color: #1e293b; margin-bottom: 0.5rem; font-size: 1.8rem;">Safety Management System</h1>
+        <p style="color: #64748b; margin-bottom: 2rem; font-size: 1rem;">Metal Management Solutions - Secure Access</p>
+        
+        <!-- Login Form -->
+        <div style="margin-bottom: 1.5rem; text-align: left;">
+          <label style="display: block; margin-bottom: 0.5rem; color: #1e293b; font-weight: 500; font-size: 0.95rem;">Company Email</label>
+          <input type="email" id="prodEmail" placeholder="you@mms.com" style="width: 100%; padding: 0.875rem; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 1rem; transition: all 0.3s; margin-bottom: 1.5rem; outline: none;" onfocus="this.style.borderColor='#dc2626'; this.style.boxShadow='0 0 0 3px rgba(220, 38, 38, 0.1)'" onblur="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none'">
+          
+          <label style="display: block; margin-bottom: 0.5rem; color: #1e293b; font-weight: 500; font-size: 0.95rem;">Password</label>
+          <input type="password" id="prodPassword" placeholder="••••••••" style="width: 100%; padding: 0.875rem; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 1rem; transition: all 0.3s; margin-bottom: 0.5rem; outline: none;" onfocus="this.style.borderColor='#dc2626'; this.style.boxShadow='0 0 0 3px rgba(220, 38, 38, 0.1)'" onblur="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none'">
+        </div>
+        
+        <!-- Error Display -->
+        <div id="loginError" style="display: none; background: #fee2e2; color: #991b1b; padding: 0.875rem; border-radius: 8px; margin-bottom: 1.5rem; font-size: 0.9rem; border-left: 4px solid #ef4444;"></div>
+        
+        <!-- Login Button -->
+        <button onclick="handleMMSLogin()" style="width: 100%; padding: 1rem; background: linear-gradient(135deg, #dc2626, #ef4444); color: white; border: none; border-radius: 10px; font-size: 1.05rem; font-weight: 600; cursor: pointer; transition: all 0.3s; margin-bottom: 1.5rem; box-shadow: 0 6px 20px rgba(220, 38, 38, 0.3);" 
+          onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 10px 30px rgba(220, 38, 38, 0.4)'"
+          onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 20px rgba(220, 38, 38, 0.3)'">
+          🔐 Login to Safety System
+        </button>
+        
+        <!-- Footer -->
+        <div style="font-size: 0.85rem; color: #64748b; border-top: 1px solid #f1f5f9; padding-top: 1rem;">
+          <div style="margin-bottom: 0.25rem;">⚠️ Authorized MMS personnel only</div>
+          <div>Contact IT for account access • support@mms.com</div>
+        </div>
+      </div>
+    </div>
 
-            <div class="nav-section">
-                <div class="nav-title">Navigation</div>
-                <a href="#" class="nav-item active">
-                    <span class="nav-icon">🏠</span>
-                    Health & Safety Dashboard
-                </a>
-            </div>
+    <!-- Firebase Backend -->
+    <script type="module" src="./firebase-config.js"></script>
+    <script type="module" src="./auth-system.js"></script>
+    <script type="module" src="./database-service.js"></script>
 
-            <!-- PWA App Section -->
-            <div class="nav-section">
-                <div class="nav-title">App</div>
-                <button class="nav-item" id="sidebarInstallBtn" style="display: none;">
-                    <span class="nav-icon">📱</span>
-                    Install App
-                </button>
-            </div>
-
-            <div class="nav-section">
-                <div class="nav-title">Safety Management</div>
-                <button class="nav-item" onclick="openModal('incidentsModal')">
-                    <span class="nav-icon">🚨</span>
-                    Incident Management
-                </button>
-                <button class="nav-item" onclick="openModal('riskModal')">
-                    <span class="nav-icon">📊</span>
-                    Risk Assessment
-                </button>
-                <button class="nav-item" onclick="openModal('trainingModal')">
-                    <span class="nav-icon">🎓</span>
-                    Safety Training
-                </button>
-                <button class="nav-item" onclick="openModal('ppeModal')">
-                    <span class="nav-icon">🥽</span>
-                    PPE Management
-                </button>
-            </div>
-
-            <div class="nav-section">
-                <div class="nav-title">Compliance</div>
-                <button class="nav-item" onclick="openModal('standardsModal')">
-                    <span class="nav-icon">📋</span>
-                    Standards & Compliance
-                </button>
-                <button class="nav-item" onclick="openModal('auditModal')">
-                    <span class="nav-icon">🔍</span>
-                    Audit & Inspection
-                </button>
-                <button class="nav-item" onclick="openModal('contractorModal')">
-                    <span class="nav-icon">👷</span>
-                    Contractor Safety
-                </button>
-            </div>
-
-            <div class="nav-section">
-                <div class="nav-title">Employee Management</div>
-                <button class="nav-item" onclick="openModal('healthModal')">
-                    <span class="nav-icon">👥</span>
-                    Employee Health
-                </button>
-                <button class="nav-item" onclick="openModal('settingsModal')">
-                    <span class="nav-icon">⚙️</span>
-                    System Settings
-                </button>
-            </div>
-        </nav>
-
-        <main class="main-content">
-            <div class="header">
-                <div>
-                    <h1>Occupational Health & Safety Management</h1>
-                    <div style="color: var(--text-light); margin-top: 0.5rem;">
-                        Metal Management Solutions - Comprehensive OHS compliance across all operations
-                    </div>
-                </div>
-                <div style="display: flex; gap: 0.5rem;">
-                    <button class="btn btn-outline" id="installBtn" style="display: none;">
-                        📱 Install App
-                    </button>
-                    <button class="btn btn-outline" onclick="exportToPDF()">
-                        📄 Export PDF
-                    </button>
-                    <button class="btn btn-primary" onclick="openModal('reportIncidentModal')">
-                        🚨 Report Incident
-                    </button>
-                </div>
-            </div>
-
-            <!-- Statistics Cards -->
-            <div class="stats-grid">
-                <div class="stat-card" onclick="openModal('incidentsModal')">
-                    <div class="stat-number" id="lostTimeInjuries">0</div>
-                    <div class="stat-label">Lost Time Injuries</div>
-                    <div class="stat-details" id="ltiDetails">
-                        Last 30 days: 0 incidents
-                    </div>
-                </div>
-                <div class="stat-card" onclick="openModal('trainingModal')">
-                    <div class="stat-number" id="safetyTrainings">156</div>
-                    <div class="stat-label">Safety Trainings</div>
-                    <div class="stat-details" id="trainingDetails">
-                        45 completed, 12 in progress
-                    </div>
-                </div>
-                <div class="stat-card" onclick="openModal('standardsModal')">
-                    <div class="stat-number" id="complianceRate">92%</div>
-                    <div class="stat-label">Compliance Rate</div>
-                    <div class="stat-details">
-                        Based on 28 standards and regulations
-                    </div>
-                </div>
-                <div class="stat-card" onclick="openModal('auditModal')">
-                    <div class="stat-number" id="activeAudits">8</div>
-                    <div class="stat-label">Active Audits</div>
-                    <div class="stat-details">
-                        4 internal, 2 external, 2 regulatory
-                    </div>
-                </div>
-            </div>
-
-            <!-- Incident Trends Chart -->
-            <div class="chart-container">
-                <div class="chart-header">
+    <div id="appContent" style="display: none;">
+        <div class="dashboard">
+            <nav class="sidebar">
+                <div class="logo">
+                    <div class="logo-icon"></div>
                     <div>
-                        <div class="chart-title">Safety Performance Trends</div>
-                        <div class="chart-subtitle">Incident monitoring across all MMS locations</div>
+                        <div style="font-weight: 700; font-size: 1.25rem;">Metal Management</div>
+                        <div style="font-size: 0.875rem; color: var(--text-light);">Health & Safety System</div>
                     </div>
-                    <div class="chart-controls">
-                        <div class="chart-type-selector">
-                            <button class="chart-type-btn active" onclick="changeChartType('line')">📈 Line</button>
-                            <button class="chart-type-btn" onclick="changeChartType('bar')">📊 Bar</button>
-                            <button class="chart-type-btn" onclick="changeChartType('pie')">🥧 Pie</button>
-                        </div>
-                        <div class="custom-calendar">
-                            <input type="date" id="startDate" class="date-input" onchange="updateChartWithCustomRange()">
-                            <span>to</span>
-                            <input type="date" id="endDate" class="date-input" onchange="updateChartWithCustomRange()">
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-title">Navigation</div>
+                    <a href="#" class="nav-item active">
+                        <span class="nav-icon">🏠</span>
+                        Health & Safety Dashboard
+                    </a>
+                </div>
+
+                <!-- PWA App Section -->
+                <div class="nav-section">
+                    <div class="nav-title">App</div>
+                    <button class="nav-item" id="sidebarInstallBtn" style="display: none;">
+                        <span class="nav-icon">📱</span>
+                        Install App
+                    </button>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-title">Safety Management</div>
+                    <button class="nav-item" onclick="openModal('incidentsModal')">
+                        <span class="nav-icon">🚨</span>
+                        Incident Management
+                    </button>
+                    <button class="nav-item" onclick="openModal('riskModal')">
+                        <span class="nav-icon">📊</span>
+                        Risk Assessment
+                    </button>
+                    <button class="nav-item" onclick="openModal('trainingModal')">
+                        <span class="nav-icon">🎓</span>
+                        Safety Training
+                    </button>
+                    <button class="nav-item" onclick="openModal('ppeModal')">
+                        <span class="nav-icon">🥽</span>
+                        PPE Management
+                    </button>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-title">Compliance</div>
+                    <button class="nav-item" onclick="openModal('standardsModal')">
+                        <span class="nav-icon">📋</span>
+                        Standards & Compliance
+                    </button>
+                    <button class="nav-item" onclick="openModal('auditModal')">
+                        <span class="nav-icon">🔍</span>
+                        Audit & Inspection
+                    </button>
+                    <button class="nav-item" onclick="openModal('contractorModal')">
+                        <span class="nav-icon">👷</span>
+                        Contractor Safety
+                    </button>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-title">Employee Management</div>
+                    <button class="nav-item" onclick="openModal('healthModal')">
+                        <span class="nav-icon">👥</span>
+                        Employee Health
+                    </button>
+                    <button class="nav-item" onclick="openModal('settingsModal')">
+                        <span class="nav-icon">⚙️</span>
+                        System Settings
+                    </button>
+                </div>
+            </nav>
+
+            <main class="main-content">
+                <div class="header">
+                    <div>
+                        <h1>Occupational Health & Safety Management</h1>
+                        <div style="color: var(--text-light); margin-top: 0.5rem;">
+                            Metal Management Solutions - Comprehensive OHS compliance across all operations
                         </div>
                     </div>
-                </div>
-                <div class="chart-canvas-container">
-                    <canvas id="incidentTrendChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Risk Assessment Matrix -->
-            <div class="risk-matrix">
-                <div class="chart-header">
-                    <div>
-                        <div class="chart-title">Risk Assessment Matrix</div>
-                        <div class="chart-subtitle">Current workplace risk assessment status</div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div style="text-align: right;">
+                                <div id="currentUserEmail" style="font-weight: 600; color: var(--text); font-size: 0.95rem;"></div>
+                                <div id="currentUserRole" style="font-size: 0.8rem; color: var(--text-light);"></div>
+                            </div>
+                            <button class="btn btn-outline" onclick="handleMMSLogout()" style="white-space: nowrap; padding: 0.5rem 1rem;">
+                                🚪 Logout
+                            </button>
+                        </div>
+                        <button class="btn btn-outline" id="installBtn" style="display: none;">
+                            📱 Install App
+                        </button>
+                        <button class="btn btn-outline" onclick="exportToPDF()">
+                            📄 Export PDF
+                        </button>
+                        <button class="btn btn-primary" onclick="openModal('reportIncidentModal')">
+                            🚨 Report Incident
+                        </button>
                     </div>
-                    <div>
-                        <button class="btn btn-success" onclick="saveRiskMatrix()">💾 Save Matrix</button>
+                </div>
+
+                <!-- Statistics Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card" onclick="openModal('incidentsModal')">
+                        <div class="stat-number" id="lostTimeInjuries">0</div>
+                        <div class="stat-label">Lost Time Injuries</div>
+                        <div class="stat-details" id="ltiDetails">
+                            Last 30 days: 0 incidents
+                        </div>
+                    </div>
+                    <div class="stat-card" onclick="openModal('trainingModal')">
+                        <div class="stat-number" id="safetyTrainings">156</div>
+                        <div class="stat-label">Safety Trainings</div>
+                        <div class="stat-details" id="trainingDetails">
+                            45 completed, 12 in progress
+                        </div>
+                    </div>
+                    <div class="stat-card" onclick="openModal('standardsModal')">
+                        <div class="stat-number" id="complianceRate">92%</div>
+                        <div class="stat-label">Compliance Rate</div>
+                        <div class="stat-details">
+                            Based on 28 standards and regulations
+                        </div>
+                    </div>
+                    <div class="stat-card" onclick="openModal('auditModal')">
+                        <div class="stat-number" id="activeAudits">8</div>
+                        <div class="stat-label">Active Audits</div>
+                        <div class="stat-details">
+                            4 internal, 2 external, 2 regulatory
+                        </div>
                     </div>
                 </div>
-                <div class="matrix-grid" id="riskMatrix">
-                    <!-- Matrix cells will be loaded by JavaScript -->
-                </div>
-            </div>
 
-            <!-- OHS Management Modules -->
-            <div class="module-grid">
-                <div class="module-card" onclick="openModal('incidentsModal')">
-                    <div class="module-icon">🚨</div>
-                    <h3>Incident Management</h3>
-                    <p>Report, track, and investigate workplace incidents with full documentation</p>
-                </div>
-
-                <div class="module-card" onclick="openModal('ppeModal')">
-                    <div class="module-icon">🥽</div>
-                    <h3>PPE Management</h3>
-                    <p>Track personal protective equipment issuance, maintenance, and compliance</p>
-                </div>
-
-                <div class="module-card" onclick="openModal('healthModal')">
-                    <div class="module-icon">👥</div>
-                    <h3>Employee Health</h3>
-                    <p>Employee health monitoring, medical examinations, and wellness programs</p>
-                </div>
-
-                <div class="module-card" onclick="openModal('contractorModal')">
-                    <div class="module-icon">👷</div>
-                    <h3>Contractor Safety</h3>
-                    <p>Manage contractor safety compliance, permits, and site-specific inductions</p>
+                <!-- Incident Trends Chart -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Safety Performance Trends</div>
+                            <div class="chart-subtitle">Incident monitoring across all MMS locations</div>
+                        </div>
+                        <div class="chart-controls">
+                            <div class="chart-type-selector">
+                                <button class="chart-type-btn active" onclick="changeChartType('line')">📈 Line</button>
+                                <button class="chart-type-btn" onclick="changeChartType('bar')">📊 Bar</button>
+                                <button class="chart-type-btn" onclick="changeChartType('pie')">🥧 Pie</button>
+                            </div>
+                            <div class="custom-calendar">
+                                <input type="date" id="startDate" class="date-input" onchange="updateChartWithCustomRange()">
+                                <span>to</span>
+                                <input type="date" id="endDate" class="date-input" onchange="updateChartWithCustomRange()">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-canvas-container">
+                        <canvas id="incidentTrendChart"></canvas>
+                    </div>
                 </div>
 
-                <div class="module-card" onclick="openModal('auditModal')">
-                    <div class="module-icon">🔍</div>
-                    <h3>Audit & Inspection</h3>
-                    <p>Schedule and conduct safety audits, inspections, and compliance verifications</p>
+                <!-- Risk Assessment Matrix -->
+                <div class="risk-matrix">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Risk Assessment Matrix</div>
+                            <div class="chart-subtitle">Current workplace risk assessment status</div>
+                        </div>
+                        <div>
+                            <button class="btn btn-success" onclick="saveRiskMatrix()">💾 Save Matrix</button>
+                        </div>
+                    </div>
+                    <div class="matrix-grid" id="riskMatrix">
+                        <!-- Matrix cells will be loaded by JavaScript -->
+                    </div>
                 </div>
 
-                <div class="module-card" onclick="openModal('standardsModal')">
-                    <div class="module-icon">📋</div>
-                    <h3>Standards Compliance</h3>
-                    <p>Manage international and national safety standards compliance</p>
-                </div>
-            </div>
+                <!-- OHS Management Modules -->
+                <div class="module-grid">
+                    <div class="module-card" onclick="openModal('incidentsModal')">
+                        <div class="module-icon">🚨</div>
+                        <h3>Incident Management</h3>
+                        <p>Report, track, and investigate workplace incidents with full documentation</p>
+                    </div>
 
-            <div class="footer">
-                <div style="font-weight: 600; color: var(--primary); margin-bottom: 0.5rem;">
-                    Metal Management Solutions
-                </div>
-                <div style="margin-bottom: 0.5rem;">
-                    Health & Safety Management System
-                </div>
-                <div style="font-size: 0.85rem; color: var(--text-light);">
-                    Copyright © 2026 Metal Management Solutions. All rights reserved.
-                </div>
-                <div style="font-size: 0.85rem; color: var(--text-light); margin-top: 0.25rem;">
-                    Operating in South Africa, Tanzania, Namibia, and Zambia
-                </div>
-            </div>
-        </main>
-    </div>
+                    <div class="module-card" onclick="openModal('ppeModal')">
+                        <div class="module-icon">🥽</div>
+                        <h3>PPE Management</h3>
+                        <p>Track personal protective equipment issuance, maintenance, and compliance</p>
+                    </div>
 
-    <!-- Toast Notification -->
-    <div class="toast" id="toast">
-        <div class="toast-icon"></div>
-        <div class="toast-content">
-            <div class="toast-title"></div>
-            <div class="toast-message"></div>
+                    <div class="module-card" onclick="openModal('healthModal')">
+                        <div class="module-icon">👥</div>
+                        <h3>Employee Health</h3>
+                        <p>Employee health monitoring, medical examinations, and wellness programs</p>
+                    </div>
+
+                    <div class="module-card" onclick="openModal('contractorModal')">
+                        <div class="module-icon">👷</div>
+                        <h3>Contractor Safety</h3>
+                        <p>Manage contractor safety compliance, permits, and site-specific inductions</p>
+                    </div>
+
+                    <div class="module-card" onclick="openModal('auditModal')">
+                        <div class="module-icon">🔍</div>
+                        <h3>Audit & Inspection</h3>
+                        <p>Schedule and conduct safety audits, inspections, and compliance verifications</p>
+                    </div>
+
+                    <div class="module-card" onclick="openModal('standardsModal')">
+                        <div class="module-icon">📋</div>
+                        <h3>Standards Compliance</h3>
+                        <p>Manage international and national safety standards compliance</p>
+                    </div>
+                </div>
+
+                <div class="footer">
+                    <div style="font-weight: 600; color: var(--primary); margin-bottom: 0.5rem;">
+                        Metal Management Solutions
+                    </div>
+                    <div style="margin-bottom: 0.5rem;">
+                        Health & Safety Management System
+                    </div>
+                    <div style="font-size: 0.85rem; color: var(--text-light);">
+                        Copyright © 2026 Metal Management Solutions. All rights reserved.
+                    </div>
+                    <div style="font-size: 0.85rem; color: var(--text-light); margin-top: 0.25rem;">
+                        Operating in South Africa, Tanzania, Namibia, and Zambia
+                    </div>
+                </div>
+            </main>
         </div>
-        <button class="close-toast" onclick="hideToast()">×</button>
-    </div>
 
-    <!-- Confirm Dialog -->
-    <div class="confirm-dialog" id="confirmDialog">
-        <div class="confirm-content">
-            <div class="confirm-icon">⚠️</div>
-            <div class="confirm-title" id="confirmTitle">Confirm Delete</div>
-            <div class="confirm-message" id="confirmMessage">Are you sure you want to delete this item? This action cannot be undone.</div>
-            <div class="confirm-buttons">
-                <button class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
-                <button class="btn btn-outline" onclick="hideConfirmDialog()">Cancel</button>
+        <!-- Toast Notification -->
+        <div class="toast" id="toast">
+            <div class="toast-icon"></div>
+            <div class="toast-content">
+                <div class="toast-title"></div>
+                <div class="toast-message"></div>
             </div>
+            <button class="close-toast" onclick="hideToast()">×</button>
         </div>
-    </div>
 
-    <!-- Report Incident Modal -->
-    <div id="reportIncidentModal" class="modal">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeModal('reportIncidentModal')">×</button>
-            <div class="modal-header">
-                <h2>Report Safety Incident</h2>
-            </div>
-            
-            <div class="success-message" id="reportSuccess">Incident reported successfully!</div>
-            <div class="error-message" id="reportError">Please fill all required fields.</div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Incident Type *</label>
-                    <select id="incidentType" required>
-                        <option value="">Select type</option>
-                        <option value="Near Miss">Near Miss</option>
-                        <option value="First Aid">First Aid</option>
-                        <option value="Medical Treatment">Medical Treatment</option>
-                        <option value="Lost Time Injury">Lost Time Injury</option>
-                        <option value="Property Damage">Property Damage</option>
-                        <option value="Environmental Incident">Environmental Incident</option>
-                    </select>
+        <!-- Confirm Dialog -->
+        <div class="confirm-dialog" id="confirmDialog">
+            <div class="confirm-content">
+                <div class="confirm-icon">⚠️</div>
+                <div class="confirm-title" id="confirmTitle">Confirm Delete</div>
+                <div class="confirm-message" id="confirmMessage">Are you sure you want to delete this item? This action cannot be undone.</div>
+                <div class="confirm-buttons">
+                    <button class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+                    <button class="btn btn-outline" onclick="hideConfirmDialog()">Cancel</button>
                 </div>
-                <div class="form-group">
-                    <label>Severity Level *</label>
-                    <select id="incidentSeverity" required>
-                        <option value="">Select severity</option>
-                        <option value="Minor">Minor</option>
-                        <option value="Moderate">Moderate</option>
-                        <option value="Serious">Serious</option>
-                        <option value="Critical">Critical</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Date & Time *</label>
-                    <input type="datetime-local" id="incidentDateTime" required>
-                </div>
-                <div class="form-group">
-                    <label>Location *</label>
-                    <select id="incidentLocation" required>
-                        <option value="">Select location</option>
-                        <optgroup label="South Africa">
-                            <option value="Cape Town HQ">Cape Town HQ</option>
-                            <option value="Cosco Durban">Cosco Durban</option>
-                            <option value="AGL Durban">AGL Durban</option>
-                        </optgroup>
-                        <optgroup label="Tanzania">
-                            <option value="Impala Dar">Impala Dar</option>
-                            <option value="Polytra Dar">Polytra Dar</option>
-                            <option value="Access Dar">Access Dar</option>
-                        </optgroup>
-                        <optgroup label="Namibia">
-                            <option value="WBCT Bulk Shed">WBCT Bulk Shed</option>
-                            <option value="WBCT Quay Side Shed">WBCT Quay Side Shed</option>
-                            <option value="Bridge Walvis Bay">Bridge Walvis Bay</option>
-                            <option value="Pindulo Walvis Bay">Pindulo Walvis Bay</option>
-                        </optgroup>
-                        <optgroup label="Zambia">
-                            <option value="Reload Giga Terminal">Reload Giga Terminal</option>
-                            <option value="AGL Chingola Hub">AGL Chingola Hub</option>
-                            <option value="Polytra Kitwe">Polytra Kitwe</option>
-                            <option value="Impala Ndola">Impala Ndola</option>
-                            <option value="SLS Ndola">SLS Ndola</option>
-                            <option value="Poseidon Zambia">Poseidon Zambia</option>
-                            <option value="Polytra Kapiri Mposhi">Polytra Kapiri Mposhi</option>
-                        </optgroup>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Reported By *</label>
-                    <select id="reportedBy" required>
-                        <option value="">Select employee</option>
-                        <!-- Employees will be populated by JavaScript -->
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Department *</label>
-                    <select id="incidentDepartment" required>
-                        <option value="">Select department</option>
-                        <option value="Inventory Control">Inventory Control</option>
-                        <option value="Operations">Operations</option>
-                        <option value="Management">Management</option>
-                        <option value="Contractor">Contractor</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label>Description *</label>
-                <textarea id="incidentDescription" rows="4" placeholder="Provide detailed description" required></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label>Immediate Actions Taken</label>
-                <textarea id="immediateActions" rows="3" placeholder="Describe immediate response actions"></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label>Attachments</label>
-                <div class="file-upload-area" onclick="document.getElementById('incidentFileInput').click()">
-                    <input type="file" id="incidentFileInput" style="display: none;" multiple>
-                    <div style="font-size: 3rem;">📎</div>
-                    <div style="margin: 1rem 0;">Click to upload incident photos or documents</div>
-                    <div style="color: var(--text-light); font-size: 0.875rem;">Supported: PDF, DOC, JPG, PNG (Max 10MB each)</div>
-                </div>
-                <div class="file-list" id="incidentFilesList"></div>
-            </div>
-            
-            <div class="form-group">
-                <label>Proposed Recommendations/Comments</label>
-                <textarea id="recommendations" rows="3" placeholder="Enter recommendations or comments"></textarea>
-            </div>
-            
-            <div class="action-buttons">
-                <button class="btn btn-primary" onclick="submitIncidentReport()">Submit Report</button>
-                <button class="btn btn-outline" onclick="closeModal('reportIncidentModal')">Cancel</button>
             </div>
         </div>
-    </div>
 
-    <!-- Incident Management Modal -->
-    <div id="incidentsModal" class="modal">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeModal('incidentsModal')">×</button>
-            <div class="modal-header">
-                <h2>Incident Management System</h2>
-                <p>Click on any cell to edit, right-click for more options</p>
-            </div>
-            
-            <div class="tab-container">
-                <div class="tab-buttons">
-                    <button class="tab-button active" onclick="switchTab('incidentsTab', 'incidentsModal')">All Incidents</button>
-                    <button class="tab-button" onclick="switchTab('incidentsAnalysisTab', 'incidentsModal')">Analysis</button>
-                    <button class="tab-button" onclick="switchTab('incidentsAttachmentsTab', 'incidentsModal')">Attachments</button>
+        <!-- Report Incident Modal -->
+        <div id="reportIncidentModal" class="modal">
+            <div class="modal-content">
+                <button class="close-modal" onclick="closeModal('reportIncidentModal')">×</button>
+                <div class="modal-header">
+                    <h2>Report Safety Incident</h2>
                 </div>
                 
-                <div class="tab-content active" id="incidentsTab">
-                    <div style="overflow-x: auto; margin-top: 1rem;">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Type</th>
-                                    <th>Date</th>
-                                    <th>Location</th>
-                                    <th>Reported By</th>
-                                    <th>Severity</th>
-                                    <th>Status</th>
-                                    <th>Description</th>
-                                    <th>Actions</th>
-                                    <th>Recommendations</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="modalIncidentsTableBody">
-                                <!-- Incidents will be loaded here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                <div class="success-message" id="reportSuccess">Incident reported successfully!</div>
+                <div class="error-message" id="reportError">Please fill all required fields.</div>
                 
-                <div class="tab-content" id="incidentsAnalysisTab">
-                    <div style="margin-top: 1rem;">
-                        <canvas id="incidentAnalysisChart" height="300"></canvas>
-                    </div>
-                </div>
-                
-                <div class="tab-content" id="incidentsAttachmentsTab">
+                <div class="form-row">
                     <div class="form-group">
-                        <label>Select Incident</label>
-                        <select id="incidentSelect" onchange="loadIncidentAttachments()">
-                            <option value="">Select incident</option>
+                        <label>Incident Type *</label>
+                        <select id="incidentType" required>
+                            <option value="">Select type</option>
+                            <option value="Near Miss">Near Miss</option>
+                            <option value="First Aid">First Aid</option>
+                            <option value="Medical Treatment">Medical Treatment</option>
+                            <option value="Lost Time Injury">Lost Time Injury</option>
+                            <option value="Property Damage">Property Damage</option>
+                            <option value="Environmental Incident">Environmental Incident</option>
                         </select>
                     </div>
-                    
-                    <div class="file-upload-area" onclick="document.getElementById('incidentModalFileInput').click()">
-                        <input type="file" id="incidentModalFileInput" style="display: none;" multiple onchange="uploadIncidentAttachment()">
-                        <div style="font-size: 3rem;">📎</div>
-                        <div style="margin: 1rem 0;">Click to upload incident documents</div>
-                    </div>
-                    
-                    <div class="file-list" id="incidentAttachmentsList">
-                        <!-- Attachments will be listed here -->
-                    </div>
-                </div>
-            </div>
-            
-            <div class="action-buttons" style="margin-top: 2rem;">
-                <button class="btn btn-outline" onclick="exportTableToPDF('incidentsTable')">📄 Export PDF</button>
-                <button class="btn btn-outline" onclick="closeModal('incidentsModal')">Close</button>
-                <button class="btn btn-primary" onclick="openModal('reportIncidentModal')">+ Report New Incident</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Safety Training Modal -->
-    <div id="trainingModal" class="modal">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeModal('trainingModal')">×</button>
-            <div class="modal-header">
-                <h2>Safety Training Management</h2>
-                <p>Track all safety training activities and certifications</p>
-            </div>
-            
-            <div class="tab-container">
-                <div class="tab-buttons">
-                    <button class="tab-button active" onclick="switchTab('trainingRecordsTab', 'trainingModal')">Training Records</button>
-                    <button class="tab-button" onclick="switchTab('trainingAttachmentsTab', 'trainingModal')">Certificates</button>
-                    <button class="tab-button" onclick="switchTab('trainingStatsTab', 'trainingModal')">Statistics</button>
-                </div>
-                
-                <div class="tab-content active" id="trainingRecordsTab">
-                    <div style="overflow-x: auto; margin-top: 1rem;">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Training ID</th>
-                                    <th>Employee</th>
-                                    <th>Training Type</th>
-                                    <th>Provider</th>
-                                    <th>Start Date</th>
-                                    <th>End Date</th>
-                                    <th>Status</th>
-                                    <th>Score</th>
-                                    <th>Expiry Date</th>
-                                    <th>Notes</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="trainingTableBody">
-                                <!-- Training records will be loaded here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <div class="tab-content" id="trainingAttachmentsTab">
                     <div class="form-group">
-                        <label>Select Employee</label>
-                        <select id="trainingEmployeeSelect" onchange="loadTrainingCertificates()">
+                        <label>Severity Level *</label>
+                        <select id="incidentSeverity" required>
+                            <option value="">Select severity</option>
+                            <option value="Minor">Minor</option>
+                            <option value="Moderate">Moderate</option>
+                            <option value="Serious">Serious</option>
+                            <option value="Critical">Critical</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Date & Time *</label>
+                        <input type="datetime-local" id="incidentDateTime" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Location *</label>
+                        <select id="incidentLocation" required>
+                            <option value="">Select location</option>
+                            <optgroup label="South Africa">
+                                <option value="Cape Town HQ">Cape Town HQ</option>
+                                <option value="Cosco Durban">Cosco Durban</option>
+                                <option value="AGL Durban">AGL Durban</option>
+                            </optgroup>
+                            <optgroup label="Tanzania">
+                                <option value="Impala Dar">Impala Dar</option>
+                                <option value="Polytra Dar">Polytra Dar</option>
+                                <option value="Access Dar">Access Dar</option>
+                            </optgroup>
+                            <optgroup label="Namibia">
+                                <option value="WBCT Bulk Shed">WBCT Bulk Shed</option>
+                                <option value="WBCT Quay Side Shed">WBCT Quay Side Shed</option>
+                                <option value="Bridge Walvis Bay">Bridge Walvis Bay</option>
+                                <option value="Pindulo Walvis Bay">Pindulo Walvis Bay</option>
+                            </optgroup>
+                            <optgroup label="Zambia">
+                                <option value="Reload Giga Terminal">Reload Giga Terminal</option>
+                                <option value="AGL Chingola Hub">AGL Chingola Hub</option>
+                                <option value="Polytra Kitwe">Polytra Kitwe</option>
+                                <option value="Impala Ndola">Impala Ndola</option>
+                                <option value="SLS Ndola">SLS Ndola</option>
+                                <option value="Poseidon Zambia">Poseidon Zambia</option>
+                                <option value="Polytra Kapiri Mposhi">Polytra Kapiri Mposhi</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Reported By *</label>
+                        <select id="reportedBy" required>
                             <option value="">Select employee</option>
+                            <!-- Employees will be populated by JavaScript -->
                         </select>
                     </div>
-                    
-                    <div class="file-upload-area" onclick="document.getElementById('trainingFileInput').click()">
-                        <input type="file" id="trainingFileInput" style="display: none;" multiple onchange="uploadTrainingCertificate()">
-                        <div style="font-size: 3rem;">📎</div>
-                        <div style="margin: 1rem 0;">Click to upload training certificates</div>
-                    </div>
-                    
-                    <div class="file-list" id="trainingCertificatesList">
-                        <!-- Certificates will be listed here -->
-                    </div>
-                </div>
-                
-                <div class="tab-content" id="trainingStatsTab">
-                    <div style="margin-top: 1rem;">
-                        <canvas id="trainingStatsChart" height="300"></canvas>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="action-buttons" style="margin-top: 2rem;">
-                <button class="btn btn-outline" onclick="addTrainingRecord()">+ Add Training</button>
-                <button class="btn btn-outline" onclick="exportTableToPDF('trainingTable')">📄 Export PDF</button>
-                <button class="btn btn-outline" onclick="closeModal('trainingModal')">Close</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- PPE Management Modal -->
-    <div id="ppeModal" class="modal">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeModal('ppeModal')">×</button>
-            <div class="modal-header">
-                <h2>PPE Management System</h2>
-                <p>Personal Protective Equipment Management</p>
-            </div>
-            
-            <div class="tab-container">
-                <div class="tab-buttons">
-                    <button class="tab-button active" onclick="switchTab('ppeRecordsTab', 'ppeModal')">PPE Records</button>
-                    <button class="tab-button" onclick="switchTab('ppeIssuanceTab', 'ppeModal')">Issuance Log</button>
-                    <button class="tab-button" onclick="switchTab('ppeAttachmentsTab', 'ppeModal')">Documents</button>
-                </div>
-                
-                <div class="tab-content active" id="ppeRecordsTab">
-                    <div style="overflow-x: auto; margin-top: 1rem;">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>PPE ID</th>
-                                    <th>Equipment Type</th>
-                                    <th>Size</th>
-                                    <th>Brand</th>
-                                    <th>Quantity</th>
-                                    <th>Location</th>
-                                    <th>Status</th>
-                                    <th>Last Inspection</th>
-                                    <th>Next Inspection</th>
-                                    <th>Condition</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="ppeTableBody">
-                                <!-- PPE items will be loaded here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <div class="tab-content" id="ppeIssuanceTab">
-                    <div style="overflow-x: auto; margin-top: 1rem;">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Issue ID</th>
-                                    <th>PPE ID</th>
-                                    <th>Employee</th>
-                                    <th>Issue Date</th>
-                                    <th>Expiry Date</th>
-                                    <th>Issued By</th>
-                                    <th>Return Date</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="ppeIssuanceTableBody">
-                                <!-- Issuance records will be loaded here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <div class="tab-content" id="ppeAttachmentsTab">
                     <div class="form-group">
-                        <label>Select PPE Item</label>
-                        <select id="ppeItemSelect" onchange="loadPPEDocuments()">
-                            <option value="">Select PPE item</option>
+                        <label>Department *</label>
+                        <select id="incidentDepartment" required>
+                            <option value="">Select department</option>
+                            <option value="Inventory Control">Inventory Control</option>
+                            <option value="Operations">Operations</option>
+                            <option value="Management">Management</option>
+                            <option value="Contractor">Contractor</option>
                         </select>
                     </div>
-                    
-                    <div class="file-upload-area" onclick="document.getElementById('ppeFileInput').click()">
-                        <input type="file" id="ppeFileInput" style="display: none;" multiple onchange="uploadPPEDocument()">
-                        <div style="font-size: 3rem;">📎</div>
-                        <div style="margin: 1rem 0;">Click to upload PPE documents</div>
-                    </div>
-                    
-                    <div class="file-list" id="ppeDocumentsList">
-                        <!-- Documents will be listed here -->
-                    </div>
-                </div>
-            </div>
-            
-            <div class="action-buttons" style="margin-top: 2rem;">
-                <button class="btn btn-outline" onclick="addPPEItem()">+ Add PPE</button>
-                <button class="btn btn-outline" onclick="issuePPE()">📝 Issue PPE</button>
-                <button class="btn btn-outline" onclick="exportTableToPDF('ppeTable')">📄 Export PDF</button>
-                <button class="btn btn-outline" onclick="closeModal('ppeModal')">Close</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Health Surveillance Modal -->
-    <div id="healthModal" class="modal">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeModal('healthModal')">×</button>
-            <div class="modal-header">
-                <h2>Employee Health Surveillance</h2>
-                <p>Employee Health Monitoring - All MMS Employees</p>
-            </div>
-            
-            <div class="tab-container">
-                <div class="tab-buttons">
-                    <button class="tab-button active" onclick="switchTab('healthRecordsTab', 'healthModal')">Health Records</button>
-                    <button class="tab-button" onclick="switchTab('healthAttachmentsTab', 'healthModal')">Medical Records</button>
-                    <button class="tab-button" onclick="switchTab('healthStatsTab', 'healthModal')">Statistics</button>
                 </div>
                 
-                <div class="tab-content active" id="healthRecordsTab">
-                    <div style="overflow-x: auto; margin-top: 1rem;">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Employee ID</th>
-                                    <th>Name</th>
-                                    <th>Location</th>
-                                    <th>Position</th>
-                                    <th>Last Medical</th>
-                                    <th>Next Due</th>
-                                    <th>Blood Group</th>
-                                    <th>Allergies</th>
-                                    <th>Medical Status</th>
-                                    <th>Emergency Contact</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="healthTableBody">
-                                <!-- Health records will be loaded here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <div class="tab-content" id="healthAttachmentsTab">
-                    <div class="form-group">
-                        <label>Select Employee</label>
-                        <select id="healthEmployeeSelect" onchange="loadHealthAttachments()">
-                            <option value="">Select employee</option>
-                        </select>
-                    </div>
-                    
-                    <div class="file-upload-area" onclick="document.getElementById('healthFileInput').click()">
-                        <input type="file" id="healthFileInput" style="display: none;" multiple onchange="uploadHealthAttachment()">
-                        <div style="font-size: 3rem;">📎</div>
-                        <div style="margin: 1rem 0;">Click to upload medical records</div>
-                    </div>
-                    
-                    <div class="file-list" id="healthAttachmentsList">
-                        <!-- Attachments will be listed here -->
-                    </div>
-                </div>
-                
-                <div class="tab-content" id="healthStatsTab">
-                    <div style="margin-top: 1rem;">
-                        <canvas id="healthStatsChart" height="300"></canvas>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="action-buttons" style="margin-top: 2rem;">
-                <button class="btn btn-outline" onclick="addHealthRecord()">+ Add Record</button>
-                <button class="btn btn-outline" onclick="exportTableToPDF('healthTable')">📄 Export PDF</button>
-                <button class="btn btn-outline" onclick="closeModal('healthModal')">Close</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Contractor Safety Modal -->
-    <div id="contractorModal" class="modal">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeModal('contractorModal')">×</button>
-            <div class="modal-header">
-                <h2>Contractor Safety Management</h2>
-                <p>Contractor Safety Compliance</p>
-            </div>
-            
-            <div class="tab-container">
-                <div class="tab-buttons">
-                    <button class="tab-button active" onclick="switchTab('contractorRecordsTab', 'contractorModal')">Contractor Records</button>
-                    <button class="tab-button" onclick="switchTab('contractorPermitsTab', 'contractorModal')">Permits</button>
-                    <button class="tab-button" onclick="switchTab('contractorAttachmentsTab', 'contractorModal')">Documents</button>
-                </div>
-                
-                <div class="tab-content active" id="contractorRecordsTab">
-                    <div style="overflow-x: auto; margin-top: 1rem;">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Contractor ID</th>
-                                    <th>Company</th>
-                                    <th>Contact Person</th>
-                                    <th>Phone</th>
-                                    <th>Email</th>
-                                    <th>Work Type</th>
-                                    <th>Location</th>
-                                    <th>Start Date</th>
-                                    <th>End Date</th>
-                                    <th>Safety Rating</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="contractorTableBody">
-                                <!-- Contractor records will be loaded here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <div class="tab-content" id="contractorPermitsTab">
-                    <div style="overflow-x: auto; margin-top: 1rem;">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Permit ID</th>
-                                    <th>Contractor</th>
-                                    <th>Work Type</th>
-                                    <th>Location</th>
-                                    <th>Issued Date</th>
-                                    <th>Expiry Date</th>
-                                    <th>Issued By</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="contractorPermitsTableBody">
-                                <!-- Permit records will be loaded here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <div class="tab-content" id="contractorAttachmentsTab">
-                    <div class="form-group">
-                        <label>Select Contractor</label>
-                        <select id="contractorSelect" onchange="loadContractorAttachments()">
-                            <option value="">Select contractor</option>
-                        </select>
-                    </div>
-                    
-                    <div class="file-upload-area" onclick="document.getElementById('contractorFileInput').click()">
-                        <input type="file" id="contractorFileInput" style="display: none;" multiple onchange="uploadContractorAttachment()">
-                        <div style="font-size: 3rem;">📎</div>
-                        <div style="margin: 1rem 0;">Click to upload contractor documents</div>
-                    </div>
-                    
-                    <div class="file-list" id="contractorAttachmentsList">
-                        <!-- Attachments will be listed here -->
-                    </div>
-                </div>
-            </div>
-            
-            <div class="action-buttons" style="margin-top: 2rem;">
-                <button class="btn btn-outline" onclick="addContractor()">+ Add Contractor</button>
-                <button class="btn btn-outline" onclick="issuePermit()">📝 Issue Permit</button>
-                <button class="btn btn-outline" onclick="exportTableToPDF('contractorTable')">📄 Export PDF</button>
-                <button class="btn btn-outline" onclick="closeModal('contractorModal')">Close</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Audit & Inspection Modal -->
-    <div id="auditModal" class="modal">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeModal('auditModal')">×</button>
-            <div class="modal-header">
-                <h2>Audit & Inspection Management</h2>
-                <p>Safety Audits and Inspections</p>
-            </div>
-            
-            <div class="tab-container">
-                <div class="tab-buttons">
-                    <button class="tab-button active" onclick="switchTab('auditRecordsTab', 'auditModal')">Audit Records</button>
-                    <button class="tab-button" onclick="switchTab('auditScheduleTab', 'auditModal')">Schedule</button>
-                    <button class="tab-button" onclick="switchTab('auditAttachmentsTab', 'auditModal')">Reports</button>
-                </div>
-                
-                <div class="tab-content active" id="auditRecordsTab">
-                    <div style="overflow-x: auto; margin-top: 1rem;">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Audit ID</th>
-                                    <th>Type</th>
-                                    <th>Location</th>
-                                    <th>Audit Date</th>
-                                    <th>Auditor</th>
-                                    <th>Score</th>
-                                    <th>Status</th>
-                                    <th>Findings</th>
-                                    <th>Corrective Actions</th>
-                                    <th>Next Audit</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="auditTableBody">
-                                <!-- Audit records will be loaded here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <div class="tab-content" id="auditScheduleTab">
-                    <div style="overflow-x: auto; margin-top: 1rem;">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Schedule ID</th>
-                                    <th>Audit Type</th>
-                                    <th>Location</th>
-                                    <th>Scheduled Date</th>
-                                    <th>Frequency</th>
-                                    <th>Assigned To</th>
-                                    <th>Status</th>
-                                    <th>Priority</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="auditScheduleTableBody">
-                                <!-- Schedule records will be loaded here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <div class="tab-content" id="auditAttachmentsTab">
-                    <div class="form-group">
-                        <label>Select Audit</label>
-                        <select id="auditSelect" onchange="loadAuditAttachments()">
-                            <option value="">Select audit</option>
-                        </select>
-                    </div>
-                    
-                    <div class="file-upload-area" onclick="document.getElementById('auditFileInput').click()">
-                        <input type="file" id="auditFileInput" style="display: none;" multiple onchange="uploadAuditAttachment()">
-                        <div style="font-size: 3rem;">📎</div>
-                        <div style="margin: 1rem 0;">Click to upload audit reports</div>
-                    </div>
-                    
-                    <div class="file-list" id="auditAttachmentsList">
-                        <!-- Attachments will be listed here -->
-                    </div>
-                </div>
-            </div>
-            
-            <div class="action-buttons" style="margin-top: 2rem;">
-                <button class="btn btn-outline" onclick="addAudit()">+ Add Audit</button>
-                <button class="btn btn-outline" onclick="scheduleAudit()">📅 Schedule Audit</button>
-                <button class="btn btn-outline" onclick="exportTableToPDF('auditTable')">📄 Export PDF</button>
-                <button class="btn btn-outline" onclick="closeModal('auditModal')">Close</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Standards Compliance Modal -->
-    <div id="standardsModal" class="modal">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeModal('standardsModal')">×</button>
-            <div class="modal-header">
-                <h2>Standards & Compliance Management</h2>
-                <p>Manage International and National Safety Standards</p>
-            </div>
-            
-            <div class="tab-container">
-                <div class="tab-buttons">
-                    <button class="tab-button active" onclick="switchTab('standardsListTab', 'standardsModal')">Standards</button>
-                    <button class="tab-button" onclick="switchTab('complianceTab', 'standardsModal')">Compliance Status</button>
-                    <button class="tab-button" onclick="switchTab('standardsAttachmentsTab', 'standardsModal')">Documents</button>
-                </div>
-                
-                <div class="tab-content active" id="standardsListTab">
-                    <div class="standards-grid" id="standardsGrid">
-                        <!-- Standards cards will be loaded here -->
-                    </div>
-                </div>
-                
-                <div class="tab-content" id="complianceTab">
-                    <div style="margin-top: 1rem;">
-                        <canvas id="complianceChart" height="300"></canvas>
-                    </div>
-                </div>
-                
-                <div class="tab-content" id="standardsAttachmentsTab">
-                    <div class="form-group">
-                        <label>Select Standard</label>
-                        <select id="standardSelect" onchange="loadStandardAttachments()">
-                            <option value="">Select standard</option>
-                        </select>
-                    </div>
-                    
-                    <div class="file-upload-area" onclick="document.getElementById('standardFileInput').click()">
-                        <input type="file" id="standardFileInput" style="display: none;" multiple onchange="uploadStandardAttachment()">
-                        <div style="font-size: 3rem;">📎</div>
-                        <div style="margin: 1rem 0;">Click to upload standard documents</div>
-                    </div>
-                    
-                    <div class="file-list" id="standardAttachmentsList">
-                        <!-- Attachments will be listed here -->
-                    </div>
-                </div>
-            </div>
-            
-            <div class="action-buttons" style="margin-top: 2rem;">
-                <button class="btn btn-outline" onclick="addStandard()">+ Add Standard</button>
-                <button class="btn btn-outline" onclick="exportStandardsToPDF()">📄 Export PDF</button>
-                <button class="btn btn-outline" onclick="closeModal('standardsModal')">Close</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Add/Edit Standard Modal -->
-    <div id="standardModal" class="modal">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeModal('standardModal')">×</button>
-            <div class="modal-header">
-                <h2 id="standardModalTitle">Add New Standard</h2>
-            </div>
-            
-            <div class="success-message" id="standardSuccess">Standard saved successfully!</div>
-            <div class="error-message" id="standardError">Please fill all required fields.</div>
-            
-            <div class="form-row">
                 <div class="form-group">
-                    <label>Standard Name *</label>
-                    <input type="text" id="standardName" placeholder="e.g., ISO 45001:2018" required>
-                </div>
-                <div class="form-group">
-                    <label>Standard Code *</label>
-                    <input type="text" id="standardCode" placeholder="e.g., ISO45001" required>
-                </div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Standard Type *</label>
-                    <select id="standardType" required onchange="toggleCountryField()">
-                        <option value="">Select type</option>
-                        <option value="International">International</option>
-                        <option value="National">National</option>
-                        <option value="Company">Company/Organizational</option>
-                        <option value="Personal">Personal Certification</option>
-                    </select>
-                </div>
-                <div class="form-group" id="countryField">
-                    <label>Country</label>
-                    <select id="standardCountry">
-                        <option value="">Select country</option>
-                        <option value="South Africa">South Africa</option>
-                        <option value="Tanzania">Tanzania</option>
-                        <option value="Namibia">Namibia</option>
-                        <option value="Zambia">Zambia</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label>Description *</label>
-                <textarea id="standardDescription" rows="4" placeholder="Description of the standard and its requirements" required></textarea>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Status *</label>
-                    <select id="standardStatus" required>
-                        <option value="">Select status</option>
-                        <option value="Compliant">Compliant</option>
-                        <option value="Non-Compliant">Non-Compliant</option>
-                        <option value="In Progress">In Progress</option>
-                        <option value="Pending Review">Pending Review</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Effective Date</label>
-                    <input type="date" id="standardEffectiveDate">
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label>Remarks</label>
-                <textarea id="standardRemarks" rows="3" placeholder="Additional remarks or notes"></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label>Upload Standard Document</label>
-                <div class="file-upload-area" onclick="document.getElementById('standardFormFileInput').click()">
-                    <input type="file" id="standardFormFileInput" style="display: none;" accept=".pdf,.doc,.docx,.jpg,.png">
-                    <div style="font-size: 3rem;">📎</div>
-                    <div style="margin: 1rem 0;">Click to upload standard document</div>
-                </div>
-                <div class="file-list" id="standardFormFilesList"></div>
-            </div>
-            
-            <div class="action-buttons">
-                <button class="btn btn-success" onclick="saveStandard()">💾 Save Standard</button>
-                <button class="btn btn-outline" onclick="closeModal('standardModal')">Cancel</button>
-                <button class="btn btn-danger" id="deleteStandardBtn" style="display: none;" onclick="deleteCurrentStandard()">🗑️ Delete</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Risk Assessment Modal -->
-    <div id="riskModal" class="modal">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeModal('riskModal')">×</button>
-            <div class="modal-header">
-                <h2>Risk Assessment Management</h2>
-                <p>Click on any risk cell to edit details</p>
-            </div>
-            
-            <div class="risk-matrix">
-                <div class="chart-header">
-                    <div>
-                        <div class="chart-title">Risk Assessment Matrix</div>
-                        <div class="chart-subtitle">Edit risk levels and departments</div>
-                    </div>
-                    <div>
-                        <button class="btn btn-success" onclick="saveRiskMatrix()">💾 Save Matrix</button>
-                    </div>
-                </div>
-                <div class="matrix-grid" id="modalRiskMatrix">
-                    <!-- Matrix cells will be loaded here -->
-                </div>
-            </div>
-            
-            <div class="action-buttons" style="margin-top: 2rem;">
-                <button class="btn btn-outline" onclick="exportRiskMatrixToPDF()">📄 Export PDF</button>
-                <button class="btn btn-outline" onclick="closeModal('riskModal')">Close</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Settings Modal -->
-    <div id="settingsModal" class="modal">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeModal('settingsModal')">×</button>
-            <div class="modal-header">
-                <h2>System Settings</h2>
-                <p>Configure your Health & Safety Management System</p>
-            </div>
-            
-            <div class="tab-container">
-                <div class="tab-buttons">
-                    <button class="tab-button active" onclick="switchTab('companySettingsTab', 'settingsModal')">Company Info</button>
-                    <button class="tab-button" onclick="switchTab('locationSettingsTab', 'settingsModal')">Locations</button>
-                    <button class="tab-button" onclick="switchTab('notificationSettingsTab', 'settingsModal')">Notifications</button>
-                    <button class="tab-button" onclick="switchTab('backupSettingsTab', 'settingsModal')">Backup & Export</button>
+                    <label>Description *</label>
+                    <textarea id="incidentDescription" rows="4" placeholder="Provide detailed description" required></textarea>
                 </div>
                 
-                <div class="tab-content active" id="companySettingsTab">
-                    <div class="form-group">
-                        <label>Company Name</label>
-                        <input type="text" id="companyName" value="Metal Management Solutions">
-                    </div>
-                    <div class="form-group">
-                        <label>Website</label>
-                        <input type="url" id="companyWebsite" value="https://www.metalmanagementsolutions.com/">
-                    </div>
-                    <div class="form-group">
-                        <label>Contact Email</label>
-                        <input type="email" id="companyEmail" placeholder="safety@metalmanagementsolutions.com">
-                    </div>
-                    <div class="form-group">
-                        <label>Contact Phone</label>
-                        <input type="tel" id="companyPhone" placeholder="+27 21 123 4567">
-                    </div>
+                <div class="form-group">
+                    <label>Immediate Actions Taken</label>
+                    <textarea id="immediateActions" rows="3" placeholder="Describe immediate response actions"></textarea>
                 </div>
                 
-                <div class="tab-content" id="locationSettingsTab">
-                    <div class="form-group">
-                        <label>Add New Location</label>
-                        <div class="form-row">
-                            <input type="text" id="newLocationName" placeholder="Location Name">
-                            <select id="newLocationCountry">
-                                <option value="">Select Country</option>
-                                <option value="South Africa">South Africa</option>
-                                <option value="Tanzania">Tanzania</option>
-                                <option value="Namibia">Namibia</option>
-                                <option value="Zambia">Zambia</option>
+                <div class="form-group">
+                    <label>Attachments</label>
+                    <div class="file-upload-area" onclick="document.getElementById('incidentFileInput').click()">
+                        <input type="file" id="incidentFileInput" style="display: none;" multiple>
+                        <div style="font-size: 3rem;">📎</div>
+                        <div style="margin: 1rem 0;">Click to upload incident photos or documents</div>
+                        <div style="color: var(--text-light); font-size: 0.875rem;">Supported: PDF, DOC, JPG, PNG (Max 10MB each)</div>
+                    </div>
+                    <div class="file-list" id="incidentFilesList"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Proposed Recommendations/Comments</label>
+                    <textarea id="recommendations" rows="3" placeholder="Enter recommendations or comments"></textarea>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="submitIncidentReport()">Submit Report</button>
+                    <button class="btn btn-outline" onclick="closeModal('reportIncidentModal')">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Incident Management Modal -->
+        <div id="incidentsModal" class="modal">
+            <div class="modal-content">
+                <button class="close-modal" onclick="closeModal('incidentsModal')">×</button>
+                <div class="modal-header">
+                    <h2>Incident Management System</h2>
+                    <p>Click on any cell to edit, right-click for more options</p>
+                </div>
+                
+                <div class="tab-container">
+                    <div class="tab-buttons">
+                        <button class="tab-button active" onclick="switchTab('incidentsTab', 'incidentsModal')">All Incidents</button>
+                        <button class="tab-button" onclick="switchTab('incidentsAnalysisTab', 'incidentsModal')">Analysis</button>
+                        <button class="tab-button" onclick="switchTab('incidentsAttachmentsTab', 'incidentsModal')">Attachments</button>
+                    </div>
+                    
+                    <div class="tab-content active" id="incidentsTab">
+                        <div style="overflow-x: auto; margin-top: 1rem;">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Type</th>
+                                        <th>Date</th>
+                                        <th>Location</th>
+                                        <th>Reported By</th>
+                                        <th>Severity</th>
+                                        <th>Status</th>
+                                        <th>Description</th>
+                                        <th>Actions</th>
+                                        <th>Recommendations</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="modalIncidentsTableBody">
+                                    <!-- Incidents will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="incidentsAnalysisTab">
+                        <div style="margin-top: 1rem;">
+                            <canvas id="incidentAnalysisChart" height="300"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="incidentsAttachmentsTab">
+                        <div class="form-group">
+                            <label>Select Incident</label>
+                            <select id="incidentSelect" onchange="loadIncidentAttachments()">
+                                <option value="">Select incident</option>
                             </select>
                         </div>
-                        <button class="btn btn-outline" onclick="addLocation()" style="margin-top: 0.5rem;">+ Add Location</button>
-                    </div>
-                    
-                    <div style="margin-top: 2rem;">
-                        <h4>Current Locations</h4>
-                        <div id="locationsList">
-                            <!-- Locations will be listed here -->
+                        
+                        <div class="file-upload-area" onclick="document.getElementById('incidentModalFileInput').click()">
+                            <input type="file" id="incidentModalFileInput" style="display: none;" multiple onchange="uploadIncidentAttachment()">
+                            <div style="font-size: 3rem;">📎</div>
+                            <div style="margin: 1rem 0;">Click to upload incident documents</div>
+                        </div>
+                        
+                        <div class="file-list" id="incidentAttachmentsList">
+                            <!-- Attachments will be listed here -->
                         </div>
                     </div>
                 </div>
                 
-                <div class="tab-content" id="notificationSettingsTab">
-                    <div class="form-group">
-                        <label>
-                            <input type="checkbox" id="emailNotifications" checked>
-                            Email Notifications
-                        </label>
+                <div class="action-buttons" style="margin-top: 2rem;">
+                    <button class="btn btn-outline" onclick="exportTableToPDF('incidentsTable')">📄 Export PDF</button>
+                    <button class="btn btn-outline" onclick="closeModal('incidentsModal')">Close</button>
+                    <button class="btn btn-primary" onclick="openModal('reportIncidentModal')">+ Report New Incident</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Safety Training Modal -->
+        <div id="trainingModal" class="modal">
+            <div class="modal-content">
+                <button class="close-modal" onclick="closeModal('trainingModal')">×</button>
+                <div class="modal-header">
+                    <h2>Safety Training Management</h2>
+                    <p>Track all safety training activities and certifications</p>
+                </div>
+                
+                <div class="tab-container">
+                    <div class="tab-buttons">
+                        <button class="tab-button active" onclick="switchTab('trainingRecordsTab', 'trainingModal')">Training Records</button>
+                        <button class="tab-button" onclick="switchTab('trainingAttachmentsTab', 'trainingModal')">Certificates</button>
+                        <button class="tab-button" onclick="switchTab('trainingStatsTab', 'trainingModal')">Statistics</button>
                     </div>
-                    <div class="form-group">
-                        <label>
-                            <input type="checkbox" id="incidentAlerts" checked>
-                            Incident Alerts
-                        </label>
+                    
+                    <div class="tab-content active" id="trainingRecordsTab">
+                        <div style="overflow-x: auto; margin-top: 1rem;">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Training ID</th>
+                                        <th>Employee</th>
+                                        <th>Training Type</th>
+                                        <th>Provider</th>
+                                        <th>Start Date</th>
+                                        <th>End Date</th>
+                                        <th>Status</th>
+                                        <th>Score</th>
+                                        <th>Expiry Date</th>
+                                        <th>Notes</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="trainingTableBody">
+                                    <!-- Training records will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>
-                            <input type="checkbox" id="trainingReminders" checked>
-                            Training Reminders
-                        </label>
+                    
+                    <div class="tab-content" id="trainingAttachmentsTab">
+                        <div class="form-group">
+                            <label>Select Employee</label>
+                            <select id="trainingEmployeeSelect" onchange="loadTrainingCertificates()">
+                                <option value="">Select employee</option>
+                            </select>
+                        </div>
+                        
+                        <div class="file-upload-area" onclick="document.getElementById('trainingFileInput').click()">
+                            <input type="file" id="trainingFileInput" style="display: none;" multiple onchange="uploadTrainingCertificate()">
+                            <div style="font-size: 3rem;">📎</div>
+                            <div style="margin: 1rem 0;">Click to upload training certificates</div>
+                        </div>
+                        
+                        <div class="file-list" id="trainingCertificatesList">
+                            <!-- Certificates will be listed here -->
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>
-                            <input type="checkbox" id="auditReminders" checked>
-                            Audit Reminders
-                        </label>
-                    </div>
-                    <div class="form-group">
-                        <label>Notification Email</label>
-                        <input type="email" id="notificationEmail" placeholder="Enter notification email">
+                    
+                    <div class="tab-content" id="trainingStatsTab">
+                        <div style="margin-top: 1rem;">
+                            <canvas id="trainingStatsChart" height="300"></canvas>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="tab-content" id="backupSettingsTab">
-                    <div class="form-group">
-                        <label>Backup Frequency</label>
-                        <select id="backupFrequency">
-                            <option value="daily">Daily</option>
-                            <option value="weekly" selected>Weekly</option>
-                            <option value="monthly">Monthly</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Auto-Export Reports</label>
-                        <select id="autoExport">
-                            <option value="none">None</option>
-                            <option value="weekly">Weekly</option>
-                            <option value="monthly" selected>Monthly</option>
-                        </select>
-                    </div>
-                    <div class="action-buttons" style="margin-top: 2rem;">
-                        <button class="btn btn-outline" onclick="backupData()">💾 Backup Now</button>
-                        <button class="btn btn-outline" onclick="exportAllData()">📄 Export All Data</button>
-                        <button class="btn btn-danger" onclick="resetData()">🔄 Reset System</button>
-                    </div>
+                <div class="action-buttons" style="margin-top: 2rem;">
+                    <button class="btn btn-outline" onclick="addTrainingRecord()">+ Add Training</button>
+                    <button class="btn btn-outline" onclick="exportTableToPDF('trainingTable')">📄 Export PDF</button>
+                    <button class="btn btn-outline" onclick="closeModal('trainingModal')">Close</button>
                 </div>
             </div>
-            
-            <div class="action-buttons" style="margin-top: 2rem;">
-                <button class="btn btn-success" onclick="saveSettings()">💾 Save Settings</button>
-                <button class="btn btn-outline" onclick="closeModal('settingsModal')">Close</button>
+        </div>
+
+        <!-- PPE Management Modal -->
+        <div id="ppeModal" class="modal">
+            <div class="modal-content">
+                <button class="close-modal" onclick="closeModal('ppeModal')">×</button>
+                <div class="modal-header">
+                    <h2>PPE Management System</h2>
+                    <p>Personal Protective Equipment Management</p>
+                </div>
+                
+                <div class="tab-container">
+                    <div class="tab-buttons">
+                        <button class="tab-button active" onclick="switchTab('ppeRecordsTab', 'ppeModal')">PPE Records</button>
+                        <button class="tab-button" onclick="switchTab('ppeIssuanceTab', 'ppeModal')">Issuance Log</button>
+                        <button class="tab-button" onclick="switchTab('ppeAttachmentsTab', 'ppeModal')">Documents</button>
+                    </div>
+                    
+                    <div class="tab-content active" id="ppeRecordsTab">
+                        <div style="overflow-x: auto; margin-top: 1rem;">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>PPE ID</th>
+                                        <th>Equipment Type</th>
+                                        <th>Size</th>
+                                        <th>Brand</th>
+                                        <th>Quantity</th>
+                                        <th>Location</th>
+                                        <th>Status</th>
+                                        <th>Last Inspection</th>
+                                        <th>Next Inspection</th>
+                                        <th>Condition</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ppeTableBody">
+                                    <!-- PPE items will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="ppeIssuanceTab">
+                        <div style="overflow-x: auto; margin-top: 1rem;">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Issue ID</th>
+                                        <th>PPE ID</th>
+                                        <th>Employee</th>
+                                        <th>Issue Date</th>
+                                        <th>Expiry Date</th>
+                                        <th>Issued By</th>
+                                        <th>Return Date</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ppeIssuanceTableBody">
+                                    <!-- Issuance records will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="ppeAttachmentsTab">
+                        <div class="form-group">
+                            <label>Select PPE Item</label>
+                            <select id="ppeItemSelect" onchange="loadPPEDocuments()">
+                                <option value="">Select PPE item</option>
+                            </select>
+                        </div>
+                        
+                        <div class="file-upload-area" onclick="document.getElementById('ppeFileInput').click()">
+                            <input type="file" id="ppeFileInput" style="display: none;" multiple onchange="uploadPPEDocument()">
+                            <div style="font-size: 3rem;">📎</div>
+                            <div style="margin: 1rem 0;">Click to upload PPE documents</div>
+                        </div>
+                        
+                        <div class="file-list" id="ppeDocumentsList">
+                            <!-- Documents will be listed here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons" style="margin-top: 2rem;">
+                    <button class="btn btn-outline" onclick="addPPEItem()">+ Add PPE</button>
+                    <button class="btn btn-outline" onclick="issuePPE()">📝 Issue PPE</button>
+                    <button class="btn btn-outline" onclick="exportTableToPDF('ppeTable')">📄 Export PDF</button>
+                    <button class="btn btn-outline" onclick="closeModal('ppeModal')">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Health Surveillance Modal -->
+        <div id="healthModal" class="modal">
+            <div class="modal-content">
+                <button class="close-modal" onclick="closeModal('healthModal')">×</button>
+                <div class="modal-header">
+                    <h2>Employee Health Surveillance</h2>
+                    <p>Employee Health Monitoring - All MMS Employees</p>
+                </div>
+                
+                <div class="tab-container">
+                    <div class="tab-buttons">
+                        <button class="tab-button active" onclick="switchTab('healthRecordsTab', 'healthModal')">Health Records</button>
+                        <button class="tab-button" onclick="switchTab('healthAttachmentsTab', 'healthModal')">Medical Records</button>
+                        <button class="tab-button" onclick="switchTab('healthStatsTab', 'healthModal')">Statistics</button>
+                    </div>
+                    
+                    <div class="tab-content active" id="healthRecordsTab">
+                        <div style="overflow-x: auto; margin-top: 1rem;">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Employee ID</th>
+                                        <th>Name</th>
+                                        <th>Location</th>
+                                        <th>Position</th>
+                                        <th>Last Medical</th>
+                                        <th>Next Due</th>
+                                        <th>Blood Group</th>
+                                        <th>Allergies</th>
+                                        <th>Medical Status</th>
+                                        <th>Emergency Contact</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="healthTableBody">
+                                    <!-- Health records will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="healthAttachmentsTab">
+                        <div class="form-group">
+                            <label>Select Employee</label>
+                            <select id="healthEmployeeSelect" onchange="loadHealthAttachments()">
+                                <option value="">Select employee</option>
+                            </select>
+                        </div>
+                        
+                        <div class="file-upload-area" onclick="document.getElementById('healthFileInput').click()">
+                            <input type="file" id="healthFileInput" style="display: none;" multiple onchange="uploadHealthAttachment()">
+                            <div style="font-size: 3rem;">📎</div>
+                            <div style="margin: 1rem 0;">Click to upload medical records</div>
+                        </div>
+                        
+                        <div class="file-list" id="healthAttachmentsList">
+                            <!-- Attachments will be listed here -->
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="healthStatsTab">
+                        <div style="margin-top: 1rem;">
+                            <canvas id="healthStatsChart" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons" style="margin-top: 2rem;">
+                    <button class="btn btn-outline" onclick="addHealthRecord()">+ Add Record</button>
+                    <button class="btn btn-outline" onclick="exportTableToPDF('healthTable')">📄 Export PDF</button>
+                    <button class="btn btn-outline" onclick="closeModal('healthModal')">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contractor Safety Modal -->
+        <div id="contractorModal" class="modal">
+            <div class="modal-content">
+                <button class="close-modal" onclick="closeModal('contractorModal')">×</button>
+                <div class="modal-header">
+                    <h2>Contractor Safety Management</h2>
+                    <p>Contractor Safety Compliance</p>
+                </div>
+                
+                <div class="tab-container">
+                    <div class="tab-buttons">
+                        <button class="tab-button active" onclick="switchTab('contractorRecordsTab', 'contractorModal')">Contractor Records</button>
+                        <button class="tab-button" onclick="switchTab('contractorPermitsTab', 'contractorModal')">Permits</button>
+                        <button class="tab-button" onclick="switchTab('contractorAttachmentsTab', 'contractorModal')">Documents</button>
+                    </div>
+                    
+                    <div class="tab-content active" id="contractorRecordsTab">
+                        <div style="overflow-x: auto; margin-top: 1rem;">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Contractor ID</th>
+                                        <th>Company</th>
+                                        <th>Contact Person</th>
+                                        <th>Phone</th>
+                                        <th>Email</th>
+                                        <th>Work Type</th>
+                                        <th>Location</th>
+                                        <th>Start Date</th>
+                                        <th>End Date</th>
+                                        <th>Safety Rating</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="contractorTableBody">
+                                    <!-- Contractor records will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="contractorPermitsTab">
+                        <div style="overflow-x: auto; margin-top: 1rem;">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Permit ID</th>
+                                        <th>Contractor</th>
+                                        <th>Work Type</th>
+                                        <th>Location</th>
+                                        <th>Issued Date</th>
+                                        <th>Expiry Date</th>
+                                        <th>Issued By</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="contractorPermitsTableBody">
+                                    <!-- Permit records will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="contractorAttachmentsTab">
+                        <div class="form-group">
+                            <label>Select Contractor</label>
+                            <select id="contractorSelect" onchange="loadContractorAttachments()">
+                                <option value="">Select contractor</option>
+                            </select>
+                        </div>
+                        
+                        <div class="file-upload-area" onclick="document.getElementById('contractorFileInput').click()">
+                            <input type="file" id="contractorFileInput" style="display: none;" multiple onchange="uploadContractorAttachment()">
+                            <div style="font-size: 3rem;">📎</div>
+                            <div style="margin: 1rem 0;">Click to upload contractor documents</div>
+                        </div>
+                        
+                        <div class="file-list" id="contractorAttachmentsList">
+                            <!-- Attachments will be listed here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons" style="margin-top: 2rem;">
+                    <button class="btn btn-outline" onclick="addContractor()">+ Add Contractor</button>
+                    <button class="btn btn-outline" onclick="issuePermit()">📝 Issue Permit</button>
+                    <button class="btn btn-outline" onclick="exportTableToPDF('contractorTable')">📄 Export PDF</button>
+                    <button class="btn btn-outline" onclick="closeModal('contractorModal')">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Audit & Inspection Modal -->
+        <div id="auditModal" class="modal">
+            <div class="modal-content">
+                <button class="close-modal" onclick="closeModal('auditModal')">×</button>
+                <div class="modal-header">
+                    <h2>Audit & Inspection Management</h2>
+                    <p>Safety Audits and Inspections</p>
+                </div>
+                
+                <div class="tab-container">
+                    <div class="tab-buttons">
+                        <button class="tab-button active" onclick="switchTab('auditRecordsTab', 'auditModal')">Audit Records</button>
+                        <button class="tab-button" onclick="switchTab('auditScheduleTab', 'auditModal')">Schedule</button>
+                        <button class="tab-button" onclick="switchTab('auditAttachmentsTab', 'auditModal')">Reports</button>
+                    </div>
+                    
+                    <div class="tab-content active" id="auditRecordsTab">
+                        <div style="overflow-x: auto; margin-top: 1rem;">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Audit ID</th>
+                                        <th>Type</th>
+                                        <th>Location</th>
+                                        <th>Audit Date</th>
+                                        <th>Auditor</th>
+                                        <th>Score</th>
+                                        <th>Status</th>
+                                        <th>Findings</th>
+                                        <th>Corrective Actions</th>
+                                        <th>Next Audit</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="auditTableBody">
+                                    <!-- Audit records will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="auditScheduleTab">
+                        <div style="overflow-x: auto; margin-top: 1rem;">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Schedule ID</th>
+                                        <th>Audit Type</th>
+                                        <th>Location</th>
+                                        <th>Scheduled Date</th>
+                                        <th>Frequency</th>
+                                        <th>Assigned To</th>
+                                        <th>Status</th>
+                                        <th>Priority</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="auditScheduleTableBody">
+                                    <!-- Schedule records will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="auditAttachmentsTab">
+                        <div class="form-group">
+                            <label>Select Audit</label>
+                            <select id="auditSelect" onchange="loadAuditAttachments()">
+                                <option value="">Select audit</option>
+                            </select>
+                        </div>
+                        
+                        <div class="file-upload-area" onclick="document.getElementById('auditFileInput').click()">
+                            <input type="file" id="auditFileInput" style="display: none;" multiple onchange="uploadAuditAttachment()">
+                            <div style="font-size: 3rem;">📎</div>
+                            <div style="margin: 1rem 0;">Click to upload audit reports</div>
+                        </div>
+                        
+                        <div class="file-list" id="auditAttachmentsList">
+                            <!-- Attachments will be listed here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons" style="margin-top: 2rem;">
+                    <button class="btn btn-outline" onclick="addAudit()">+ Add Audit</button>
+                    <button class="btn btn-outline" onclick="scheduleAudit()">📅 Schedule Audit</button>
+                    <button class="btn btn-outline" onclick="exportTableToPDF('auditTable')">📄 Export PDF</button>
+                    <button class="btn btn-outline" onclick="closeModal('auditModal')">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Standards Compliance Modal -->
+        <div id="standardsModal" class="modal">
+            <div class="modal-content">
+                <button class="close-modal" onclick="closeModal('standardsModal')">×</button>
+                <div class="modal-header">
+                    <h2>Standards & Compliance Management</h2>
+                    <p>Manage International and National Safety Standards</p>
+                </div>
+                
+                <div class="tab-container">
+                    <div class="tab-buttons">
+                        <button class="tab-button active" onclick="switchTab('standardsListTab', 'standardsModal')">Standards</button>
+                        <button class="tab-button" onclick="switchTab('complianceTab', 'standardsModal')">Compliance Status</button>
+                        <button class="tab-button" onclick="switchTab('standardsAttachmentsTab', 'standardsModal')">Documents</button>
+                    </div>
+                    
+                    <div class="tab-content active" id="standardsListTab">
+                        <div class="standards-grid" id="standardsGrid">
+                            <!-- Standards cards will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="complianceTab">
+                        <div style="margin-top: 1rem;">
+                            <canvas id="complianceChart" height="300"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="standardsAttachmentsTab">
+                        <div class="form-group">
+                            <label>Select Standard</label>
+                            <select id="standardSelect" onchange="loadStandardAttachments()">
+                                <option value="">Select standard</option>
+                            </select>
+                        </div>
+                        
+                        <div class="file-upload-area" onclick="document.getElementById('standardFileInput').click()">
+                            <input type="file" id="standardFileInput" style="display: none;" multiple onchange="uploadStandardAttachment()">
+                            <div style="font-size: 3rem;">📎</div>
+                            <div style="margin: 1rem 0;">Click to upload standard documents</div>
+                        </div>
+                        
+                        <div class="file-list" id="standardAttachmentsList">
+                            <!-- Attachments will be listed here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons" style="margin-top: 2rem;">
+                    <button class="btn btn-outline" onclick="addStandard()">+ Add Standard</button>
+                    <button class="btn btn-outline" onclick="exportStandardsToPDF()">📄 Export PDF</button>
+                    <button class="btn btn-outline" onclick="closeModal('standardsModal')">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add/Edit Standard Modal -->
+        <div id="standardModal" class="modal">
+            <div class="modal-content">
+                <button class="close-modal" onclick="closeModal('standardModal')">×</button>
+                <div class="modal-header">
+                    <h2 id="standardModalTitle">Add New Standard</h2>
+                </div>
+                
+                <div class="success-message" id="standardSuccess">Standard saved successfully!</div>
+                <div class="error-message" id="standardError">Please fill all required fields.</div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Standard Name *</label>
+                        <input type="text" id="standardName" placeholder="e.g., ISO 45001:2018" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Standard Code *</label>
+                        <input type="text" id="standardCode" placeholder="e.g., ISO45001" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Standard Type *</label>
+                        <select id="standardType" required onchange="toggleCountryField()">
+                            <option value="">Select type</option>
+                            <option value="International">International</option>
+                            <option value="National">National</option>
+                            <option value="Company">Company/Organizational</option>
+                            <option value="Personal">Personal Certification</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="countryField">
+                        <label>Country</label>
+                        <select id="standardCountry">
+                            <option value="">Select country</option>
+                            <option value="South Africa">South Africa</option>
+                            <option value="Tanzania">Tanzania</option>
+                            <option value="Namibia">Namibia</option>
+                            <option value="Zambia">Zambia</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Description *</label>
+                    <textarea id="standardDescription" rows="4" placeholder="Description of the standard and its requirements" required></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Status *</label>
+                        <select id="standardStatus" required>
+                            <option value="">Select status</option>
+                            <option value="Compliant">Compliant</option>
+                            <option value="Non-Compliant">Non-Compliant</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Pending Review">Pending Review</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Effective Date</label>
+                        <input type="date" id="standardEffectiveDate">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Remarks</label>
+                    <textarea id="standardRemarks" rows="3" placeholder="Additional remarks or notes"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Upload Standard Document</label>
+                    <div class="file-upload-area" onclick="document.getElementById('standardFormFileInput').click()">
+                        <input type="file" id="standardFormFileInput" style="display: none;" accept=".pdf,.doc,.docx,.jpg,.png">
+                        <div style="font-size: 3rem;">📎</div>
+                        <div style="margin: 1rem 0;">Click to upload standard document</div>
+                    </div>
+                    <div class="file-list" id="standardFormFilesList"></div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-success" onclick="saveStandard()">💾 Save Standard</button>
+                    <button class="btn btn-outline" onclick="closeModal('standardModal')">Cancel</button>
+                    <button class="btn btn-danger" id="deleteStandardBtn" style="display: none;" onclick="deleteCurrentStandard()">🗑️ Delete</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Risk Assessment Modal -->
+        <div id="riskModal" class="modal">
+            <div class="modal-content">
+                <button class="close-modal" onclick="closeModal('riskModal')">×</button>
+                <div class="modal-header">
+                    <h2>Risk Assessment Management</h2>
+                    <p>Click on any risk cell to edit details</p>
+                </div>
+                
+                <div class="risk-matrix">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Risk Assessment Matrix</div>
+                            <div class="chart-subtitle">Edit risk levels and departments</div>
+                        </div>
+                        <div>
+                            <button class="btn btn-success" onclick="saveRiskMatrix()">💾 Save Matrix</button>
+                        </div>
+                    </div>
+                    <div class="matrix-grid" id="modalRiskMatrix">
+                        <!-- Matrix cells will be loaded here -->
+                    </div>
+                </div>
+                
+                <div class="action-buttons" style="margin-top: 2rem;">
+                    <button class="btn btn-outline" onclick="exportRiskMatrixToPDF()">📄 Export PDF</button>
+                    <button class="btn btn-outline" onclick="closeModal('riskModal')">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Modal -->
+        <div id="settingsModal" class="modal">
+            <div class="modal-content">
+                <button class="close-modal" onclick="closeModal('settingsModal')">×</button>
+                <div class="modal-header">
+                    <h2>System Settings</h2>
+                    <p>Configure your Health & Safety Management System</p>
+                </div>
+                
+                <div class="tab-container">
+                    <div class="tab-buttons">
+                        <button class="tab-button active" onclick="switchTab('companySettingsTab', 'settingsModal')">Company Info</button>
+                        <button class="tab-button" onclick="switchTab('locationSettingsTab', 'settingsModal')">Locations</button>
+                        <button class="tab-button" onclick="switchTab('notificationSettingsTab', 'settingsModal')">Notifications</button>
+                        <button class="tab-button" onclick="switchTab('backupSettingsTab', 'settingsModal')">Backup & Export</button>
+                    </div>
+                    
+                    <div class="tab-content active" id="companySettingsTab">
+                        <div class="form-group">
+                            <label>Company Name</label>
+                            <input type="text" id="companyName" value="Metal Management Solutions">
+                        </div>
+                        <div class="form-group">
+                            <label>Website</label>
+                            <input type="url" id="companyWebsite" value="https://www.metalmanagementsolutions.com/">
+                        </div>
+                        <div class="form-group">
+                            <label>Contact Email</label>
+                            <input type="email" id="companyEmail" placeholder="safety@metalmanagementsolutions.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Contact Phone</label>
+                            <input type="tel" id="companyPhone" placeholder="+27 21 123 4567">
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="locationSettingsTab">
+                        <div class="form-group">
+                            <label>Add New Location</label>
+                            <div class="form-row">
+                                <input type="text" id="newLocationName" placeholder="Location Name">
+                                <select id="newLocationCountry">
+                                    <option value="">Select Country</option>
+                                    <option value="South Africa">South Africa</option>
+                                    <option value="Tanzania">Tanzania</option>
+                                    <option value="Namibia">Namibia</option>
+                                    <option value="Zambia">Zambia</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-outline" onclick="addLocation()" style="margin-top: 0.5rem;">+ Add Location</button>
+                        </div>
+                        
+                        <div style="margin-top: 2rem;">
+                            <h4>Current Locations</h4>
+                            <div id="locationsList">
+                                <!-- Locations will be listed here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="notificationSettingsTab">
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="emailNotifications" checked>
+                                Email Notifications
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="incidentAlerts" checked>
+                                Incident Alerts
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="trainingReminders" checked>
+                                Training Reminders
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="auditReminders" checked>
+                                Audit Reminders
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>Notification Email</label>
+                            <input type="email" id="notificationEmail" placeholder="Enter notification email">
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="backupSettingsTab">
+                        <div class="form-group">
+                            <label>Backup Frequency</label>
+                            <select id="backupFrequency">
+                                <option value="daily">Daily</option>
+                                <option value="weekly" selected>Weekly</option>
+                                <option value="monthly">Monthly</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Auto-Export Reports</label>
+                            <select id="autoExport">
+                                <option value="none">None</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="monthly" selected>Monthly</option>
+                            </select>
+                        </div>
+                        <div class="action-buttons" style="margin-top: 2rem;">
+                            <button class="btn btn-outline" onclick="backupData()">💾 Backup Now</button>
+                            <button class="btn btn-outline" onclick="exportAllData()">📄 Export All Data</button>
+                            <button class="btn btn-danger" onclick="resetData()">🔄 Reset System</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons" style="margin-top: 2rem;">
+                    <button class="btn btn-success" onclick="saveSettings()">💾 Save Settings</button>
+                    <button class="btn btn-outline" onclick="closeModal('settingsModal')">Close</button>
+                </div>
             </div>
         </div>
     </div>

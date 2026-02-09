@@ -48,8 +48,7 @@
     {
       "src": "./icon-512x512.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
   ],
   "shortcuts": [
@@ -57,15 +56,13 @@
       "name": "Report Incident",
       "short_name": "Report",
       "description": "Report a new safety incident",
-      "url": "./index.html?action=report",
-      "icons": [{ "src": "./icon-96x96.png", "sizes": "96x96" }]
+      "url": "./index.html?action=report"
     },
     {
       "name": "Safety Dashboard",
       "short_name": "Dashboard",
       "description": "View safety metrics",
-      "url": "./index.html",
-      "icons": [{ "src": "./icon-96x96.png", "sizes": "96x96" }]
+      "url": "./index.html"
     }
   ]
 }

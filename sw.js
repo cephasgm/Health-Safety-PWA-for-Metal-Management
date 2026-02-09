@@ -1,20 +1,21 @@
-// MMS Safety - Service Worker
-const CACHE_NAME = 'mms-safety-1.0';
+// Service Worker - MMS Safety
+const CACHE = 'mms-safety-v1';
 
-self.addEventListener('install', event => {
+self.addEventListener('install', function(event) {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll([
-        './',
-        './index.html',
-        './manifest.json'
-      ]))
+    caches.open(CACHE).then(function(cache) {
+      return cache.addAll([
+        'index.html',
+        'manifest.json'
+      ]);
+    })
   );
 });
 
-self.addEventListener('fetch', event => {
+self.addEventListener('fetch', function(event) {
   event.respondWith(
-    caches.match(event.request)
-      .then(response => response || fetch(event.request))
+    fetch(event.request).catch(function() {
+      return caches.match(event.request);
+    })
   );
 });

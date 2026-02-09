@@ -1,0 +1,75 @@
+# FIREBASE FIRESTORE SECURITY RULES
+# Copy and paste into Firebase Console → Firestore → Rules
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ===== SAFETY INCIDENTS =====
+    match /safety_incidents/{incident} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null;
+      allow delete: if false; // Never delete incidents, only mark as inactive
+    }
+    
+    // ===== EMPLOYEE HEALTH RECORDS =====
+    match /employee_health/{employee} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null 
+        && request.auth.token.email.matches('.*@mms\\.com$');
+    }
+    
+    // ===== PPE INVENTORY =====
+    match /ppe_inventory/{item} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    
+    // ===== SAFETY TRAINING =====
+    match /safety_training/{record} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    
+    // ===== SAFETY AUDITS =====
+    match /safety_audits/{audit} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    
+    // ===== CONTRACTOR SAFETY =====
+    match /contractor_safety/{contractor} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    
+    // ===== SAFETY STANDARDS =====
+    match /safety_standards/{standard} {
+      allow read: if true; // Public read for standards
+      allow write: if request.auth != null 
+        && request.auth.token.email.matches('.*@mms\\.com$');
+    }
+    
+    // ===== SYSTEM LOGS =====
+    match /system_logs/{log} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+  }
+}
+
+# ============================================
+# FIREBASE STORAGE SECURITY RULES
+# Copy and paste into Firebase Console → Storage → Rules
+
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /safety_docs/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null 
+        && request.auth.token.email.matches('.*@mms\\.com$');
+    }
+  }
+}

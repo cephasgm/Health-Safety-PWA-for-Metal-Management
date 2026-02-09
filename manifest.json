@@ -1,9 +1,9 @@
 {
   "name": "MMS Safety",
   "short_name": "MMS Safety",
-  "description": "Health & Safety Management System",
-  "start_url": "/Health-Safety-PWA-for-Metal-Management/",
-  "scope": "/Health-Safety-PWA-for-Metal-Management/",
+  "description": "Metal Management Solutions Safety System",
+  "start_url": ".",
+  "scope": ".",
   "display": "standalone",
   "orientation": "portrait",
   "theme_color": "#dc2626",
@@ -43,14 +43,6 @@
       "src": "icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "Report Incident",
-      "short_name": "Report",
-      "description": "Report safety incident",
-      "url": "/Health-Safety-PWA-for-Metal-Management/?report=true"
     }
   ]
 }

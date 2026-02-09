@@ -4,75 +4,266 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MMS Safety - Offline</title>
+    <link rel="manifest" href="./manifest.json">
     <style>
+        :root {
+            --primary: #dc2626;
+            --primary-dark: #b91c1c;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0d4d9c, #1e6ec8);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
             padding: 2rem;
+            line-height: 1.6;
         }
+        
+        .container {
+            max-width: 500px;
+            width: 100%;
+        }
+        
         .offline-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
+            font-size: 5rem;
+            margin-bottom: 2rem;
+            animation: pulse 2s infinite;
         }
+        
         h1 {
-            font-size: 2rem;
+            font-size: 2.5rem;
             margin-bottom: 1rem;
+            font-weight: 700;
         }
-        p {
-            font-size: 1rem;
+        
+        .subtitle {
+            font-size: 1.1rem;
             opacity: 0.9;
             margin-bottom: 2rem;
             max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
         }
+        
+        .features {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: left;
+        }
+        
+        .features h3 {
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+        }
+        
+        .features ul {
+            list-style: none;
+        }
+        
+        .features li {
+            margin-bottom: 0.75rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        .features li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #86efac;
+            font-weight: bold;
+        }
+        
         .actions {
             display: flex;
             gap: 1rem;
+            justify-content: center;
             margin-top: 2rem;
+            flex-wrap: wrap;
         }
+        
         button {
-            padding: 0.75rem 1.5rem;
+            padding: 1rem 2rem;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             font-size: 1rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: all 0.3s ease;
+            min-width: 160px;
         }
-        button:hover {
-            transform: translateY(-2px);
-        }
+        
         .retry {
             background: white;
-            color: #0d4d9c;
+            color: var(--primary);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
-        .continue {
-            background: rgba(255,255,255,0.2);
+        
+        .retry:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+        
+        .home {
+            background: rgba(255, 255, 255, 0.15);
             color: white;
-            border: 1px solid rgba(255,255,255,0.3);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .home:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+        
+        .connection-status {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .spinner {
+            display: inline-block;
+            animation: spin 1s linear infinite;
+            margin-right: 0.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .actions {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="offline-icon">📶</div>
-    <h1>You're Offline</h1>
-    <p>The MMS Safety Dashboard requires an internet connection to load fresh data. However, you can still access previously loaded content.</p>
-    <div class="actions">
-        <button class="retry" onclick="window.location.reload()">↻ Retry Connection</button>
-        <button class="continue" onclick="window.history.back()">← Go Back</button>
+    <div class="container">
+        <div class="offline-icon">📶</div>
+        
+        <h1>You're Offline</h1>
+        
+        <p class="subtitle">
+            The MMS Safety Dashboard requires an internet connection to load fresh data and sync information.
+        </p>
+        
+        <div class="features">
+            <h3>What you can do:</h3>
+            <ul>
+                <li>View previously loaded safety data</li>
+                <li>Access cached incident reports</li>
+                <li>Check saved PPE inventory</li>
+                <li>Review training records</li>
+            </ul>
+        </div>
+        
+        <div class="actions">
+            <button class="retry" onclick="retryConnection()">
+                <span id="spinner" class="spinner" style="display: none;">↻</span>
+                <span id="retryText">↻ Retry Connection</span>
+            </button>
+            <button class="home" onclick="goHome()">← Return Home</button>
+        </div>
+        
+        <div class="connection-status" id="connectionStatus">
+            <div id="statusIcon">❌</div>
+            <div>No internet connection detected</div>
+        </div>
     </div>
+
     <script>
-        // Check connection status periodically
+        let retryCount = 0;
+        const maxRetries = 5;
+        
+        function retryConnection() {
+            const spinner = document.getElementById('spinner');
+            const retryText = document.getElementById('retryText');
+            const statusIcon = document.getElementById('statusIcon');
+            
+            spinner.style.display = 'inline-block';
+            retryText.textContent = 'Checking connection...';
+            
+            retryCount++;
+            
+            setTimeout(() => {
+                if (navigator.onLine) {
+                    statusIcon.textContent = '✅';
+                    statusIcon.style.color = '#86efac';
+                    document.querySelector('.connection-status').innerHTML = 
+                        '<div>✅ Connection restored! Reloading...</div>';
+                    
+                    setTimeout(() => {
+                        window.location.href = './index.html';
+                    }, 1000);
+                } else {
+                    spinner.style.display = 'none';
+                    retryText.textContent = `Retry (${retryCount}/${maxRetries})`;
+                    
+                    if (retryCount >= maxRetries) {
+                        retryText.textContent = 'Try again later';
+                        document.getElementById('retry').disabled = true;
+                    }
+                    
+                    statusIcon.textContent = '❌';
+                    statusIcon.style.color = '#fca5a5';
+                }
+            }, 1500);
+        }
+        
+        function goHome() {
+            window.location.href = './index.html';
+        }
+        
+        // Monitor connection status
+        window.addEventListener('online', () => {
+            document.getElementById('connectionStatus').innerHTML = 
+                '<div>✅ Connection restored! Page will reload...</div>';
+            setTimeout(() => {
+                window.location.href = './index.html';
+            }, 2000);
+        });
+        
+        window.addEventListener('offline', () => {
+            document.getElementById('connectionStatus').innerHTML = 
+                '<div>❌ Connection lost. Working offline.</div>';
+        });
+        
+        // Auto-retry every 10 seconds
         setInterval(() => {
-            if (navigator.onLine) {
-                window.location.reload();
+            if (!navigator.onLine && retryCount < maxRetries) {
+                retryConnection();
             }
-        }, 5000);
+        }, 10000);
     </script>
 </body>
 </html>

@@ -35,9 +35,10 @@
       "type": "image/png"
     },
     {
-      "src": "./icon-192.png",
+      "src": "./icon-192x192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "./icon-384x384.png",
@@ -45,14 +46,15 @@
       "type": "image/png"
     },
     {
-      "src": "./icon-512.png",
+      "src": "./icon-512x512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ],
   "screenshots": [
     {
-      "src": "https://raw.githubusercontent.com/cephasgm/Health-Safety-PWA-for-Metal-Management/main/screenshot.png",
+      "src": "./screenshot.png",
       "sizes": "1280x720",
       "type": "image/png",
       "description": "MMS Safety Dashboard"
@@ -65,7 +67,7 @@
       "short_name": "Report",
       "description": "Quickly report a safety incident",
       "url": "/Health-Safety-PWA-for-Metal-Management/?action=report",
-      "icons": [{ "src": "./icon-192.png", "sizes": "192x192" }]
+      "icons": [{ "src": "./icon-192x192.png", "sizes": "192x192" }]
     }
   ]
 }

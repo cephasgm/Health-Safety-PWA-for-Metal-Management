@@ -4,13 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MMS Safety - Offline</title>
-    <link rel="manifest" href="./manifest.json">
     <style>
-        :root {
-            --primary: #dc2626;
-            --primary-dark: #b91c1c;
-        }
-        
         * {
             margin: 0;
             padding: 0;
@@ -18,252 +12,243 @@
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            min-height: 100vh;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            text-align: center;
+            min-height: 100vh;
             padding: 2rem;
+            text-align: center;
             line-height: 1.6;
         }
         
-        .container {
+        .offline-container {
             max-width: 500px;
             width: 100%;
+            background: white;
+            border-radius: 16px;
+            padding: 3rem 2rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border: 1px solid #e2e8f0;
         }
         
         .offline-icon {
-            font-size: 5rem;
-            margin-bottom: 2rem;
-            animation: pulse 2s infinite;
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            color: #dc2626;
         }
         
         h1 {
-            font-size: 2.5rem;
+            font-size: 2rem;
+            color: #dc2626;
             margin-bottom: 1rem;
             font-weight: 700;
         }
         
-        .subtitle {
+        p {
+            color: #64748b;
+            margin-bottom: 1.5rem;
             font-size: 1.1rem;
-            opacity: 0.9;
-            margin-bottom: 2rem;
-            max-width: 400px;
-            margin-left: auto;
-            margin-right: auto;
         }
         
         .features {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 2rem;
-            margin: 2rem 0;
             text-align: left;
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
         }
         
         .features h3 {
+            color: #dc2626;
             margin-bottom: 1rem;
             font-size: 1.25rem;
         }
         
         .features ul {
             list-style: none;
+            padding-left: 0;
         }
         
         .features li {
             margin-bottom: 0.75rem;
-            padding-left: 1.5rem;
+            padding-left: 1.75rem;
             position: relative;
         }
         
         .features li:before {
-            content: "✓";
+            content: '✓';
             position: absolute;
             left: 0;
-            color: #86efac;
+            color: #10b981;
             font-weight: bold;
         }
         
-        .actions {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            margin-top: 2rem;
-            flex-wrap: wrap;
-        }
-        
-        button {
-            padding: 1rem 2rem;
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
             border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            min-width: 160px;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            margin: 0.5rem;
         }
         
-        .retry {
-            background: white;
-            color: var(--primary);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        
-        .retry:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-        }
-        
-        .home {
-            background: rgba(255, 255, 255, 0.15);
+        .btn-primary {
+            background: #dc2626;
             color: white;
-            border: 2px solid rgba(255, 255, 255, 0.3);
         }
         
-        .home:hover {
-            background: rgba(255, 255, 255, 0.25);
+        .btn-primary:hover {
+            background: #b91c1c;
+            transform: translateY(-1px);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
+        }
+        
+        .btn-outline:hover {
+            background: #f1f5f9;
+            border-color: #dc2626;
+            color: #dc2626;
         }
         
         .connection-status {
             margin-top: 2rem;
             padding: 1rem;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            display: none;
         }
         
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+        .connection-status.online {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+            display: block;
         }
         
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+        .connection-status.offline {
+            background: #fecaca;
+            color: #991b1b;
+            border: 1px solid #f87171;
+            display: block;
         }
         
-        .spinner {
-            display: inline-block;
-            animation: spin 1s linear infinite;
-            margin-right: 0.5rem;
+        .footer {
+            margin-top: 2rem;
+            color: #64748b;
+            font-size: 0.9rem;
         }
         
-        @media (max-width: 768px) {
-            .actions {
-                flex-direction: column;
+        @media (max-width: 480px) {
+            .offline-container {
+                padding: 2rem 1rem;
             }
             
-            button {
-                width: 100%;
+            h1 {
+                font-size: 1.5rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="offline-icon">📶</div>
-        
+    <div class="offline-container">
+        <div class="offline-icon">📡</div>
         <h1>You're Offline</h1>
-        
-        <p class="subtitle">
-            The MMS Safety Dashboard requires an internet connection to load fresh data and sync information.
-        </p>
+        <p>The MMS Safety app requires an internet connection for full functionality.</p>
         
         <div class="features">
-            <h3>What you can do:</h3>
+            <h3>Available Offline Features:</h3>
             <ul>
-                <li>View previously loaded safety data</li>
-                <li>Access cached incident reports</li>
-                <li>Check saved PPE inventory</li>
+                <li>View cached safety data</li>
+                <li>Access incident reports</li>
+                <li>Check PPE inventory</li>
                 <li>Review training records</li>
+                <li>View employee health data</li>
             </ul>
         </div>
         
-        <div class="actions">
-            <button class="retry" onclick="retryConnection()">
-                <span id="spinner" class="spinner" style="display: none;">↻</span>
-                <span id="retryText">↻ Retry Connection</span>
-            </button>
-            <button class="home" onclick="goHome()">← Return Home</button>
+        <p>Some features will be limited until you reconnect.</p>
+        
+        <div class="connection-status offline" id="status">
+            ❌ Currently offline
         </div>
         
-        <div class="connection-status" id="connectionStatus">
-            <div id="statusIcon">❌</div>
-            <div>No internet connection detected</div>
+        <div style="margin-top: 2rem;">
+            <button class="btn btn-primary" onclick="tryReconnect()">
+                🔄 Try to Reconnect
+            </button>
+            <button class="btn btn-outline" onclick="goToDashboard()">
+                🏠 Go to Dashboard
+            </button>
+        </div>
+        
+        <div class="footer">
+            Metal Management Solutions • Health & Safety System
         </div>
     </div>
 
     <script>
-        let retryCount = 0;
-        const maxRetries = 5;
-        
-        function retryConnection() {
-            const spinner = document.getElementById('spinner');
-            const retryText = document.getElementById('retryText');
-            const statusIcon = document.getElementById('statusIcon');
-            
-            spinner.style.display = 'inline-block';
-            retryText.textContent = 'Checking connection...';
-            
-            retryCount++;
+        function tryReconnect() {
+            const status = document.getElementById('status');
+            status.textContent = '🔄 Checking connection...';
+            status.className = 'connection-status';
             
             setTimeout(() => {
                 if (navigator.onLine) {
-                    statusIcon.textContent = '✅';
-                    statusIcon.style.color = '#86efac';
-                    document.querySelector('.connection-status').innerHTML = 
-                        '<div>✅ Connection restored! Reloading...</div>';
+                    status.textContent = '✅ Connection restored!';
+                    status.className = 'connection-status online';
                     
                     setTimeout(() => {
                         window.location.href = './index.html';
-                    }, 1000);
+                    }, 1500);
                 } else {
-                    spinner.style.display = 'none';
-                    retryText.textContent = `Retry (${retryCount}/${maxRetries})`;
-                    
-                    if (retryCount >= maxRetries) {
-                        retryText.textContent = 'Try again later';
-                        document.getElementById('retry').disabled = true;
-                    }
-                    
-                    statusIcon.textContent = '❌';
-                    statusIcon.style.color = '#fca5a5';
+                    status.textContent = '❌ Still offline. Please check your connection.';
+                    status.className = 'connection-status offline';
                 }
-            }, 1500);
+            }, 1000);
         }
         
-        function goHome() {
+        function goToDashboard() {
             window.location.href = './index.html';
         }
         
         // Monitor connection status
         window.addEventListener('online', () => {
-            document.getElementById('connectionStatus').innerHTML = 
-                '<div>✅ Connection restored! Page will reload...</div>';
+            const status = document.getElementById('status');
+            status.textContent = '✅ Connection restored!';
+            status.className = 'connection-status online';
+            
             setTimeout(() => {
                 window.location.href = './index.html';
             }, 2000);
         });
         
         window.addEventListener('offline', () => {
-            document.getElementById('connectionStatus').innerHTML = 
-                '<div>❌ Connection lost. Working offline.</div>';
+            const status = document.getElementById('status');
+            status.textContent = '❌ Connection lost';
+            status.className = 'connection-status offline';
         });
         
-        // Auto-retry every 10 seconds
-        setInterval(() => {
-            if (!navigator.onLine && retryCount < maxRetries) {
-                retryConnection();
-            }
-        }, 10000);
+        // Check initial connection
+        if (navigator.onLine) {
+            setTimeout(() => {
+                window.location.href = './index.html';
+            }, 3000);
+        }
     </script>
 </body>
 </html>

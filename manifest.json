@@ -1,7 +1,7 @@
 {
-  "name": "MMS Safety Management",
+  "name": "MMS Safety",
   "short_name": "MMS Safety",
-  "description": "Health & Safety Management System for Metal Management Solutions",
+  "description": "Health & Safety Management System",
   "start_url": "/Health-Safety-PWA-for-Metal-Management/",
   "scope": "/Health-Safety-PWA-for-Metal-Management/",
   "display": "standalone",
@@ -10,46 +10,47 @@
   "background_color": "#f1f5f9",
   "icons": [
     {
-      "src": "./icon-72x72.png",
+      "src": "icon-72x72.png",
       "sizes": "72x72",
       "type": "image/png"
     },
     {
-      "src": "./icon-96x96.png",
+      "src": "icon-96x96.png",
       "sizes": "96x96",
       "type": "image/png"
     },
     {
-      "src": "./icon-128x128.png",
+      "src": "icon-128x128.png",
       "sizes": "128x128",
       "type": "image/png"
     },
     {
-      "src": "./icon-152x152.png",
+      "src": "icon-152x152.png",
       "sizes": "152x152",
       "type": "image/png"
     },
     {
-      "src": "./icon-192x192.png",
+      "src": "icon-192x192.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     },
     {
-      "src": "./icon-512x512.png",
+      "src": "icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512x512.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
   ],
-  "categories": ["business", "productivity", "utilities"],
   "shortcuts": [
     {
       "name": "Report Incident",
       "short_name": "Report",
-      "description": "Quickly report a safety incident",
-      "url": "/Health-Safety-PWA-for-Metal-Management/?action=report",
-      "icons": [{ "src": "./icon-192x192.png", "sizes": "192x192" }]
+      "description": "Report safety incident",
+      "url": "/Health-Safety-PWA-for-Metal-Management/?report=true"
     }
   ]
 }

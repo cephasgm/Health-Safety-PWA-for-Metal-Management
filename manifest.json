@@ -1,68 +1,104 @@
 {
-  "name": "MMS Safety Dashboard",
+  "name": "MMS Safety Management",
   "short_name": "MMS Safety",
-  "description": "Metal Management Solutions Health & Safety Management System",
-  "start_url": "./index.html",
+  "description": "Health & Safety Management System for Metal Management Solutions",
+  "start_url": "/Health-Safety-PWA-for-Metal-Management/index.html",
+  "scope": "/Health-Safety-PWA-for-Metal-Management/",
   "display": "standalone",
-  "background_color": "#dc2626",
+  "orientation": "portrait",
   "theme_color": "#dc2626",
-  "orientation": "any",
-  "scope": "./",
-  "categories": ["business", "productivity", "safety"],
+  "background_color": "#f1f5f9",
   "icons": [
     {
       "src": "./icon-72x72.png",
       "sizes": "72x72",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "./icon-96x96.png",
       "sizes": "96x96",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "./icon-128x128.png",
       "sizes": "128x128",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "./icon-144x144.png",
       "sizes": "144x144",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "./icon-152x152.png",
       "sizes": "152x152",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "./icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "./icon-384x384.png",
       "sizes": "384x384",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "./icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ],
+  "screenshots": [
+    {
+      "src": "https://raw.githubusercontent.com/yourusername/Health-Safety-PWA-for-Metal-Management/main/screenshot1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "description": "Dashboard overview"
+    },
+    {
+      "src": "https://raw.githubusercontent.com/yourusername/Health-Safety-PWA-for-Metal-Management/main/screenshot2.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "description": "Incident reporting"
+    }
+  ],
+  "categories": ["business", "productivity", "utilities"],
   "shortcuts": [
     {
       "name": "Report Incident",
       "short_name": "Report",
-      "description": "Report a new safety incident",
-      "url": "./index.html?action=report"
+      "description": "Quickly report a safety incident",
+      "url": "/Health-Safety-PWA-for-Metal-Management/index.html?action=report",
+      "icons": [{ "src": "./icon-192.png", "sizes": "192x192" }]
     },
     {
-      "name": "Safety Dashboard",
+      "name": "Dashboard",
       "short_name": "Dashboard",
-      "description": "View safety metrics",
-      "url": "./index.html"
+      "description": "View safety dashboard",
+      "url": "/Health-Safety-PWA-for-Metal-Management/index.html",
+      "icons": [{ "src": "./icon-192.png", "sizes": "192x192" }]
     }
   ]
 }

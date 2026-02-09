@@ -17,7 +17,7 @@
             --success: #10b981;
             --warning: #f59e0b;
             --error: #ef4444;
-            --background: #f8fafc;
+            --background: #f1f5f9;
             --surface: #ffffff;
             --text: #1e293b;
             --text-light: #64748b;
@@ -35,6 +35,12 @@
             background: var(--background);
             color: var(--text);
             line-height: 1.6;
+            background-image: url('https://raw.githubusercontent.com/yourusername/Health-Safety-PWA-for-Metal-Management/main/mining-background.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            background-blend-mode: overlay;
+            background-color: rgba(241, 245, 249, 0.95);
         }
 
         .dashboard {
@@ -44,7 +50,7 @@
         }
 
         .sidebar {
-            background: var(--surface);
+            background: rgba(255, 255, 255, 0.95);
             border-right: 1px solid var(--border);
             padding: 2rem 1rem;
             position: fixed;
@@ -52,6 +58,7 @@
             height: 100vh;
             overflow-y: auto;
             z-index: 100;
+            backdrop-filter: blur(10px);
         }
 
         .logo {
@@ -75,6 +82,9 @@
             color: white;
             font-weight: bold;
             font-size: 1.25rem;
+            background-image: url('https://raw.githubusercontent.com/yourusername/Health-Safety-PWA-for-Metal-Management/main/icon-192.png');
+            background-size: cover;
+            background-position: center;
         }
 
         .nav-section {
@@ -123,6 +133,9 @@
             grid-column: 2;
             padding: 2rem;
             margin-left: 280px;
+            background: rgba(255, 255, 255, 0.9);
+            min-height: 100vh;
+            backdrop-filter: blur(5px);
         }
 
         .header {
@@ -132,11 +145,16 @@
             margin-bottom: 2rem;
             flex-wrap: wrap;
             gap: 1rem;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(220, 38, 38, 0.1);
         }
 
         .header h1 {
             font-size: 1.875rem;
             font-weight: 700;
+            color: var(--primary);
         }
 
         /* Enhanced Statistics Cards */
@@ -148,7 +166,7 @@
         }
 
         .stat-card {
-            background: linear-gradient(135deg, var(--surface) 0%, #f8fafc 100%);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%);
             padding: 1.5rem;
             border-radius: 16px;
             border: 1px solid var(--border);
@@ -157,6 +175,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(10px);
         }
 
         .stat-card:hover {
@@ -204,7 +223,7 @@
 
         /* Enhanced Chart Container */
         .chart-container {
-            background: var(--surface);
+            background: rgba(255, 255, 255, 0.95);
             padding: 1.25rem;
             border-radius: 16px;
             border: 1px solid var(--border);
@@ -213,6 +232,7 @@
             display: flex;
             flex-direction: column;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(10px);
         }
 
         .chart-header {
@@ -293,12 +313,13 @@
 
         /* Enhanced Risk Assessment Matrix */
         .risk-matrix {
-            background: linear-gradient(135deg, var(--surface) 0%, #f8fafc 100%);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%);
             border-radius: 16px;
             border: 1px solid var(--border);
             padding: 1.5rem;
             margin-bottom: 2rem;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(10px);
         }
 
         .matrix-grid {
@@ -627,7 +648,7 @@
         }
 
         .module-card {
-            background: var(--surface);
+            background: rgba(255, 255, 255, 0.95);
             padding: 2rem;
             border-radius: 12px;
             border: 1px solid var(--border);
@@ -636,6 +657,7 @@
             text-decoration: none;
             color: inherit;
             display: block;
+            backdrop-filter: blur(10px);
         }
 
         .module-card:hover {
@@ -857,6 +879,18 @@
             border: 1px solid #86efac;
         }
 
+        .badge-company {
+            background: #f3e8ff;
+            color: #7c3aed;
+            border: 1px solid #c4b5fd;
+        }
+
+        .badge-personal {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+
         .standard-card h3 {
             font-size: 1.25rem;
             font-weight: 600;
@@ -963,6 +997,8 @@
             border-top: 1px solid var(--border);
             font-size: 0.9rem;
             line-height: 1.6;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 12px;
         }
 
         /* Responsive Design */
@@ -1043,7 +1079,7 @@
     <div class="dashboard">
         <nav class="sidebar">
             <div class="logo">
-                <div class="logo-icon">MMS</div>
+                <div class="logo-icon"></div>
                 <div>
                     <div style="font-weight: 700; font-size: 1.25rem;">Metal Management</div>
                     <div style="font-size: 0.875rem; color: var(--text-light);">Health & Safety System</div>
@@ -1052,13 +1088,9 @@
 
             <div class="nav-section">
                 <div class="nav-title">Navigation</div>
-                <a href="#" class="nav-item" onclick="showDashboard()">
-                    <span class="nav-icon">🏠</span>
-                    Home Dashboard
-                </a>
                 <a href="#" class="nav-item active">
-                    <span class="nav-icon">🛡️</span>
-                    Health & Safety
+                    <span class="nav-icon">🏠</span>
+                    Health & Safety Dashboard
                 </a>
             </div>
 
@@ -1994,13 +2026,15 @@
             <div class="form-row">
                 <div class="form-group">
                     <label>Standard Type *</label>
-                    <select id="standardType" required>
+                    <select id="standardType" required onchange="toggleCountryField()">
                         <option value="">Select type</option>
                         <option value="International">International</option>
                         <option value="National">National</option>
+                        <option value="Company">Company/Organizational</option>
+                        <option value="Personal">Personal Certification</option>
                     </select>
                 </div>
-                <div class="form-group">
+                <div class="form-group" id="countryField">
                     <label>Country</label>
                     <select id="standardCountry">
                         <option value="">Select country</option>
@@ -2466,7 +2500,7 @@
                     medicalStatus: 'Fit',
                     emergencyContact: '+264 81 123 4569'
                 },
-                // Zambia (partial list - add more as needed)
+                // Zambia
                 {
                     id: 'EMP-ZM-001',
                     name: 'Alick Banda',
@@ -2491,12 +2525,312 @@
                     medicalStatus: 'Pending',
                     emergencyContact: ''
                 },
+                {
+                    id: 'EMP-ZM-003',
+                    name: 'Caleb Simpanzye',
+                    location: 'Zambia',
+                    position: '',
+                    lastMedical: '',
+                    nextDue: '',
+                    bloodGroup: '',
+                    allergies: '',
+                    medicalStatus: 'Pending',
+                    emergencyContact: ''
+                },
+                {
+                    id: 'EMP-ZM-004',
+                    name: 'Cephas Phiri',
+                    location: 'Zambia',
+                    position: '',
+                    lastMedical: '',
+                    nextDue: '',
+                    bloodGroup: '',
+                    allergies: '',
+                    medicalStatus: 'Pending',
+                    emergencyContact: ''
+                },
+                {
+                    id: 'EMP-ZM-005',
+                    name: 'Changwa Sikombe',
+                    location: 'Zambia',
+                    position: '',
+                    lastMedical: '',
+                    nextDue: '',
+                    bloodGroup: '',
+                    allergies: '',
+                    medicalStatus: 'Pending',
+                    emergencyContact: ''
+                },
+                {
+                    id: 'EMP-ZM-006',
+                    name: 'Chiti Mwamba',
+                    location: 'Zambia',
+                    position: '',
+                    lastMedical: '',
+                    nextDue: '',
+                    bloodGroup: '',
+                    allergies: '',
+                    medicalStatus: 'Pending',
+                    emergencyContact: ''
+                },
+                {
+                    id: 'EMP-ZM-007',
+                    name: 'Edward Vyande',
+                    location: 'Zambia',
+                    position: '',
+                    lastMedical: '',
+                    nextDue: '',
+                    bloodGroup: '',
+                    allergies: '',
+                    medicalStatus: 'Pending',
+                    emergencyContact: ''
+                },
+                {
+                    id: 'EMP-ZM-008',
+                    name: 'Given Phiri',
+                    location: 'Zambia',
+                    position: '',
+                    lastMedical: '',
+                    nextDue: '',
+                    bloodGroup: '',
+                    allergies: '',
+                    medicalStatus: 'Pending',
+                    emergencyContact: ''
+                },
+                {
+                    id: 'EMP-ZM-009',
+                    name: 'Happie M\'gode',
+                    location: 'Zambia',
+                    position: '',
+                    lastMedical: '',
+                    nextDue: '',
+                    bloodGroup: '',
+                    allergies: '',
+                    medicalStatus: 'Pending',
+                    emergencyContact: ''
+                },
+                {
+                    id: 'EMP-ZM-010',
+                    name: 'Ivan Mbewe',
+                    location: 'Zambia',
+                    position: '',
+                    lastMedical: '',
+                    nextDue: '',
+                    bloodGroup: '',
+                    allergies: '',
+                    medicalStatus: 'Pending',
+                    emergencyContact: ''
+                },
+                {
+                    id: 'EMP-ZM-011',
+                    name: 'Joseph Banda',
+                    location: 'Zambia',
+                    position: '',
+                    lastMedical: '',
+                    nextDue: '',
+                    bloodGroup: '',
+                    allergies: '',
+                    medicalStatus: 'Pending',
+                    emergencyContact: ''
+                },
+                {
+                    id: 'EMP-ZM-012',
+                    name: 'Julius Makambwe',
+                    location: 'Zambia',
+                    position: '',
+                    lastMedical: '',
+                    nextDue: '',
+                    bloodGroup: '',
+                    allergies: '',
+                    medicalStatus: 'Pending',
+                    emergencyContact: ''
+                },
+                {
+                    id: 'EMP-ZM-013',
+                    name: 'Malambo Kozi',
+                    location: 'Zambia',
+                    position: '',
+                    lastMedical: '',
+                    nextDue: '',
+                    bloodGroup: '',
+                    allergies: '',
+                    medicalStatus: 'Pending',
+                    emergencyContact: ''
+                },
+                {
+                    id: 'EMP-ZM-014',
+                    name: 'Miles Kaweche',
+                    location: 'Zambia',
+                    position: '',
+                    lastMedical: '',
+                    nextDue: '',
+                    bloodGroup: '',
+                    allergies: '',
+                    medicalStatus: 'Pending',
+                    emergencyContact: ''
+                },
+                {
+                    id: 'EMP-ZM-015',
+                    name: 'Zachariah Musonda',
+                    location: 'Zambia',
+                    position: '',
+                    lastMedical: '',
+                    nextDue: '',
+                    bloodGroup: '',
+                    allergies: '',
+                    medicalStatus: 'Pending',
+                    emergencyContact: ''
+                },
+                {
+                    id: 'EMP-ZM-016',
+                    name: 'Mutandi Kalaluka',
+                    location: 'Zambia',
+                    position: '',
+                    lastMedical: '',
+                    nextDue: '',
+                    bloodGroup: '',
+                    allergies: '',
+                    medicalStatus: 'Pending',
+                    emergencyContact: ''
+                },
+                {
+                    id: 'EMP-ZM-017',
+                    name: 'Natasha Tembo',
+                    location: 'Zambia',
+                    position: '',
+                    lastMedical: '',
+                    nextDue: '',
+                    bloodGroup: '',
+                    allergies: '',
+                    medicalStatus: 'Pending',
+                    emergencyContact: ''
+                },
+                {
+                    id: 'EMP-ZM-018',
+                    name: 'Patrick Mwale',
+                    location: 'Zambia',
+                    position: '',
+                    lastMedical: '',
+                    nextDue: '',
+                    bloodGroup: '',
+                    allergies: '',
+                    medicalStatus: 'Pending',
+                    emergencyContact: ''
+                },
+                {
+                    id: 'EMP-ZM-019',
+                    name: 'Phius Mweene',
+                    location: 'Zambia',
+                    position: '',
+                    lastMedical: '',
+                    nextDue: '',
+                    bloodGroup: '',
+                    allergies: '',
+                    medicalStatus: 'Pending',
+                    emergencyContact: ''
+                },
+                {
+                    id: 'EMP-ZM-020',
+                    name: 'Richard Phiri',
+                    location: 'Zambia',
+                    position: '',
+                    lastMedical: '',
+                    nextDue: '',
+                    bloodGroup: '',
+                    allergies: '',
+                    medicalStatus: 'Pending',
+                    emergencyContact: ''
+                },
+                {
+                    id: 'EMP-ZM-021',
+                    name: 'Gerald Mwale',
+                    location: 'Zambia',
+                    position: '',
+                    lastMedical: '',
+                    nextDue: '',
+                    bloodGroup: '',
+                    allergies: '',
+                    medicalStatus: 'Pending',
+                    emergencyContact: ''
+                },
+                {
+                    id: 'EMP-ZM-022',
+                    name: 'Jackson Chola',
+                    location: 'Zambia',
+                    position: '',
+                    lastMedical: '',
+                    nextDue: '',
+                    bloodGroup: '',
+                    allergies: '',
+                    medicalStatus: 'Pending',
+                    emergencyContact: ''
+                },
+                {
+                    id: 'EMP-ZM-023',
+                    name: 'Michael Mwate',
+                    location: 'Zambia',
+                    position: '',
+                    lastMedical: '',
+                    nextDue: '',
+                    bloodGroup: '',
+                    allergies: '',
+                    medicalStatus: 'Pending',
+                    emergencyContact: ''
+                },
+                {
+                    id: 'EMP-ZM-024',
+                    name: 'Mfula Mighty',
+                    location: 'Zambia',
+                    position: '',
+                    lastMedical: '',
+                    nextDue: '',
+                    bloodGroup: '',
+                    allergies: '',
+                    medicalStatus: 'Pending',
+                    emergencyContact: ''
+                },
+                {
+                    id: 'EMP-ZM-025',
+                    name: 'Richard Mwaba',
+                    location: 'Zambia',
+                    position: '',
+                    lastMedical: '',
+                    nextDue: '',
+                    bloodGroup: '',
+                    allergies: '',
+                    medicalStatus: 'Pending',
+                    emergencyContact: ''
+                },
+                {
+                    id: 'EMP-ZM-026',
+                    name: 'David Muzeka',
+                    location: 'Zambia',
+                    position: '',
+                    lastMedical: '',
+                    nextDue: '',
+                    bloodGroup: '',
+                    allergies: '',
+                    medicalStatus: 'Pending',
+                    emergencyContact: ''
+                },
+                {
+                    id: 'EMP-ZM-027',
+                    name: 'Yamba Yamba',
+                    location: 'Zambia',
+                    position: '',
+                    lastMedical: '',
+                    nextDue: '',
+                    bloodGroup: '',
+                    allergies: '',
+                    medicalStatus: 'Pending',
+                    emergencyContact: ''
+                },
                 // South Africa
                 {
                     id: 'EMP-ZA-001',
                     name: 'Katlego Matsane',
                     location: 'South Africa',
-                    position: 'Inventory Control Specialist - Durban',
+                    position: 'Inventory Control Specialist',
                     lastMedical: '2024-01-10',
                     nextDue: '2025-01-10',
                     bloodGroup: 'O-',
@@ -2508,7 +2842,7 @@
                     id: 'EMP-ZA-002',
                     name: 'Bonnie Sibande',
                     location: 'South Africa',
-                    position: 'Inventory Control Specialist - Durban',
+                    position: 'Inventory Control Specialist',
                     lastMedical: '2024-02-05',
                     nextDue: '2025-02-05',
                     bloodGroup: 'A+',
@@ -2582,7 +2916,7 @@
                     id: 'STD-003',
                     name: 'NOSHC1 & NOSHC2',
                     code: 'NOSHC',
-                    type: 'National',
+                    type: 'Personal',
                     country: 'Tanzania',
                     description: 'National Occupational Safety and Health Certificate levels 1 & 2.',
                     status: 'Compliant',
@@ -2593,12 +2927,169 @@
                     id: 'STD-004',
                     name: 'NEBOSH International General Certificate',
                     code: 'NEBOSH-IGC',
-                    type: 'International',
+                    type: 'Personal',
                     country: '',
                     description: 'Internationally recognized health and safety qualification.',
                     status: 'In Progress',
                     effectiveDate: '2024-03-01',
                     remarks: 'Cephas Gideon Mkama currently training'
+                },
+                // Company/Organizational Standards
+                {
+                    id: 'STD-005',
+                    name: 'Zambia OHS Regulatory Framework',
+                    code: 'ZMB-OHS',
+                    type: 'Company',
+                    country: 'Zambia',
+                    description: 'Zambia OHS regulatory framework including NOSA compliance',
+                    status: 'In Progress',
+                    effectiveDate: '2024-01-01',
+                    remarks: 'Implementation in progress'
+                },
+                {
+                    id: 'STD-006',
+                    name: 'Zambia Bureau of Standards (ZABS)',
+                    code: 'ZABS',
+                    type: 'Company',
+                    country: 'Zambia',
+                    description: 'National body for standards and certification',
+                    status: 'Pending Review',
+                    effectiveDate: '',
+                    remarks: 'Certification pending'
+                },
+                {
+                    id: 'STD-007',
+                    name: 'ISO 9001:2015 Certification',
+                    code: 'ISO9001-2015',
+                    type: 'Company',
+                    country: '',
+                    description: 'Quality Management System certification',
+                    status: 'Compliant',
+                    effectiveDate: '2023-06-01',
+                    remarks: 'Renewal due 2025-06-01'
+                },
+                {
+                    id: 'STD-008',
+                    name: 'Namibia OHS Framework',
+                    code: 'NAM-OHS',
+                    type: 'Company',
+                    country: 'Namibia',
+                    description: 'NOSA and ISO 9001:2015 compliance framework for Namibia',
+                    status: 'In Progress',
+                    effectiveDate: '2024-01-01',
+                    remarks: 'Implementation phase'
+                },
+                {
+                    id: 'STD-009',
+                    name: 'South African National Accreditation System (SANAS)',
+                    code: 'SANAS',
+                    type: 'Company',
+                    country: 'South Africa',
+                    description: 'South African accreditation for OHS standards',
+                    status: 'Compliant',
+                    effectiveDate: '2023-12-01',
+                    remarks: 'Annual audit required'
+                },
+                // Multi-National OHS Certifications
+                {
+                    id: 'STD-010',
+                    name: 'OHSAS 18001',
+                    code: 'OHSAS18001',
+                    type: 'International',
+                    country: '',
+                    description: 'Occupational Health and Safety Assessment Series',
+                    status: 'In Progress',
+                    effectiveDate: '',
+                    remarks: 'Migration to ISO 45001 in progress'
+                },
+                {
+                    id: 'STD-011',
+                    name: 'ISO 9001 + ISO 14001 Integration',
+                    code: 'ISO9001-14001',
+                    type: 'International',
+                    country: '',
+                    description: 'Integrated Quality and Environmental Management System',
+                    status: 'Pending Review',
+                    effectiveDate: '',
+                    remarks: 'Planning phase'
+                },
+                {
+                    id: 'STD-012',
+                    name: 'NOSA 5-Star Performance System',
+                    code: 'NOSA5-STAR',
+                    type: 'International',
+                    country: '',
+                    description: 'Five-star safety performance rating system',
+                    status: 'In Progress',
+                    effectiveDate: '2024-01-01',
+                    remarks: 'Implementation across SA operations'
+                },
+                {
+                    id: 'STD-013',
+                    name: 'ISO/IEC 27001',
+                    code: 'ISO27001',
+                    type: 'International',
+                    country: '',
+                    description: 'Information Security Management System',
+                    status: 'Pending Review',
+                    effectiveDate: '',
+                    remarks: 'Future implementation planned'
+                },
+                // Personal Certifications by Country
+                {
+                    id: 'STD-014',
+                    name: 'SAMTRAC / SHEMTRAC (NOSA)',
+                    code: 'SAMTRAC',
+                    type: 'Personal',
+                    country: 'South Africa',
+                    description: 'Safety Management Training Course / Safety Health Environment Management',
+                    status: 'Compliant',
+                    effectiveDate: '2023-11-01',
+                    remarks: 'Multiple employees certified'
+                },
+                {
+                    id: 'STD-015',
+                    name: 'National Certificate: OHS & Environment',
+                    code: 'SAQA-OHS',
+                    type: 'Personal',
+                    country: 'South Africa',
+                    description: 'SAQA registered OHS qualification',
+                    status: 'Compliant',
+                    effectiveDate: '2023-10-15',
+                    remarks: 'Team leaders certified'
+                },
+                {
+                    id: 'STD-016',
+                    name: 'NEBOSH International Diploma',
+                    code: 'NEBOSH-DIP',
+                    type: 'Personal',
+                    country: '',
+                    description: 'Advanced international OHS qualification',
+                    status: 'In Progress',
+                    effectiveDate: '',
+                    remarks: 'Selected management team undertaking'
+                },
+                {
+                    id: 'STD-017',
+                    name: 'IOSH Membership',
+                    code: 'IOSH',
+                    type: 'Personal',
+                    country: '',
+                    description: 'Institution of Occupational Safety and Health membership',
+                    status: 'Compliant',
+                    effectiveDate: '2024-01-01',
+                    remarks: 'Safety officers certified'
+                },
+                {
+                    id: 'STD-018',
+                    name: 'ISO 45001 Lead Auditor',
+                    code: 'ISO45001-AUDIT',
+                    type: 'Personal',
+                    country: '',
+                    description: 'Lead auditor certification for ISO 45001',
+                    status: 'In Progress',
+                    effectiveDate: '',
+                    remarks: 'Training scheduled for Q2 2024'
                 }
             ];
         }
@@ -2628,8 +3119,44 @@
                     score: '',
                     expiryDate: '',
                     notes: 'Currently undergoing training'
+                },
+                {
+                    id: 'TRN-003',
+                    employee: 'Salman Esmail',
+                    trainingType: 'NOSHC1&2',
+                    provider: 'OSHA Tanzania',
+                    startDate: '2023-10-01',
+                    endDate: '2024-01-15',
+                    status: 'Completed',
+                    score: '92%',
+                    expiryDate: '2027-01-15',
+                    notes: 'National Occupational Safety and Health Certificate'
+                },
+                {
+                    id: 'TRN-004',
+                    employee: 'Leon Fourie',
+                    trainingType: 'SAMTRAC',
+                    provider: 'NOSA',
+                    startDate: '2023-11-01',
+                    endDate: '2024-02-01',
+                    status: 'Completed',
+                    score: '88%',
+                    expiryDate: '2026-02-01',
+                    notes: 'Safety Management Training Course'
                 }
             ];
+        }
+
+        function toggleCountryField() {
+            const type = document.getElementById('standardType').value;
+            const countryField = document.getElementById('countryField');
+            
+            if (type === 'International' || type === 'Company') {
+                countryField.style.display = 'none';
+                document.getElementById('standardCountry').value = '';
+            } else {
+                countryField.style.display = 'block';
+            }
         }
 
         function populateEmployeeSelects() {
@@ -2641,7 +3168,7 @@
             healthRecords.forEach(employee => {
                 const option = document.createElement('option');
                 option.value = employee.name;
-                option.textContent = `${employee.name} - ${employee.position}`;
+                option.textContent = `${employee.name} - ${employee.position || 'Not specified'}`;
                 select.appendChild(option);
             });
         }
@@ -3474,13 +4001,18 @@
                 const card = document.createElement('div');
                 card.className = 'standard-card';
                 
+                let badgeClass = 'badge-international';
+                if (standard.type === 'National') badgeClass = 'badge-national';
+                else if (standard.type === 'Company') badgeClass = 'badge-company';
+                else if (standard.type === 'Personal') badgeClass = 'badge-personal';
+                
                 let statusClass = 'status-pending';
                 if (standard.status === 'Compliant') statusClass = 'status-compliant';
                 else if (standard.status === 'Non-Compliant') statusClass = 'status-noncompliant';
                 else if (standard.status === 'In Progress') statusClass = 'status-inprogress';
                 
                 card.innerHTML = `
-                    <div class="standard-badge ${standard.type === 'International' ? 'badge-international' : 'badge-national'}">
+                    <div class="standard-badge ${badgeClass}">
                         ${standard.type}
                     </div>
                     <h3>${standard.name}</h3>
@@ -3511,6 +4043,7 @@
             document.getElementById('deleteStandardBtn').style.display = 'none';
             document.getElementById('standardSuccess').style.display = 'none';
             document.getElementById('standardError').style.display = 'none';
+            document.getElementById('countryField').style.display = 'block';
             
             // Clear form
             document.getElementById('standardName').value = '';
@@ -3534,6 +4067,13 @@
             document.getElementById('deleteStandardBtn').style.display = 'inline-flex';
             document.getElementById('standardSuccess').style.display = 'none';
             document.getElementById('standardError').style.display = 'none';
+            
+            // Show/hide country field based on type
+            if (standard.type === 'International' || standard.type === 'Company') {
+                document.getElementById('countryField').style.display = 'none';
+            } else {
+                document.getElementById('countryField').style.display = 'block';
+            }
             
             // Fill form
             document.getElementById('standardName').value = standard.name;
@@ -3575,7 +4115,7 @@
                     name,
                     code,
                     type,
-                    country,
+                    country: (type === 'International' || type === 'Company') ? '' : country,
                     description,
                     status,
                     effectiveDate,
@@ -3589,7 +4129,7 @@
                     name,
                     code,
                     type,
-                    country,
+                    country: (type === 'International' || type === 'Company') ? '' : country,
                     description,
                     status,
                     effectiveDate,
@@ -3890,9 +4430,12 @@
 
         // Add New Items Functions
         function addTrainingRecord() {
+            // Get all employee names for the dropdown
+            const employeeOptions = healthRecords.map(emp => emp.name).join('|');
+            
             const newRecord = {
                 id: `TRN-${new Date().getFullYear()}-${(trainingRecords.length + 1).toString().padStart(3, '0')}`,
-                employee: 'Cephas Gideon Mkama',
+                employee: 'Select Employee',
                 trainingType: 'New Training',
                 provider: 'Training Provider',
                 startDate: new Date().toISOString().split('T')[0],
@@ -4078,6 +4621,9 @@
                 inputType = 'select';
             } else if (field === 'location') {
                 options = locations.map(l => l.name);
+                inputType = 'select';
+            } else if (field === 'employee' && dataType === 'trainingRecords') {
+                options = healthRecords.map(emp => emp.name);
                 inputType = 'select';
             } else if (field === 'date' || field.includes('Date')) {
                 inputType = 'date';
@@ -4541,11 +5087,6 @@
         }
 
         // Utility Functions
-        function showDashboard() {
-            // This would navigate to a dashboard page in a real application
-            showToast('Info', 'Dashboard functionality would be implemented here', 'warning');
-        }
-
         function setupEventListeners() {
             // Close modal when clicking outside
             window.onclick = function(event) {

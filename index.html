@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Health & Safety - MMS ERP</title>
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#dc2626">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MMS Safety">
+    <link rel="apple-touch-icon" href="./icon-192.png">
+    <link rel="icon" href="./icon-192.png" type="image/png">
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -1094,6 +1103,15 @@
                 </a>
             </div>
 
+            <!-- PWA App Section -->
+            <div class="nav-section">
+                <div class="nav-title">App</div>
+                <button class="nav-item" id="sidebarInstallBtn" style="display: none;">
+                    <span class="nav-icon">📱</span>
+                    Install App
+                </button>
+            </div>
+
             <div class="nav-section">
                 <div class="nav-title">Safety Management</div>
                 <button class="nav-item" onclick="openModal('incidentsModal')">
@@ -1152,6 +1170,9 @@
                     </div>
                 </div>
                 <div style="display: flex; gap: 0.5rem;">
+                    <button class="btn btn-outline" id="installBtn" style="display: none;">
+                        📱 Install App
+                    </button>
                     <button class="btn btn-outline" onclick="exportToPDF()">
                         📄 Export PDF
                     </button>
@@ -2245,6 +2266,10 @@
         </div>
     </div>
 
+    <!-- PWA Initialization -->
+    <script src="./pwa-init.js"></script>
+    
+    <!-- Main Application Script -->
     <script>
         // Global Variables
         let incidents = [];
@@ -2294,7 +2319,21 @@
         // Initialize Application
         document.addEventListener('DOMContentLoaded', function() {
             initializeApp();
+            setupInstallButtons(); // Setup PWA install buttons
         });
+
+        // PWA Install Button Setup
+        function setupInstallButtons() {
+            const headerBtn = document.getElementById('installBtn');
+            const sidebarBtn = document.getElementById('sidebarInstallBtn');
+            
+            if (headerBtn && window.pwaInstaller) {
+                headerBtn.addEventListener('click', () => window.pwaInstaller.installPWA());
+            }
+            if (sidebarBtn && window.pwaInstaller) {
+                sidebarBtn.addEventListener('click', () => window.pwaInstaller.installPWA());
+            }
+        }
 
         function initializeApp() {
             loadAllData();

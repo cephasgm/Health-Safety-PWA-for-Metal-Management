@@ -2,16 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=5, viewport-fit=cover">
     <title>Health & Safety - MMS ERP</title>
     <!-- PWA Meta Tags -->
-    <link rel="manifest" href="./manifest.json">
-    <meta name="theme-color" content="#dc2626">
+    <link rel="manifest" href="./manifest.json" crossorigin="use-credentials">
+    <link rel="icon" href="./icon-192.png" type="image/png">
+    <link rel="apple-touch-icon" href="./icon-192.png">
+    <meta name="application-name" content="MMS Safety">
+    <meta name="apple-mobile-web-app-title" content="MMS Safety">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="MMS Safety">
-    <link rel="apple-touch-icon" href="./icon-192.png">
-    <link rel="icon" href="./icon-192.png" type="image/png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#dc2626">
+    <meta name="msapplication-TileColor" content="#dc2626">
+    <meta name="msapplication-TileImage" content="./icon-144x144.png">
+    <meta name="msapplication-config" content="none">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
@@ -5148,6 +5153,64 @@
                 }
             });
         }
+    </script>
+
+    <!-- PWA Debug Panel (Remove in production) -->
+    <div id="pwa-debug" style="display: none; position: fixed; bottom: 10px; right: 10px; background: white; border: 1px solid #ccc; padding: 10px; z-index: 9999; border-radius: 5px;">
+        <button onclick="toggleDebug()">Toggle PWA Debug</button>
+        <div id="debug-info"></div>
+    </div>
+
+    <script>
+        // Debug function
+        function toggleDebug() {
+            const debug = document.getElementById('pwa-debug');
+            debug.style.display = debug.style.display === 'none' ? 'block' : 'none';
+            
+            if (debug.style.display === 'block') {
+                const info = {
+                    url: window.location.href,
+                    https: window.location.protocol === 'https:',
+                    manifest: !!document.querySelector('link[rel="manifest"]'),
+                    serviceWorker: 'serviceWorker' in navigator,
+                    beforeInstallPrompt: 'BeforeInstallPromptEvent' in window,
+                    displayMode: window.matchMedia('(display-mode: standalone)').matches ? 'standalone' : 'browser',
+                    userAgent: navigator.userAgent
+                };
+                
+                document.getElementById('debug-info').innerHTML = `
+                    <h4>PWA Debug Info</h4>
+                    <pre>${JSON.stringify(info, null, 2)}</pre>
+                    <button onclick="checkPWA()">Check PWA Status</button>
+                    <button onclick="testInstall()">Test Install</button>
+                `;
+            }
+        }
+
+        function checkPWA() {
+            if (window.debugPWA) {
+                const pwaInfo = window.debugPWA();
+                alert(JSON.stringify(pwaInfo, null, 2));
+            } else {
+                alert('PWA Installer not loaded');
+            }
+        }
+
+        function testInstall() {
+            if (window.pwaInstaller) {
+                window.pwaInstaller.installPWA();
+            } else {
+                alert('PWA Installer not available');
+            }
+        }
+
+        // Auto-check PWA status
+        setTimeout(() => {
+            if (window.pwaInstaller) {
+                const status = window.pwaInstaller.checkPWARequirements();
+                console.log('PWA Status Check:', status);
+            }
+        }, 3000);
     </script>
 </body>
 </html>

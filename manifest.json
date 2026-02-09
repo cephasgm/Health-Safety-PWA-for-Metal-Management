@@ -52,14 +52,6 @@
       "purpose": "any maskable"
     }
   ],
-  "screenshots": [
-    {
-      "src": "./screenshot.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "description": "MMS Safety Dashboard"
-    }
-  ],
   "categories": ["business", "productivity", "utilities"],
   "shortcuts": [
     {

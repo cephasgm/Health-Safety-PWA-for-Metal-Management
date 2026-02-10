@@ -1129,8 +1129,6 @@
     <script type="module" src="./firebase-config.js"></script>
     <script type="module" src="./auth-system.js"></script>
     <script type="module" src="./database-service.js"></script>
-    <!-- Session Management -->
-    <script type="module" src="./session-manager.js"></script>
 
     <div id="appContent" style="display: none;">
         <div class="dashboard">
@@ -3582,7 +3580,7 @@
 
         function getChartOptions(chartType) {
             const baseOptions = {
-                responsive: true;
+                responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {

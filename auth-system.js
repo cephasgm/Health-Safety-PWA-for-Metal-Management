@@ -11,6 +11,7 @@ class MMSAuthSystem {
     this.currentUser = null;
     this.userRole = 'guest';
     this.userLocation = 'unknown';
+    this.userPermissions = {};
     this.init();
   }
 
@@ -22,12 +23,14 @@ class MMSAuthSystem {
       if (user) {
         this.currentUser = user;
         this.analyzeUserProfile(user);
-        console.log(`✅ Authenticated: ${user.email}`);
+        this.setupUserPermissions();
+        console.log(`✅ Authenticated: ${user.email} as ${this.userRole}`);
         this.showApplication();
         this.trackLogin('success');
       } else {
         this.currentUser = null;
         this.userRole = 'guest';
+        this.userPermissions = {};
         console.log('⚠️ User logged out');
         this.showLogin();
         this.trackLogin('logout');
@@ -45,8 +48,10 @@ class MMSAuthSystem {
       this.userRole = 'safety_officer';
     } else if (email.includes('manager') || email.includes('supervisor')) {
       this.userRole = 'manager';
-    } else {
+    } else if (email.includes('employee') || email.includes('staff')) {
       this.userRole = 'employee';
+    } else {
+      this.userRole = 'employee'; // Default role
     }
     
     // Extract location from email
@@ -63,6 +68,80 @@ class MMSAuthSystem {
     }
     
     console.log(`📍 User ${email} identified as ${this.userRole} from ${this.userLocation}`);
+  }
+
+  setupUserPermissions() {
+    // Define permission levels for each role
+    const permissions = {
+      'admin': {
+        canViewDashboard: true,
+        canReportIncidents: true,
+        canEditIncidents: true,
+        canDeleteRecords: true,
+        canManageUsers: true,
+        canViewHealthRecords: true,
+        canExportData: true,
+        canManageSettings: true,
+        canMigrateData: true,
+        canViewAuditLogs: true,
+        modules: ['all']
+      },
+      'safety_officer': {
+        canViewDashboard: true,
+        canReportIncidents: true,
+        canEditIncidents: true,
+        canDeleteRecords: false,
+        canManageUsers: false,
+        canViewHealthRecords: true,
+        canExportData: true,
+        canManageSettings: false,
+        canMigrateData: false,
+        canViewAuditLogs: false,
+        modules: ['incidents', 'training', 'ppe', 'audits', 'observations', 'equipment']
+      },
+      'manager': {
+        canViewDashboard: true,
+        canReportIncidents: true,
+        canEditIncidents: false,
+        canDeleteRecords: false,
+        canManageUsers: false,
+        canViewHealthRecords: false,
+        canExportData: true,
+        canManageSettings: false,
+        canMigrateData: false,
+        canViewAuditLogs: false,
+        modules: ['incidents', 'training', 'reports']
+      },
+      'employee': {
+        canViewDashboard: true,
+        canReportIncidents: true,
+        canEditIncidents: false,
+        canDeleteRecords: false,
+        canManageUsers: false,
+        canViewHealthRecords: false,
+        canExportData: false,
+        canManageSettings: false,
+        canMigrateData: false,
+        canViewAuditLogs: false,
+        modules: ['incidents', 'checklists']
+      },
+      'guest': {
+        canViewDashboard: false,
+        canReportIncidents: false,
+        canEditIncidents: false,
+        canDeleteRecords: false,
+        canManageUsers: false,
+        canViewHealthRecords: false,
+        canExportData: false,
+        canManageSettings: false,
+        canMigrateData: false,
+        canViewAuditLogs: false,
+        modules: []
+      }
+    };
+
+    this.userPermissions = permissions[this.userRole] || permissions['guest'];
+    console.log(`🔒 Set permissions for ${this.userRole}:`, this.userPermissions);
   }
 
   async login(email, password) {
@@ -88,6 +167,7 @@ class MMSAuthSystem {
         user: userCredential.user,
         role: this.userRole,
         location: this.userLocation,
+        permissions: this.userPermissions,
         message: 'Welcome to MMS Safety System'
       };
       
@@ -160,6 +240,9 @@ class MMSAuthSystem {
     
     // Update UI with user info
     this.updateUserInterface();
+    
+    // Apply role permissions to UI
+    this.applyRolePermissions();
   }
 
   updateUserInterface() {
@@ -170,16 +253,20 @@ class MMSAuthSystem {
       emailElement.title = this.currentUser.email;
     }
     
-    // Update role display
+    // Update role display with badge
     const roleElement = document.getElementById('currentUserRole');
     if (roleElement) {
-      const roleDisplay = this.userRole.replace('_', ' ').toUpperCase();
-      roleElement.textContent = `${roleDisplay} • ${this.userLocation}`;
+      const roleNames = {
+        'admin': '👑 Administrator',
+        'safety_officer': '🛡️ Safety Officer', 
+        'manager': '📊 Manager',
+        'employee': '👤 Employee',
+        'guest': '👤 Guest'
+      };
+      roleElement.textContent = `${roleNames[this.userRole] || '👤 User'} • ${this.userLocation}`;
+      roleElement.style.fontWeight = '600';
       roleElement.style.color = this.getRoleColor(this.userRole);
     }
-    
-    // Update role-based UI
-    this.applyRolePermissions();
     
     // Update location-specific data
     this.updateLocationData();
@@ -190,43 +277,134 @@ class MMSAuthSystem {
       'admin': '#dc2626',
       'safety_officer': '#3b82f6', 
       'manager': '#10b981',
-      'employee': '#6b7280'
+      'employee': '#6b7280',
+      'guest': '#9ca3af'
     };
     return colors[role] || '#6b7280';
   }
 
   applyRolePermissions() {
-    // Admin: Full access
-    // Safety Officer: Most features
-    // Manager: View only
-    // Employee: Limited access
+    console.log(`🔒 Applying ${this.userRole} permissions...`);
     
-    const adminOnly = document.querySelectorAll('[data-permission="admin"]');
-    const officerOnly = document.querySelectorAll('[data-permission="safety_officer"]');
-    const managerOnly = document.querySelectorAll('[data-permission="manager"]');
+    // Hide all permission-based elements first
+    const allPermissionElements = document.querySelectorAll('[data-permission]');
+    allPermissionElements.forEach(el => {
+      el.style.display = 'none';
+      el.classList.add('permission-hidden');
+    });
     
-    // Hide all restricted elements first
-    adminOnly.forEach(el => el.style.display = 'none');
-    officerOnly.forEach(el => el.style.display = 'none');
-    managerOnly.forEach(el => el.style.display = 'none');
-    
-    // Show based on role
+    // Show elements based on role
     switch(this.userRole) {
       case 'admin':
-        adminOnly.forEach(el => el.style.display = 'block');
-        officerOnly.forEach(el => el.style.display = 'block');
-        managerOnly.forEach(el => el.style.display = 'block');
+        // Admin sees everything
+        document.querySelectorAll('[data-permission="admin"], [data-permission="safety_officer"], [data-permission="manager"], [data-permission="employee"]')
+          .forEach(el => {
+            el.style.display = '';
+            el.classList.remove('permission-hidden');
+          });
         break;
+        
       case 'safety_officer':
-        officerOnly.forEach(el => el.style.display = 'block');
-        managerOnly.forEach(el => el.style.display = 'block');
+        // Safety officers see their content + manager + employee
+        document.querySelectorAll('[data-permission="safety_officer"], [data-permission="manager"], [data-permission="employee"]')
+          .forEach(el => {
+            el.style.display = '';
+            el.classList.remove('permission-hidden');
+          });
         break;
+        
       case 'manager':
-        managerOnly.forEach(el => el.style.display = 'block');
+        // Managers see their content + employee
+        document.querySelectorAll('[data-permission="manager"], [data-permission="employee"]')
+          .forEach(el => {
+            el.style.display = '';
+            el.classList.remove('permission-hidden');
+          });
+        break;
+        
+      case 'employee':
+        // Employees see only their content
+        document.querySelectorAll('[data-permission="employee"]')
+          .forEach(el => {
+            el.style.display = '';
+            el.classList.remove('permission-hidden');
+          });
         break;
     }
     
-    console.log(`🔒 Applied ${this.userRole} permissions`);
+    // Also update feature permissions based on capability
+    this.updateFeaturePermissions();
+  }
+
+  updateFeaturePermissions() {
+    // Disable buttons/inputs based on permissions
+    document.querySelectorAll('[data-feature="edit"]').forEach(el => {
+      el.disabled = !this.userPermissions.canEditIncidents;
+      if (el.disabled) {
+        el.title = 'Editing requires Safety Officer or Admin role';
+      }
+    });
+    
+    document.querySelectorAll('[data-feature="delete"]').forEach(el => {
+      el.disabled = !this.userPermissions.canDeleteRecords;
+      if (el.disabled) {
+        el.title = 'Deleting requires Admin role';
+      }
+    });
+    
+    document.querySelectorAll('[data-feature="export"]').forEach(el => {
+      el.disabled = !this.userPermissions.canExportData;
+      if (el.disabled) {
+        el.title = 'Exporting requires Manager or higher role';
+      }
+    });
+    
+    document.querySelectorAll('[data-feature="migrate"]').forEach(el => {
+      el.disabled = !this.userPermissions.canMigrateData;
+      if (el.disabled) {
+        el.title = 'Data migration requires Admin role';
+      }
+    });
+    
+    document.querySelectorAll('[data-feature="audit"]').forEach(el => {
+      el.disabled = !this.userPermissions.canViewAuditLogs;
+      if (el.disabled) {
+        el.title = 'Audit logs require Admin role';
+      }
+    });
+    
+    // Show/hide module cards based on permissions
+    const modules = this.userPermissions.modules || [];
+    document.querySelectorAll('.module-card').forEach(card => {
+      const moduleText = card.querySelector('h3')?.textContent.toLowerCase() || '';
+      let hasAccess = false;
+      
+      if (modules.includes('all')) {
+        hasAccess = true;
+      } else {
+        // Check if user has access to this module type
+        if (moduleText.includes('incident') && modules.includes('incidents')) hasAccess = true;
+        if (moduleText.includes('training') && modules.includes('training')) hasAccess = true;
+        if (moduleText.includes('ppe') && modules.includes('ppe')) hasAccess = true;
+        if (moduleText.includes('audit') && modules.includes('audits')) hasAccess = true;
+        if (moduleText.includes('observation') && modules.includes('observations')) hasAccess = true;
+        if (moduleText.includes('equipment') && modules.includes('equipment')) hasAccess = true;
+        if (moduleText.includes('checklist') && modules.includes('checklists')) hasAccess = true;
+        if (moduleText.includes('report') && modules.includes('reports')) hasAccess = true;
+      }
+      
+      if (!hasAccess) {
+        card.style.opacity = '0.5';
+        card.style.pointerEvents = 'none';
+        card.title = 'Module not available for your role';
+      } else {
+        card.style.opacity = '1';
+        card.style.pointerEvents = 'auto';
+        card.title = '';
+      }
+    });
+    
+    console.log('✅ Feature permissions applied');
   }
 
   updateLocationData() {
@@ -235,38 +413,65 @@ class MMSAuthSystem {
     locationSelects.forEach(select => {
       // Could pre-select user's location
       console.log(`📍 User location: ${this.userLocation}`);
+      
+      // Highlight option matching user's location
+      Array.from(select.options).forEach(option => {
+        if (option.text.includes(this.userLocation)) {
+          option.style.fontWeight = '600';
+          option.style.color = this.getRoleColor(this.userRole);
+        }
+      });
     });
   }
 
   trackLogin(status) {
-    // Could send to analytics
+    // Send to analytics if available
     if (window.gtag && status === 'success') {
       window.gtag('event', 'login', {
         'event_category': 'authentication',
-        'event_label': this.userRole
+        'event_label': this.userRole,
+        'user_role': this.userRole,
+        'user_location': this.userLocation
       });
     }
   }
 
-  // Permission checks for programmatic use
-  canReportIncidents() {
-    return ['admin', 'safety_officer'].includes(this.userRole);
+  // Permission check methods for programmatic use
+  can(permission) {
+    return this.userPermissions[permission] || false;
   }
 
-  canEditIncidents() {
-    return ['admin', 'safety_officer'].includes(this.userRole);
+  canAccessModule(moduleName) {
+    const modules = this.userPermissions.modules || [];
+    if (modules.includes('all')) return true;
+    
+    const moduleMap = {
+      'incidents': 'incidents',
+      'training': 'training',
+      'ppe': 'ppe',
+      'audits': 'audits',
+      'equipment': 'equipment',
+      'chemical': 'equipment', // Group with equipment
+      'observations': 'observations',
+      'checklists': 'checklists',
+      'reports': 'reports',
+      'emergency': 'checklists', // Group with checklists
+      'risk': 'incidents', // Group with incidents
+      'investigation': 'incidents' // Group with incidents
+    };
+    
+    const requiredModule = moduleMap[moduleName.toLowerCase()];
+    return requiredModule ? modules.includes(requiredModule) : false;
   }
 
-  canDeleteRecords() {
-    return this.userRole === 'admin';
-  }
-
-  canManageUsers() {
-    return this.userRole === 'admin';
-  }
-
-  canViewHealthRecords() {
-    return ['admin', 'safety_officer'].includes(this.userRole);
+  // Get user info for display
+  getUserInfo() {
+    return {
+      email: this.currentUser?.email,
+      role: this.userRole,
+      location: this.userLocation,
+      permissions: this.userPermissions
+    };
   }
 }
 
@@ -296,26 +501,26 @@ window.handleMMSLogin = async function() {
   
   // Basic validation
   if (!email || !password) {
-    this.showError('Please enter both email and password');
+    window.showError('Please enter both email and password');
     return;
   }
   
   if (!email.includes('@mms.com') && !email.includes('@metalmanagement')) {
-    this.showError('Please use your company email address');
+    window.showError('Please use your company email address (@mms.com)');
     return;
   }
   
   // UI feedback
   loginBtn.disabled = true;
   const originalText = loginBtn.innerHTML;
-  loginBtn.innerHTML = '<span class="spinner"></span> Authenticating...';
+  loginBtn.innerHTML = '<span style="margin-right: 8px;">⏳</span> Authenticating...';
   
   // Perform login
   const result = await mmsAuth.login(email, password);
   
   if (result.success) {
     // Success
-    loginBtn.innerHTML = '✅ Success! Redirecting...';
+    loginBtn.innerHTML = '<span style="margin-right: 8px;">✅</span> Success! Loading...';
     loginBtn.style.background = '#10b981';
     
     // Clear password field
@@ -335,7 +540,7 @@ window.handleMMSLogin = async function() {
     loginBtn.innerHTML = originalText;
     loginBtn.disabled = false;
     
-    this.showError(result.error);
+    window.showError(result.error);
     
     // Clear password on error
     passwordInput.value = '';
@@ -365,19 +570,47 @@ window.handleMMSLogout = async function() {
   if (confirm('Are you sure you want to logout?')) {
     const logoutBtn = event.target;
     logoutBtn.disabled = true;
-    logoutBtn.innerHTML = 'Logging out...';
+    logoutBtn.innerHTML = '<span style="margin-right: 8px;">⏳</span> Logging out...';
     
     await mmsAuth.logout();
     
     // Reset button after delay
     setTimeout(() => {
-      logoutBtn.disabled = false;
-      logoutBtn.innerHTML = '🚪 Logout';
+      if (logoutBtn) {
+        logoutBtn.disabled = false;
+        logoutBtn.innerHTML = '🚪 Logout';
+      }
     }, 1000);
   }
+};
+
+// Check if user can perform action
+window.canUser = function(permission) {
+  return window.mmsAuth?.can(permission) || false;
+};
+
+// Check module access
+window.canAccess = function(moduleName) {
+  return window.mmsAuth?.canAccessModule(moduleName) || false;
+};
+
+// Get current user info
+window.getCurrentUser = function() {
+  return window.mmsAuth?.getUserInfo() || null;
 };
 
 // Make auth instance globally available
 window.mmsAuth = mmsAuth;
 
-console.log('✅ MMS Auth System Ready');
+// Add shake animation for login errors
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+  }
+`;
+document.head.appendChild(style);
+
+console.log('✅ Enhanced MMS Auth System Ready');

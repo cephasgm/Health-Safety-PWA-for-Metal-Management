@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MMS Safety System - Deployment Checklist</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            color: #1e293b;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border-left: 6px solid #dc2626;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            background: #dc2626;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #dc2626;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-container {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .progress-bar {
+            height: 12px;
+            background: #e2e8f0;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #34d399);
+            border-radius: 6px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        .progress-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        .phases-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .phase-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .phase-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+        }
+
+        .phase-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .phase-number {
+            width: 40px;
+            height: 40px;
+            background: #3b82f6;
+            color: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .phase-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1e293b;
+            flex: 1;
+            margin-left: 1rem;
+        }
+
+        .phase-status {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-completed {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-in-progress {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-pending {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .checklist-items {
+            list-style: none;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            background: #f8fafc;
+            transition: all 0.2s ease;
+        }
+
+        .checklist-item:hover {
+            background: #f1f5f9;
+        }
+
+        .checklist-item.completed {
+            background: #f0fdf4;
+            border-left: 4px solid #10b981;
+        }
+
+        .checklist-item.in-progress {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #cbd5e1;
+            border-radius: 6px;
+            margin-right: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+
+        .checkbox.checked {
+            background: #10b981;
+            border-color: #10b981;
+            color: white;
+        }
+
+        .checkbox.in-progress {
+            background: #3b82f6;
+            border-color: #3b82f6;
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        .item-content {
+            flex: 1;
+        }
+
+        .item-title {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+            color: #1e293b;
+        }
+
+        .item-description {
+            font-size: 0.85rem;
+            color: #64748b;
+            line-height: 1.4;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.375rem 0.75rem;
+            border-radius: 6px;
+            border: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-test {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .btn-test:hover {
+            background: #bfdbfe;
+        }
+
+        .btn-docs {
+            background: #f3e8ff;
+            color: #7c3aed;
+        }
+
+        .btn-docs:hover {
+            background: #e9d5ff;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .btn {
+            padding: 0.875rem 2rem;
+            border-radius: 10px;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            color: white;
+            box-shadow: 0 6px 20px rgba(220, 38, 38, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(220, 38, 38, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #1e293b;
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        .export-section {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 3rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+
+        .export-options {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .export-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            color: #1e293b;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .export-btn:hover {
+            background: #f8fafc;
+            border-color: #dc2626;
+            color: #dc2626;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: #1e293b;
+            color: white;
+            text-align: center;
+            border-radius: 6px;
+            padding: 0.5rem;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.8rem;
+            font-weight: normal;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            
+            .phases-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">MMS</div>
+            </div>
+            <h1>Safety System Deployment Checklist</h1>
+            <p class="subtitle">Complete step-by-step guide for production deployment</p>
+            
+            <!-- Progress Bar -->
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-stats">
+                    <span id="completedCount">0 completed</span>
+                    <span id="totalCount">0 total</span>
+                    <span id="progressPercent">0%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phases Grid -->
+        <div class="phases-grid" id="phasesContainer">
+            <!-- Phases will be loaded dynamically -->
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button class="btn btn-primary" onclick="markAllCompleted()">
+                ✅ Mark All as Complete
+            </button>
+            <button class="btn btn-secondary" onclick="resetChecklist()">
+                🔄 Reset Checklist
+            </button>
+            <button class="btn btn-secondary" onclick="window.print()">
+                🖨️ Print Checklist
+            </button>
+        </div>
+
+        <!-- Export Section -->
+        <div class="export-section">
+            <h3 style="margin-bottom: 1rem; color: #1e293b;">Export Deployment Report</h3>
+            <div class="export-options">
+                <button class="export-btn" onclick="exportToPDF()">
+                    📄 Export as PDF
+                </button>
+                <button class="export-btn" onclick="exportToJSON()">
+                    💾 Export as JSON
+                </button>
+                <button class="export-btn" onclick="exportToText()">
+                    📝 Export as Text
+                </button>
+                <button class="export-btn" onclick="generateAuditReport()">
+                    🔍 Generate Audit Report
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Deployment Checklist Data
+        const deploymentPhases = [
+            {
+                id: 'phase-1',
+                title: 'Phase 1: Firebase Setup',
+                status: 'completed',
+                items: [
+                    {
+                        id: '1-1',
+                        title: 'Create Firebase Project',
+                        description: 'Create project: mms-safety-system in Firebase Console',
+                        status: 'completed',
+                        testUrl: 'https://console.firebase.google.com/',
+                        docsUrl: 'https://firebase.google.com/docs/projects/create'
+                    },
+                    {
+                        id: '1-2',
+                        title: 'Enable Firestore Database',
+                        description: 'Create database in test mode, location: europe-west3',
+                        status: 'completed',
+                        testUrl: 'https://console.firebase.google.com/project/_/firestore',
+                        docsUrl: 'https://firebase.google.com/docs/firestore/quickstart'
+                    },
+                    {
+                        id: '1-3',
+                        title: 'Enable Authentication',
+                        description: 'Enable Email/Password authentication method',
+                        status: 'completed',
+                        testUrl: 'https://console.firebase.google.com/project/_/authentication',
+                        docsUrl: 'https://firebase.google.com/docs/auth/web/start'
+                    },
+                    {
+                        id: '1-4',
+                        title: 'Enable Storage',
+                        description: 'Create Firebase Storage bucket for file uploads',
+                        status: 'completed',
+                        testUrl: 'https://console.firebase.google.com/project/_/storage',
+                        docsUrl: 'https://firebase.google.com/docs/storage/web/start'
+                    }
+                ]
+            },
+            {
+                id: 'phase-2',
+                title: 'Phase 2: Backend Integration',
+                status: 'completed',
+                items: [
+                    {
+                        id: '2-1',
+                        title: 'Configure firebase-config.js',
+                        description: 'Add your Firebase config to the file',
+                        status: 'completed',
+                        testUrl: './firebase-config.js',
+                        docsUrl: '#'
+                    },
+                    {
+                        id: '2-2',
+                        title: 'Implement Authentication System',
+                        description: 'Login/logout functionality with role-based access',
+                        status: 'completed',
+                        testUrl: './auth-system.js',
+                        docsUrl: '#'
+                    },
+                    {
+                        id: '2-3',
+                        title: 'Database Service Setup',
+                        description: 'Cloud operations for incidents, employees, etc.',
+                        status: 'completed',
+                        testUrl: './database-service.js',
+                        docsUrl: '#'
+                    },
+                    {
+                        id: '2-4',
+                        title: 'Apply Security Rules',
+                        description: 'Copy security rules to Firebase Console',
+                        status: 'in-progress',
+                        testUrl: './firebase-security-rules.txt',
+                        docsUrl: 'https://firebase.google.com/docs/firestore/security/get-started'
+                    }
+                ]
+            },
+            {
+                id: 'phase-3',
+                title: 'Phase 3: PWA Enhancements',
+                status: 'completed',
+                items: [
+                    {
+                        id: '3-1',
+                        title: 'Push Notifications',
+                        description: 'Real-time alerts for new incidents',
+                        status: 'completed',
+                        testUrl: '#',
+                        docsUrl: 'https://developer.mozilla.org/en-US/docs/Web/API/Push_API'
+                    },
+                    {
+                        id: '3-2',
+                        title: 'Background Sync',
+                        description: 'Offline data synchronization',
+                        status: 'completed',
+                        testUrl: '#',
+                        docsUrl: 'https://developer.mozilla.org/en-US/docs/Web/API/Background_Sync_API'
+                    },
+                    {
+                        id: '3-3',
+                        title: 'File Upload Service',
+                        description: 'Upload incident photos to cloud storage',
+                        status: 'completed',
+                        testUrl: '#',
+                        docsUrl: '#'
+                    },
+                    {
+                        id: '3-4',
+                        title: 'Enhanced Install Prompts',
+                        description: 'Smart PWA installation promotion',
+                        status: 'completed',
+                        testUrl: './install-promotion.js',
+                        docsUrl: 'https://web.dev/learn/pwa/installation/'
+                    }
+                ]
+            },
+            {
+                id: 'phase-4',
+                title: 'Phase 4: Testing & Deployment',
+                status: 'in-progress',
+                items: [
+                    {
+                        id: '4-1',
+                        title: 'Lighthouse Audit',
+                        description: 'Performance, accessibility, best practices score',
+                        status: 'pending',
+                        testUrl: 'chrome://lighthouse',
+                        docsUrl: 'https://developers.google.com/web/tools/lighthouse'
+                    },
+                    {
+                        id: '4-2',
+                        title: 'Cross-Browser Testing',
+                        description: 'Test on Chrome, Firefox, Safari, Edge',
+                        status: 'pending',
+                        testUrl: 'https://www.browserstack.com/',
+                        docsUrl: 'https://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Cross_browser_testing'
+                    },
+                    {
+                        id: '4-3',
+                        title: 'Security Scan',
+                        description: 'Check for vulnerabilities and security headers',
+                        status: 'pending',
+                        testUrl: 'https://observatory.mozilla.org/',
+                        docsUrl: 'https://web.dev/secure/'
+                    },
+                    {
+                        id: '4-4',
+                        title: 'Performance Monitoring',
+                        description: 'Set up real-time performance metrics',
+                        status: 'pending',
+                        testUrl: 'https://pagespeed.web.dev/',
+                        docsUrl: 'https://web.dev/learn/#performance'
+                    },
+                    {
+                        id: '4-5',
+                        title: 'User Acceptance Testing',
+                        description: 'Test with actual safety officers',
+                        status: 'pending',
+                        testUrl: '#',
+                        docsUrl: '#'
+                    },
+                    {
+                        id: '4-6',
+                        title: 'Deployment to Production',
+                        description: 'Final deployment and go-live',
+                        status: 'pending',
+                        testUrl: 'https://cephasgm.github.io/Health-Safety-PWA-for-Metal-Management/',
+                        docsUrl: '#'
+                    }
+                ]
+            },
+            {
+                id: 'phase-5',
+                title: 'Phase 5: Post-Deployment',
+                status: 'pending',
+                items: [
+                    {
+                        id: '5-1',
+                        title: 'Create User Accounts',
+                        description: 'Create accounts for all safety officers',
+                        status: 'pending',
+                        testUrl: 'https://console.firebase.google.com/project/_/authentication/users',
+                        docsUrl: '#'
+                    },
+                    {
+                        id: '5-2',
+                        title: 'Data Migration',
+                        description: 'Migrate existing data to cloud',
+                        status: 'pending',
+                        testUrl: '#',
+                        docsUrl: '#'
+                    },
+                    {
+                        id: '5-3',
+                        title: 'User Training',
+                        description: 'Train safety officers on system usage',
+                        status: 'pending',
+                        testUrl: './USER-GUIDE.md',
+                        docsUrl: '#'
+                    },
+                    {
+                        id: '5-4',
+                        title: 'Monitoring Setup',
+                        description: 'Set up error tracking and analytics',
+                        status: 'pending',
+                        testUrl: 'https://console.firebase.google.com/project/_/analytics',
+                        docsUrl: 'https://firebase.google.com/docs/analytics'
+                    },
+                    {
+                        id: '5-5',
+                        title: 'Backup Strategy',
+                        description: 'Implement regular data backups',
+                        status: 'pending',
+                        testUrl: '#',
+                        docsUrl: 'https://firebase.google.com/docs/firestore/manage-data/export-import'
+                    }
+                ]
+            }
+        ];
+
+        // Initialize the checklist
+        function initChecklist() {
+            loadChecklistFromStorage();
+            renderPhases();
+            updateProgress();
+        }
+
+        // Load saved state from localStorage
+        function loadChecklistFromStorage() {
+            const saved = localStorage.getItem('mmsDeploymentChecklist');
+            if (saved) {
+                const savedData = JSON.parse(saved);
+                deploymentPhases.forEach(phase => {
+                    const savedPhase = savedData.find(p => p.id === phase.id);
+                    if (savedPhase) {
+                        phase.status = savedPhase.status;
+                        phase.items.forEach(item => {
+                            const savedItem = savedPhase.items.find(i => i.id === item.id);
+                            if (savedItem) {
+                                item.status = savedItem.status;
+                            }
+                        });
+                    }
+                });
+            }
+        }
+
+        // Save state to localStorage
+        function saveChecklistToStorage() {
+            const saveData = deploymentPhases.map(phase => ({
+                id: phase.id,
+                status: phase.status,
+                items: phase.items.map(item => ({
+                    id: item.id,
+                    status: item.status
+                }))
+            }));
+            localStorage.setItem('mmsDeploymentChecklist', JSON.stringify(saveData));
+        }
+
+        // Render all phases
+        function renderPhases() {
+            const container = document.getElementById('phasesContainer');
+            container.innerHTML = '';
+            
+            deploymentPhases.forEach(phase => {
+                const phaseElement = document.createElement('div');
+                phaseElement.className = 'phase-card';
+                phaseElement.innerHTML = `
+                    <div class="phase-header">
+                        <div class="phase-number">${phase.id.split('-')[1]}</div>
+                        <div class="phase-title">${phase.title}</div>
+                        <div class="phase-status status-${phase.status.replace('-', '-')}">
+                            ${phase.status.replace('-', ' ').toUpperCase()}
+                        </div>
+                    </div>
+                    <ul class="checklist-items" id="${phase.id}-items">
+                        ${phase.items.map(item => `
+                            <li class="checklist-item ${item.status}" id="${item.id}">
+                                <div class="checkbox ${item.status}" onclick="toggleItemStatus('${phase.id}', '${item.id}')">
+                                    ${item.status === 'completed' ? '✓' : item.status === 'in-progress' ? '⋯' : ''}
+                                </div>
+                                <div class="item-content">
+                                    <div class="item-title">${item.title}</div>
+                                    <div class="item-description">${item.description}</div>
+                                </div>
+                                <div class="item-actions">
+                                    ${item.testUrl ? `<button class="action-btn btn-test" onclick="window.open('${item.testUrl}', '_blank')">Test</button>` : ''}
+                                    ${item.docsUrl ? `<button class="action-btn btn-docs" onclick="window.open('${item.docsUrl}', '_blank')">Docs</button>` : ''}
+                                </div>
+                            </li>
+                        `).join('')}
+                    </ul>
+                `;
+                container.appendChild(phaseElement);
+            });
+        }
+
+        // Toggle item status
+        function toggleItemStatus(phaseId, itemId) {
+            const phase = deploymentPhases.find(p => p.id === phaseId);
+            if (!phase) return;
+            
+            const item = phase.items.find(i => i.id === itemId);
+            if (!item) return;
+            
+            // Cycle through statuses: pending → in-progress → completed → pending
+            const statusOrder = ['pending', 'in-progress', 'completed'];
+            const currentIndex = statusOrder.indexOf(item.status);
+            const nextIndex = (currentIndex + 1) % statusOrder.length;
+            item.status = statusOrder[nextIndex];
+            
+            // Update phase status based on items
+            updatePhaseStatus(phase);
+            
+            // Save and update UI
+            saveChecklistToStorage();
+            renderPhases();
+            updateProgress();
+        }
+
+        // Update phase status based on items
+        function updatePhaseStatus(phase) {
+            const totalItems = phase.items.length;
+            const completedItems = phase.items.filter(i => i.status === 'completed').length;
+            const inProgressItems = phase.items.filter(i => i.status === 'in-progress').length;
+            
+            if (completedItems === totalItems) {
+                phase.status = 'completed';
+            } else if (completedItems > 0 || inProgressItems > 0) {
+                phase.status = 'in-progress';
+            } else {
+                phase.status = 'pending';
+            }
+        }
+
+        // Update progress bar and stats
+        function updateProgress() {
+            let totalItems = 0;
+            let completedItems = 0;
+            let inProgressItems = 0;
+            
+            deploymentPhases.forEach(phase => {
+                totalItems += phase.items.length;
+                completedItems += phase.items.filter(i => i.status === 'completed').length;
+                inProgressItems += phase.items.filter(i => i.status === 'in-progress').length;
+            });
+            
+            const progressPercent = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
+            
+            // Update progress bar
+            document.getElementById('progressFill').style.width = `${progressPercent}%`;
+            
+            // Update stats
+            document.getElementById('completedCount').textContent = 
+                `${completedItems} completed, ${inProgressItems} in progress`;
+            document.getElementById('totalCount').textContent = `${totalItems} total`;
+            document.getElementById('progressPercent').textContent = `${progressPercent}%`;
+        }
+
+        // Mark all items as completed
+        function markAllCompleted() {
+            if (confirm('Mark all checklist items as completed?')) {
+                deploymentPhases.forEach(phase => {
+                    phase.status = 'completed';
+                    phase.items.forEach(item => {
+                        item.status = 'completed';
+                    });
+                });
+                saveChecklistToStorage();
+                renderPhases();
+                updateProgress();
+            }
+        }
+
+        // Reset checklist
+        function resetChecklist() {
+            if (confirm('Reset all checklist items to pending? This cannot be undone.')) {
+                deploymentPhases.forEach(phase => {
+                    phase.status = 'pending';
+                    phase.items.forEach(item => {
+                        item.status = 'pending';
+                    });
+                });
+                localStorage.removeItem('mmsDeploymentChecklist');
+                renderPhases();
+                updateProgress();
+            }
+        }
+
+        // Export to PDF
+        function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Header
+            doc.setFontSize(20);
+            doc.setTextColor(220, 38, 38);
+            doc.text('MMS Safety System Deployment Report', 20, 20);
+            
+            doc.setFontSize(12);
+            doc.setTextColor(100, 116, 139);
+            doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 30);
+            doc.text(`Progress: ${calculateProgress()}% complete`, 20, 40);
+            
+            let y = 50;
+            
+            // Each phase
+            deploymentPhases.forEach(phase => {
+                doc.setFontSize(14);
+                doc.setTextColor(30, 41, 59);
+                doc.text(`${phase.id.toUpperCase()}: ${phase.title}`, 20, y);
+                y += 10;
+                
+                doc.setFontSize(10);
+                phase.items.forEach(item => {
+                    const statusIcon = item.status === 'completed' ? '✅' : 
+                                      item.status === 'in-progress' ? '⏳' : '⭕';
+                    doc.text(`  ${statusIcon} ${item.title}`, 25, y);
+                    y += 8;
+                    
+                    if (y > 270) {
+                        doc.addPage();
+                        y = 20;
+                    }
+                });
+                
+                y += 10;
+            });
+            
+            // Save PDF
+            doc.save(`mms-deployment-report-${new Date().toISOString().split('T')[0]}.pdf`);
+            
+            alert('PDF report generated successfully!');
+        }
+
+        // Export to JSON
+        function exportToJSON() {
+            const report = {
+                title: 'MMS Safety System Deployment Report',
+                generated: new Date().toISOString(),
+                progress: calculateProgress(),
+                phases: deploymentPhases.map(phase => ({
+                    phase: phase.title,
+                    status: phase.status,
+                    items: phase.items.map(item => ({
+                        task: item.title,
+                        status: item.status,
+                        description: item.description
+                    }))
+                }))
+            };
+            
+            const dataStr = JSON.stringify(report, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = `mms-deployment-${new Date().toISOString().split('T')[0]}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            alert('JSON report exported successfully!');
+        }
+
+        // Export to Text
+        function exportToText() {
+            let textContent = 'MMS SAFETY SYSTEM DEPLOYMENT CHECKLIST\n';
+            textContent += '=========================================\n\n';
+            textContent += `Generated: ${new Date().toLocaleDateString()}\n`;
+            textContent += `Progress: ${calculateProgress()}% complete\n\n`;
+            
+            deploymentPhases.forEach(phase => {
+                textContent += `${phase.id.toUpperCase()}: ${phase.title}\n`;
+                textContent += `Status: ${phase.status.toUpperCase()}\n\n`;
+                
+                phase.items.forEach(item => {
+                    const statusIcon = item.status === 'completed' ? '[✓]' : 
+                                      item.status === 'in-progress' ? '[→]' : '[ ]';
+                    textContent += `  ${statusIcon} ${item.title}\n`;
+                    textContent += `     ${item.description}\n\n`;
+                });
+                
+                textContent += '\n';
+            });
+            
+            const blob = new Blob([textContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `mms-deployment-${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert('Text report exported successfully!');
+        }
+
+        // Generate Audit Report
+        function generateAuditReport() {
+            const report = {
+                system: 'MMS Safety Management System',
+                auditDate: new Date().toISOString(),
+                auditor: window.mmsAuth?.currentUser?.email || 'Unknown',
+                summary: {
+                    totalPhases: deploymentPhases.length,
+                    completedPhases: deploymentPhases.filter(p => p.status === 'completed').length,
+                    totalTasks: deploymentPhases.reduce((sum, phase) => sum + phase.items.length, 0),
+                    completedTasks: deploymentPhases.reduce((sum, phase) => 
+                        sum + phase.items.filter(i => i.status === 'completed').length, 0
+                    ),
+                    complianceScore: calculateProgress(),
+                    status: calculateProgress() >= 90 ? 'READY FOR PRODUCTION' : 
+                           calculateProgress() >= 70 ? 'NEEDS FINAL TESTING' : 
+                           'IN DEVELOPMENT'
+                },
+                recommendations: generateRecommendations()
+            };
+            
+            alert(`AUDIT REPORT GENERATED\n\nStatus: ${report.summary.status}\nScore: ${report.summary.complianceScore}%\n\nCheck console for details.`);
+            console.log('MMS Safety System Audit Report:', report);
+        }
+
+        // Helper functions
+        function calculateProgress() {
+            let total = 0;
+            let completed = 0;
+            
+            deploymentPhases.forEach(phase => {
+                total += phase.items.length;
+                completed += phase.items.filter(i => i.status === 'completed').length;
+            });
+            
+            return total > 0 ? Math.round((completed / total) * 100) : 0;
+        }
+
+        function generateRecommendations() {
+            const pendingPhases = deploymentPhases.filter(p => p.status !== 'completed');
+            const recommendations = [];
+            
+            if (pendingPhases.length > 0) {
+                recommendations.push('Complete pending phases: ' + 
+                    pendingPhases.map(p => p.title).join(', '));
+            }
+            
+            const criticalItems = deploymentPhases.flatMap(p => 
+                p.items.filter(i => i.status !== 'completed' && 
+                    (i.title.includes('Security') || i.title.includes('Firebase') || i.title.includes('Authentication')))
+            );
+            
+            if (criticalItems.length > 0) {
+                recommendations.push('Prioritize critical security items: ' + 
+                    criticalItems.map(i => i.title).join(', '));
+            }
+            
+            if (calculateProgress() < 100) {
+                recommendations.push('Schedule final user acceptance testing');
+                recommendations.push('Prepare deployment announcement and training materials');
+            }
+            
+            return recommendations;
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', initChecklist);
+    </script>
+
+    <!-- jsPDF for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</body>
+</html>

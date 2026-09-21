@@ -6,8 +6,8 @@
     <title>Dashboard — MMS Safety</title>
 
     <link rel="manifest" href="./manifest.json" crossorigin="use-credentials">
-    <link rel="icon" href="./icons/icon-128x128.png" type="image/png">
-    <link rel="apple-touch-icon" href="./icons/icon-144x144.png">
+    <link rel="icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQH-OX7pJFjc3CfaHaBNc9u3xtN9VqAh3PAvoJxRmQBng&s=10" type="image/png">
+    <link rel="apple-touch-icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQH-OX7pJFjc3CfaHaBNc9u3xtN9VqAh3PAvoJxRmQBng&s=10">
     <meta name="application-name" content="MMS Safety">
     <meta name="apple-mobile-web-app-title" content="MMS Safety">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -50,38 +50,63 @@
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body.auth-pending > *:not(script) { visibility: hidden !important; }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-            background: var(--bg);
             color: var(--text);
             line-height: 1.55;
             -webkit-font-smoothing: antialiased;
             font-size: 15px;
+            background-color: #eef2f6;
+            background-image:
+                linear-gradient(rgba(248, 250, 252, 0.94), rgba(238, 242, 246, 0.94)),
+                url('https://static.wixstatic.com/media/a590e2_43d83c2cac9f4285999d8972872350c0~mv2.jpg/v1/fill/w_1920,h_1080,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/MMS-Web-3.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
         }
 
         /* HEADER */
         .header {
             position: sticky; top: 0; z-index: 90;
-            background: rgba(255,255,255,0.94);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
             border-bottom: 1px solid var(--border);
             padding: 0.85rem 2rem;
+            background-image:
+                linear-gradient(90deg, rgba(255,255,255,0.96) 0%, rgba(255,255,255,0.90) 100%),
+                url('https://static.wixstatic.com/media/a590e2_f1c6f65d4f82488ea5e51b936e428eb0~mv2.jpg/v1/fill/w_1200,h_120,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/a590e2_f1c6f65d4f82488ea5e51b936e428eb0~mv2.jpg');
+            background-size: cover;
+            background-position: center;
         }
         .header-inner {
             max-width: 1400px; margin: 0 auto;
             display: flex; align-items: center; justify-content: space-between;
             gap: 1rem;
         }
-        .brand { display: flex; align-items: center; gap: 0.7rem; text-decoration: none; color: inherit; transition: opacity 0.15s; }
+        .brand {
+            display: flex; align-items: center; gap: 0.7rem;
+            text-decoration: none; color: inherit;
+            transition: opacity 0.15s;
+        }
         .brand:hover { opacity: 0.85; }
+
+        /* REAL MMS logo */
         .brand-icon {
-            width: 40px; height: 40px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            color: white; border-radius: 11px;
+            width: 44px; height: 44px;
+            background: #ffffff;
+            border-radius: 11px;
             display: flex; align-items: center; justify-content: center;
-            font-weight: 800; font-size: 0.85rem;
-            box-shadow: 0 4px 10px rgba(220,38,38,0.25); flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(15,23,42,0.10), 0 0 0 1px rgba(226,232,240,0.9);
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .brand-icon img {
+            width: 100%; height: 100%;
+            object-fit: contain;
+            padding: 3px;
         }
         .brand-text .title { font-weight: 700; font-size: 0.95rem; line-height: 1.15; }
         .brand-text .subtitle { font-size: 0.7rem; color: var(--text-light); margin-top: 0.1rem; font-weight: 500; }
@@ -131,7 +156,14 @@
         /* MAIN */
         .main-content { max-width: 1400px; margin: 0 auto; padding: 1.5rem 2rem 2rem; }
 
-        .action-bar { display: flex; gap: 0.6rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .action-bar {
+            display: flex; gap: 0.6rem; margin-bottom: 1.5rem; flex-wrap: wrap;
+            padding: 0.75rem 1rem;
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(8px);
+            border-radius: 14px;
+            border: 1px solid rgba(226,232,240,0.7);
+        }
 
         .btn {
             display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem;
@@ -151,28 +183,45 @@
         .btn-success { background: var(--success); color: white; }
         .btn-success:hover { background: #059669; }
 
-        /* STATS */
+        /* STATS — subtle industrial texture behind white */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
         .stat-card {
-            background: var(--surface); padding: 1.35rem 1.5rem;
-            border-radius: 16px; border: 1px solid var(--border);
-            cursor: pointer; transition: all 0.2s ease;
-            position: relative; overflow: hidden;
+            padding: 1.35rem 1.5rem;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            background-color: #ffffff;
+            background-image:
+                linear-gradient(135deg, rgba(255,255,255,0.96) 0%, rgba(248,250,252,0.94) 100%),
+                url('https://static.wixstatic.com/media/265674_b1a9b35d84d54d94b04255d29ecabc58~mv2.jpg/v1/fill/w_400,h_300,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/265674_b1a9b35d84d54d94b04255d29ecabc58~mv2.jpg');
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 1px 2px rgba(15,23,42,0.04);
         }
         .stat-card::before {
             content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
             background: linear-gradient(90deg, var(--primary), var(--primary-light));
             opacity: 0; transition: opacity 0.2s ease;
         }
-        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(15,23,42,0.08); }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(15,23,42,0.10); }
         .stat-card:hover::before { opacity: 1; }
-        .stat-number { font-size: 2.15rem; font-weight: 800; color: var(--gray-900); letter-spacing: -0.03em; line-height: 1; margin-bottom: 0.5rem; }
-        .stat-label { font-size: 0.78rem; color: var(--text-light); font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
-        .stat-details { margin-top: 0.9rem; padding-top: 0.75rem; border-top: 1px solid var(--gray-100); font-size: 0.78rem; color: var(--text-light); display: none; }
+        .stat-number { font-size: 2.15rem; font-weight: 800; color: var(--gray-900); letter-spacing: -0.03em; line-height: 1; margin-bottom: 0.5rem; position: relative; }
+        .stat-label { font-size: 0.78rem; color: var(--text-light); font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; position: relative; }
+        .stat-details { margin-top: 0.9rem; padding-top: 0.75rem; border-top: 1px solid var(--gray-100); font-size: 0.78rem; color: var(--text-light); display: none; position: relative; }
         .stat-card:hover .stat-details { display: block; }
 
         /* CARD */
-        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.35rem 1.5rem; margin-bottom: 1.5rem; }
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.35rem 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 2px rgba(15,23,42,0.03);
+        }
         .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1.15rem; flex-wrap: wrap; }
         .card-title { font-size: 0.98rem; font-weight: 700; color: var(--gray-900); }
         .card-subtitle { font-size: 0.78rem; color: var(--text-light); margin-top: 0.2rem; }
@@ -193,7 +242,14 @@
         .quick-action-hint { font-size: 0.7rem; color: var(--text-light); margin-top: 0.15rem; }
 
         /* MODULES */
-        .modules-section { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; }
+        .modules-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 2px rgba(15,23,42,0.03);
+        }
         .modules-section-header { margin-bottom: 1.5rem; }
         .modules-section-title { font-size: 1.15rem; font-weight: 700; color: var(--gray-900); }
         .modules-section-subtitle { font-size: 0.82rem; color: var(--text-light); margin-top: 0.25rem; }
@@ -219,9 +275,14 @@
 
         /* CHART */
         .chart-container {
-            background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
-            padding: 1.35rem 1.5rem 1.5rem; margin-bottom: 1.5rem;
-            height: 400px; display: flex; flex-direction: column;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.35rem 1.5rem 1.5rem;
+            margin-bottom: 1.5rem;
+            height: 400px;
+            display: flex; flex-direction: column;
+            box-shadow: 0 1px 2px rgba(15,23,42,0.03);
         }
         .chart-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem; }
         .chart-title { font-size: 0.98rem; font-weight: 700; }
@@ -243,12 +304,23 @@
         .date-input:focus { outline: none; border-color: var(--primary); }
         .chart-canvas-container { flex: 1; min-height: 0; position: relative; }
 
-        /* FOOTER */
+        /* FOOTER — dark branded with industrial image overlay */
         .footer {
-            text-align: center; padding: 1.5rem 0 0.5rem; margin-top: 1.5rem;
-            border-top: 1px solid var(--border); font-size: 0.78rem; color: var(--gray-400);
+            text-align: center; padding: 1.75rem 2rem;
+            margin-top: 1.5rem;
+            font-size: 0.78rem; color: #cbd5e1;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.06);
+            position: relative;
+            overflow: hidden;
+            background-color: #0f172a;
+            background-image:
+                linear-gradient(135deg, rgba(15,23,42,0.94) 0%, rgba(30,41,59,0.88) 50%, rgba(127,29,29,0.78) 100%),
+                url('https://static.wixstatic.com/media/a590e2_f1c6f65d4f82488ea5e51b936e428eb0~mv2.jpg/v1/fill/w_1600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/a590e2_f1c6f65d4f82488ea5e51b936e428eb0~mv2.jpg');
+            background-size: cover;
+            background-position: center;
         }
-        .footer .brand-credit { color: var(--gray-600); font-weight: 700; }
+        .footer .brand-credit { color: #f1f5f9; font-weight: 700; }
 
         /* TABLES */
         .data-table { width: 100%; border-collapse: collapse; margin-top: 0.75rem; }
@@ -487,7 +559,11 @@
         <header class="header">
             <div class="header-inner">
                 <a href="./index.html" class="brand" title="Back to Home">
-                    <div class="brand-icon">MMS</div>
+                    <div class="brand-icon">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQH-OX7pJFjc3CfaHaBNc9u3xtN9VqAh3PAvoJxRmQBng&s=10"
+                             alt="MMS Logo"
+                             onerror="this.onerror=null; this.src='https://static.wixstatic.com/media/b8f1ed_7de9eb33cb2b4da8b111d879a1443bd5~mv2.png/v1/fill/w_200,h_200,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/mms_integrated%20operational%20management.png';">
+                    </div>
                     <div class="brand-text">
                         <div class="title">Metal Management</div>
                         <div class="subtitle">ISO 45001 OH&S System</div>
@@ -719,10 +795,14 @@
                     </div>
                 </div>
             </div>
+
             <!-- Predictive Analytics Widget -->
+            <div id="predictiveWidgetMount"></div>
             <!-- Lone Worker Monitor -->
             <div id="loneWorkerWidgetMount"></div>
-            <div id="predictiveWidgetMount"></div>
+            <!-- Subscription & Billing -->
+            <div id="subscriptionWidgetMount"></div>
+
             <!-- Trend Chart -->
             <div class="chart-container">
                 <div class="chart-header">
@@ -777,9 +857,7 @@
             </div>
         </div>
 
-        <!-- ═══════════════════════════════════════════════════
-             MODAL 1 — Report Incident
-             ═══════════════════════════════════════════════════ -->
+        <!-- ═══════════ MODAL 1 — Report Incident ═══════════ -->
         <div id="reportIncidentModal" class="modal">
             <div class="modal-content">
                 <button class="close-modal" onclick="closeModal('reportIncidentModal')">×</button>
@@ -1509,55 +1587,25 @@
             </div>
         </div>
 
-        <!-- ═══════════ MODAL 20 — Hazard Identification (ISO 6.1.2) ═══════════ -->
+        <!-- ═══════════ MODAL 20 — Hazard Identification ═══════════ -->
         <div id="hazardModal" class="modal">
             <div class="modal-content" style="max-width: 1100px;">
                 <button class="close-modal" onclick="closeModal('hazardModal')">×</button>
                 <div class="modal-header"><h2>Hazard Identification & JHA/JSA</h2><p>Hazard identification and assessment of risks</p></div>
-                <div id="hazardContent">
-                    <div style="text-align: center; padding: 3rem;">
-                        <div style="font-size: 4rem;">⚠️</div>
-                        <h3>Hazard Identification Module</h3>
-                        <p style="color: var(--text-light); margin-top: 0.5rem;">Full implementation delivered in <code>js/modules/hazard-identification.js</code> (next file).</p>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 2rem; text-align: left;">
-                            <div style="background: var(--gray-50); padding: 1rem; border-radius: 8px;">
-                                <strong>JHA / JSA Templates</strong>
-                                <div style="font-size: 0.85rem; color: var(--text-light); margin-top: 0.25rem;">Job Hazard Analysis for metal-handling tasks</div>
-                            </div>
-                            <div style="background: var(--gray-50); padding: 1rem; border-radius: 8px;">
-                                <strong>Hierarchy of Controls</strong>
-                                <div style="font-size: 0.85rem; color: var(--text-light); margin-top: 0.25rem;">Elimination → Substitution → Engineering → Admin → PPE</div>
-                            </div>
-                            <div style="background: var(--gray-50); padding: 1rem; border-radius: 8px;">
-                                <strong>Risk Matrix</strong>
-                                <div style="font-size: 0.85rem; color: var(--text-light); margin-top: 0.25rem;">Likelihood × Severity scoring</div>
-                            </div>
-                            <div style="background: var(--gray-50); padding: 1rem; border-radius: 8px;">
-                                <strong>LOTOTO Builder</strong>
-                                <div style="font-size: 0.85rem; color: var(--text-light); margin-top: 0.25rem;">Lockout/Tagout/Tryout procedures</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <div id="hazardContent"></div>
             </div>
         </div>
 
-        <!-- ═══════════ MODAL 21 — Interested Parties (ISO 4.2) ═══════════ -->
+        <!-- ═══════════ MODAL 21 — Interested Parties ═══════════ -->
         <div id="stakeholderModal" class="modal">
             <div class="modal-content" style="max-width: 1100px;">
                 <button class="close-modal" onclick="closeModal('stakeholderModal')">×</button>
                 <div class="modal-header"><h2>Interested Parties Register</h2><p>Understanding needs and expectations of workers and other interested parties</p></div>
-                <div id="stakeholderContent">
-                    <div style="text-align: center; padding: 3rem;">
-                        <div style="font-size: 4rem;">🤝</div>
-                        <h3>Stakeholder Register</h3>
-                        <p style="color: var(--text-light); margin-top: 0.5rem;">Full implementation delivered in <code>js/modules/stakeholder-register.js</code> (next file).</p>
-                    </div>
-                </div>
+                <div id="stakeholderContent"></div>
             </div>
         </div>
 
-        <!-- ═══════════ MODAL 22 — Legal Requirements (ISO 6.1.3) ═══════════ -->
+        <!-- ═══════════ MODAL 22 — Legal Requirements ═══════════ -->
         <div id="complianceObligationsModal" class="modal">
             <div class="modal-content" style="max-width: 1100px;">
                 <button class="close-modal" onclick="closeModal('complianceObligationsModal')">×</button>
@@ -1566,7 +1614,7 @@
             </div>
         </div>
 
-        <!-- ═══════════ MODAL 23 — Management Review (ISO 9.3) ═══════════ -->
+        <!-- ═══════════ MODAL 23 — Management Review ═══════════ -->
         <div id="managementReviewModal" class="modal">
             <div class="modal-content" style="max-width: 1100px;">
                 <button class="close-modal" onclick="closeModal('managementReviewModal')">×</button>
@@ -1575,7 +1623,7 @@
             </div>
         </div>
 
-        <!-- ═══════════ MODAL 24 — Corrective Actions (ISO 10.2) ═══════════ -->
+        <!-- ═══════════ MODAL 24 — Corrective Actions ═══════════ -->
         <div id="correctiveActionsModal" class="modal">
             <div class="modal-content" style="max-width: 1100px;">
                 <button class="close-modal" onclick="closeModal('correctiveActionsModal')">×</button>

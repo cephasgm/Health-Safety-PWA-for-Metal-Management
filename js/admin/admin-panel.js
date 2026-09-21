@@ -37,11 +37,15 @@ class AdminPanel {
   }
 
   checkAdminAccess() {
+    // Modern source: auth-bootstrap.js sets window.mmsCurrentUser
+    const modernUser = window.mmsCurrentUser;
+    if (modernUser && modernUser.isAdmin) return true;
+
+    // Legacy source: auth-system.js sets window.mmsAuth
     const userInfo = window.mmsAuth?.getUserInfo?.();
-    const isAdmin = userInfo?.role === 'admin';
-    
+    const isAdmin = userInfo?.role === 'admin' || modernUser?.role === 'admin';
+
     if (!isAdmin) {
-      // Hide admin panel if not admin
       const adminPanels = document.querySelectorAll('[data-permission="admin"]');
       adminPanels.forEach(panel => {
         panel.style.display = 'none';

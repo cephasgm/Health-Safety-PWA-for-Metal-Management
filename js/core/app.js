@@ -1584,3 +1584,269 @@ function uploadStandardAttachment()  { /* wired by future file */ }
 function uploadPPEDocument()         { /* wired by future file */ }
 
 console.log('[MMS app.js] Business logic loaded — all functions globally available.');
+// ==================================================================
+// PHASE 6 PATCH — Wire real modules into placeholder modals
+// ==================================================================
+(function patchModuleLoaders() {
+
+    // ---------- Risk Calculator ----------
+    window.loadRiskCalculator = function () {
+        var el = document.getElementById('riskCalculatorContent');
+        if (!el) return;
+        if (window.riskCalculator && typeof window.riskCalculator.generateAssessmentForm === 'function') {
+            el.innerHTML = window.riskCalculator.generateAssessmentForm();
+        } else {
+            el.innerHTML = '<div style="text-align:center; padding:3rem; color:#64748b;">' +
+                '<div style="font-size:3rem;">⚠️</div>' +
+                '<h3>Risk Calculator not loaded</h3></div>';
+        }
+    };
+
+    // ---------- Safety Checklists ----------
+    window.loadSafetyChecklists = function () {
+        var el = document.getElementById('checklistContent');
+        if (!el) return;
+
+        if (!window.safetyChecklist) {
+            el.innerHTML = '<div style="text-align:center; padding:3rem; color:#64748b;">' +
+                '<div style="font-size:3rem;">⚠️</div>' +
+                '<h3>Checklist module not loaded</h3></div>';
+            return;
+        }
+
+        var checklists = window.safetyChecklist.checklists || {};
+        var keys = Object.keys(checklists);
+
+        if (keys.length === 0) {
+            el.innerHTML = '<div style="text-align:center; padding:3rem; color:#64748b;">' +
+                '<div style="font-size:3rem;">📋</div>' +
+                '<h3>No checklists available</h3></div>';
+            return;
+        }
+
+        var html = '<div style="margin-bottom:1rem;">' +
+            '<div style="font-weight:600; color:#0f172a; margin-bottom:0.25rem;">Available Checklists</div>' +
+            '<div style="font-size:0.82rem; color:#64748b;">Pick one to begin a live inspection</div>' +
+        '</div>' +
+        '<div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:0.85rem;">';
+
+        keys.forEach(function (key) {
+            var c = checklists[key];
+            var isCritical = (c.items || []).some(function (i) { return i.critical; });
+            html += '<button class="module-item" onclick="window.__openChecklist(\'' + key + '\')" ' +
+                'style="text-align:left; padding:1rem;">' +
+                '<span class="mi-icon">' + (isCritical ? '⚠️' : '✅') + '</span>' +
+                '<span class="mi-label">' +
+                    '<div style="font-weight:600;">' + escapeHtml(c.title) + '</div>' +
+                    '<div style="font-size:0.75rem; color:#94a3b8; margin-top:0.15rem;">' +
+                        (c.frequency || '').toUpperCase() + ' · ' + (c.items || []).length + ' items' +
+                    '</div>' +
+                '</span>' +
+            '</button>';
+        });
+
+        html += '</div>';
+        el.innerHTML = html;
+    };
+
+    window.__openChecklist = function (checklistKey) {
+        var el = document.getElementById('checklistContent');
+        if (!el || !window.safetyChecklist) return;
+        // Inject a container and let the real module render inside it
+        el.innerHTML = '<div id="activeChecklistContainer"></div>' +
+            '<div style="margin-top:1rem;"><button class="btn btn-outline btn-sm" onclick="window.loadSafetyChecklists()">← Back to list</button></div>';
+        setTimeout(function () {
+            window.safetyChecklist.renderChecklistUI(checklistKey, 'activeChecklistContainer');
+        }, 50);
+    };
+
+    // ---------- Safety Observations ----------
+    window.loadSafetyObservations = function () {
+        var el = document.getElementById('observationContent');
+        if (!el) return;
+
+        if (!window.safetyObservations) {
+            el.innerHTML = '<div style="text-align:center; padding:3rem; color:#64748b;">' +
+                '<div style="font-size:3rem;">⚠️</div>' +
+                '<h3>Observations module not loaded</h3></div>';
+            return;
+        }
+
+        var categories = window.safetyObservations.observationCategories || [];
+        var types = window.safetyObservations.observationTypes || [];
+
+        var html = '' +
+            '<div style="display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-bottom:1.25rem; flex-wrap:wrap;">' +
+                '<div>' +
+                    '<div style="font-weight:600;">Record a Safety Observation</div>' +
+                    '<div style="font-size:0.82rem; color:#64748b; margin-top:0.15rem;">Positive catches, hazards, and unsafe conditions</div>' +
+                '</div>' +
+            '</div>' +
+
+            '<div class="form-row">' +
+                '<div class="form-group"><label>Category</label>' +
+                    '<select id="obs-category">' +
+                        categories.map(function (c) {
+                            return '<option value="' + c.id + '">' + escapeHtml(c.name) + '</option>';
+                        }).join('') +
+                    '</select>' +
+                '</div>' +
+                '<div class="form-group"><label>Type</label>' +
+                    '<select id="obs-type">' +
+                        types.map(function (t) {
+                            return '<option value="' + t.id + '">' + escapeHtml(t.name) + '</option>';
+                        }).join('') +
+                    '</select>' +
+                '</div>' +
+            '</div>' +
+
+            '<div class="form-row">' +
+                '<div class="form-group"><label>Location</label>' +
+                    '<input type="text" id="obs-location" placeholder="e.g., Cape Town HQ — Yard B">' +
+                '</div>' +
+                '<div class="form-group"><label>Risk Level</label>' +
+                    '<select id="obs-risk">' +
+                        '<option value="low">Low</option>' +
+                        '<option value="medium">Medium</option>' +
+                        '<option value="high">High</option>' +
+                        '<option value="critical">Critical</option>' +
+                    '</select>' +
+                '</div>' +
+            '</div>' +
+
+            '<div class="form-group"><label>Title</label>' +
+                '<input type="text" id="obs-title" placeholder="Short summary">' +
+            '</div>' +
+
+            '<div class="form-group"><label>Description</label>' +
+                '<textarea id="obs-description" rows="3" placeholder="What did you observe?"></textarea>' +
+            '</div>' +
+
+            '<div class="form-group"><label>Immediate Action Taken</label>' +
+                '<textarea id="obs-action" rows="2" placeholder="What did you do about it right away?"></textarea>' +
+            '</div>' +
+
+            '<div class="action-buttons">' +
+                '<button class="btn btn-primary" onclick="window.__saveObservation()">💾 Save Observation</button>' +
+                '<button class="btn btn-outline" onclick="window.loadSafetyObservations()">Reset</button>' +
+            '</div>' +
+
+            '<div id="obs-recent" style="margin-top:2rem;"></div>';
+
+        el.innerHTML = html;
+        window.__refreshRecentObservations();
+    };
+
+    window.__saveObservation = function () {
+        var category = (document.getElementById('obs-category') || {}).value;
+        var type = (document.getElementById('obs-type') || {}).value;
+        var location = (document.getElementById('obs-location') || {}).value;
+        var risk = (document.getElementById('obs-risk') || {}).value;
+        var title = (document.getElementById('obs-title') || {}).value;
+        var description = (document.getElementById('obs-description') || {}).value;
+        var action = (document.getElementById('obs-action') || {}).value;
+
+        if (!title || !description) {
+            alert('Please enter a title and description.');
+            return;
+        }
+
+        var data = {
+            category: category,
+            type: type,
+            location: location,
+            risk_level: risk,
+            title: title,
+            description: description,
+            immediate_action: action,
+            observed_date: new Date().toISOString()
+        };
+
+        window.safetyObservations.recordObservation(data).then(function (result) {
+            if (result.success) {
+                showToast('Observation Saved', 'Ref: ' + result.observation.id, 'success');
+                window.loadSafetyObservations();
+            } else {
+                showToast('Save Failed', result.error || 'Unknown error', 'error');
+            }
+        });
+    };
+
+    window.__refreshRecentObservations = function () {
+        var host = document.getElementById('obs-recent');
+        if (!host || !window.safetyObservations) return;
+        window.safetyObservations.getObservations({}).then(function (res) {
+            var items = (res && res.data) ? res.data.slice(0, 5) : [];
+            if (items.length === 0) {
+                host.innerHTML = '<div style="padding:1rem; background:#f8fafc; border-radius:10px; font-size:0.85rem; color:#64748b;">No observations recorded yet.</div>';
+                return;
+            }
+            var html = '<div style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.5px; color:#64748b; font-weight:700; margin-bottom:0.5rem;">Recent Observations</div>';
+            items.forEach(function (o) {
+                html += '<div style="padding:0.75rem 0.9rem; background:#f8fafc; border-radius:8px; margin-bottom:0.5rem;">' +
+                    '<div style="font-weight:600; font-size:0.87rem;">' + escapeHtml(o.title || '') + '</div>' +
+                    '<div style="font-size:0.75rem; color:#64748b; margin-top:0.15rem;">' +
+                        escapeHtml(o.location || '—') + ' · ' + escapeHtml(o.risk_level || 'low') +
+                    '</div>' +
+                '</div>';
+            });
+            host.innerHTML = html;
+        });
+    };
+
+    // ---------- Incident Investigator ----------
+    window.loadIncidentInvestigator = function () {
+        var el = document.getElementById('investigationContent');
+        if (!el) return;
+
+        if (!window.incidentInvestigator) {
+            el.innerHTML = '<div style="text-align:center; padding:3rem; color:#64748b;">' +
+                '<div style="font-size:3rem;">⚠️</div>' +
+                '<h3>Investigation module not loaded</h3></div>';
+            return;
+        }
+
+        el.innerHTML = '<div style="text-align:center; padding:2rem; color:#64748b;">Loading investigations…</div>';
+
+        window.incidentInvestigator.getOpenInvestigations().then(function (res) {
+            var items = (res && res.data) ? res.data : [];
+            var html = '' +
+                '<div style="display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-bottom:1.25rem; flex-wrap:wrap;">' +
+                    '<div>' +
+                        '<div style="font-weight:600;">Open Investigations</div>' +
+                        '<div style="font-size:0.82rem; color:#64748b; margin-top:0.15rem;">' + items.length + ' active</div>' +
+                    '</div>' +
+                    '<button class="btn btn-primary btn-sm" onclick="window.__startInvestigationDialog()">+ Start New Investigation</button>' +
+                '</div>';
+
+            if (items.length === 0) {
+                html += '<div style="text-align:center; padding:2.5rem 1rem; color:#64748b; border:1px dashed #cbd5e1; border-radius:12px;">' +
+                    '<div style="font-size:3rem; margin-bottom:0.5rem;">🔍</div>' +
+                    '<div style="font-weight:600; color:#0f172a; margin-bottom:0.35rem;">No open investigations</div>' +
+                    '<div style="font-size:0.85rem;">Investigations appear here once started from a reported incident.</div>' +
+                '</div>';
+            } else {
+                items.forEach(function (inv) {
+                    html += '<div style="padding:0.9rem 1.1rem; background:#f8fafc; border-radius:10px; margin-bottom:0.6rem; border-left:3px solid #dc2626;">' +
+                        '<div style="font-weight:600;">' + escapeHtml(inv.incident_type || 'Investigation') + ' — ' + escapeHtml(inv.incident_id || inv.id) + '</div>' +
+                        '<div style="font-size:0.8rem; color:#64748b; margin-top:0.25rem;">' +
+                            'Stage: ' + (inv.current_stage || 1) + ' / ' + (inv.total_stages || 0) +
+                            ' · Progress: ' + (inv.progress_percentage || 0) + '%' +
+                        '</div>' +
+                    '</div>';
+                });
+            }
+
+            el.innerHTML = html;
+        });
+    };
+
+    window.__startInvestigationDialog = function () {
+        var incidentId = prompt('Enter incident ID to investigate (e.g., INC-123456):', '');
+        if (!incidentId) return;
+        if (!window.mmsCurrentUser) { alert('Sign in required.'); return; }
+        window.startInvestigation(incidentId);
+    };
+
+    console.log('[app.js] Module loaders patched — real modules now wired');
+})();

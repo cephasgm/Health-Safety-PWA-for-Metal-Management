@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=5, viewport-fit=cover">
+    <title>Sign In — MMS Safety</title>
+
+    <link rel="manifest" href="./manifest.json" crossorigin="use-credentials">
+    <link rel="icon" href="./icons/icon-128x128.png" type="image/png">
+    <link rel="apple-touch-icon" href="./icons/icon-144x144.png">
+    <meta name="application-name" content="MMS Safety">
+    <meta name="apple-mobile-web-app-title" content="MMS Safety">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#dc2626">
+
+    <style>
+        :root {
+            --primary: #dc2626;
+            --primary-dark: #b91c1c;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --dark: #0f172a;
+            --dark-2: #1e293b;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--dark) 0%, var(--dark-2) 100%);
+            display: flex; flex-direction: column; color: var(--text);
+        }
+        .auth-header { padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; }
+        .mms-logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: white; transition: opacity 0.2s; }
+        .mms-logo:hover { opacity: 0.85; }
+        .mms-logo-icon {
+            width: 40px; height: 40px; background: var(--primary); border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 800; font-size: 0.9rem;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+        }
+        .mms-logo-text .title { font-weight: 700; font-size: 1rem; }
+        .mms-logo-text .subtitle { font-size: 0.75rem; color: #94a3b8; }
+        .back-link {
+            color: #cbd5e1; text-decoration: none; font-size: 0.9rem;
+            padding: 0.5rem 0.9rem; border-radius: 8px; transition: all 0.2s;
+            display: inline-flex; align-items: center; gap: 0.4rem;
+        }
+        .back-link:hover { background: rgba(255,255,255,0.08); color: white; }
+
+        .auth-main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
+        .auth-card {
+            background: white; padding: 2.75rem 2.5rem; border-radius: 20px;
+            box-shadow: 0 25px 70px rgba(0,0,0,0.35); width: 100%; max-width: 440px;
+            border-top: 6px solid var(--primary); position: relative; overflow: hidden;
+        }
+        .auth-card .brand-mark {
+            width: 68px; height: 68px; background: var(--primary); border-radius: 16px;
+            margin: 0 auto 1.25rem; display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 800; font-size: 1.5rem;
+            box-shadow: 0 10px 25px rgba(220, 38, 38, 0.4); letter-spacing: 0.5px;
+        }
+        .auth-card h1 { text-align: center; font-size: 1.55rem; font-weight: 700; margin-bottom: 0.4rem; color: var(--text); }
+        .auth-card .subhead { text-align: center; color: var(--text-light); font-size: 0.95rem; margin-bottom: 2rem; }
+
+        .form-group { margin-bottom: 1.1rem; text-align: left; }
+        .form-group label { display: block; margin-bottom: 0.4rem; color: var(--text); font-weight: 500; font-size: 0.9rem; }
+        .form-group input {
+            width: 100%; padding: 0.85rem 1rem; border: 2px solid var(--border); border-radius: 10px;
+            font-size: 0.95rem; font-family: inherit; transition: all 0.25s; outline: none;
+            background: white; color: var(--text);
+        }
+        .form-group input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1); }
+
+        .alert {
+            padding: 0.85rem 1rem; border-radius: 9px; font-size: 0.88rem;
+            margin-bottom: 1.25rem; display: none; text-align: left;
+        }
+        .alert-error { background: #fee2e2; color: #991b1b; border-left: 4px solid #ef4444; }
+        .alert-success { background: #dcfce7; color: #166534; border-left: 4px solid #10b981; }
+        .alert.show { display: block; }
+
+        .btn-submit {
+            width: 100%; padding: 1rem;
+            background: linear-gradient(135deg, var(--primary), #ef4444);
+            color: white; border: none; border-radius: 10px;
+            font-size: 1rem; font-weight: 600; cursor: pointer;
+            transition: all 0.25s; font-family: inherit;
+            box-shadow: 0 6px 20px rgba(220, 38, 38, 0.3); margin-top: 0.5rem;
+        }
+        .btn-submit:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(220, 38, 38, 0.4); }
+        .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .forgot-link {
+            display: block; text-align: right; margin-top: -0.5rem; margin-bottom: 1.25rem;
+            font-size: 0.83rem; color: var(--primary); text-decoration: none;
+        }
+        .forgot-link:hover { text-decoration: underline; }
+
+        /* ─── Divider + alt links ─── */
+        .alt-divider {
+            display: flex; align-items: center; gap: 0.75rem;
+            margin: 1.75rem 0 1.25rem;
+            font-size: 0.75rem; color: var(--text-light);
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .alt-divider::before, .alt-divider::after {
+            content: ''; flex: 1; height: 1px; background: var(--border);
+        }
+
+        .alt-links {
+            display: flex; flex-direction: column; gap: 0.6rem;
+        }
+        .alt-btn {
+            display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+            width: 100%; padding: 0.85rem 1rem;
+            border: 2px solid var(--border); border-radius: 10px;
+            background: white; color: var(--text);
+            font-size: 0.92rem; font-weight: 600;
+            text-decoration: none; cursor: pointer;
+            transition: all 0.2s; font-family: inherit;
+        }
+        .alt-btn:hover { border-color: var(--primary); color: var(--primary); background: #fef2f2; }
+        .alt-btn.primary-outline { border-color: var(--primary); color: var(--primary); }
+        .alt-btn.primary-outline:hover { background: var(--primary); color: white; }
+
+        .auth-footer-note {
+            text-align: center; margin-top: 1.75rem; font-size: 0.83rem;
+            color: var(--text-light); border-top: 1px solid #f1f5f9;
+            padding-top: 1.25rem; line-height: 1.5;
+        }
+
+        .site-footer { padding: 1.25rem 2rem; text-align: center; font-size: 0.82rem; color: #64748b; }
+        .site-footer .brand-credit { color: #cbd5e1; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+    <header class="auth-header">
+        <a href="./index.html" class="mms-logo" title="Metal Management Solutions — Home">
+            <div class="mms-logo-icon">MMS</div>
+            <div class="mms-logo-text">
+                <div class="title">Metal Management Solutions</div>
+                <div class="subtitle">ISO 45001 OH&S System</div>
+            </div>
+        </a>
+        <a href="./index.html" class="back-link">← Back to Home</a>
+    </header>
+
+    <main class="auth-main">
+        <div class="auth-card">
+            <div class="brand-mark">MMS</div>
+            <h1>Welcome Back</h1>
+            <p class="subhead">Sign in to access the Safety Management System</p>
+
+            <div class="alert alert-error" id="authError"></div>
+            <div class="alert alert-success" id="authSuccess"></div>
+
+            <form id="signinForm" onsubmit="handleMMSLogin(event)">
+                <div class="form-group">
+                    <label for="prodEmail">Company Email</label>
+                    <input type="email" id="prodEmail" placeholder="you@mms.com" autocomplete="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="prodPassword">Password</label>
+                    <input type="password" id="prodPassword" placeholder="••••••••" autocomplete="current-password" required>
+                </div>
+                <a href="#" class="forgot-link" onclick="handleForgotPassword(event)">Forgot password?</a>
+                <button type="submit" class="btn-submit" id="signinBtn">🔐 Sign In to Safety System</button>
+            </form>
+
+            <div class="alt-divider">New to MMS Safety?</div>
+
+            <div class="alt-links">
+                <a href="./signup.html" class="alt-btn primary-outline">
+                    ✨ Create Account
+                </a>
+                <a href="./signup.html?pilot=1" class="alt-btn">
+                    🚀 Request Pilot Access (Free 3 Months)
+                </a>
+            </div>
+
+            <div class="auth-footer-note">
+                ⚠️ Authorized personnel only<br>
+                Need help? <a href="mailto:support@mms.com" style="color: var(--primary); text-decoration: none;">support@mms.com</a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        Copyright © 2025 <span class="brand-credit">Cephas GM</span> | Innovating for Tomorrow
+    </footer>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         REAL FIREBASE AUTH — NO MOCKS
+         ═══════════════════════════════════════════════════════════ -->
+    <script type="module">
+        import { auth } from './js/core/firebase-config.js';
+        import {
+            signInWithEmailAndPassword,
+            sendPasswordResetEmail,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+        if (!auth) {
+            console.error('❌ firebase-config.js did not export { auth }. Check its exports.');
+            document.addEventListener('DOMContentLoaded', () => {
+                showError('Configuration error: Firebase not initialized. Contact IT.');
+            });
+        }
+
+        // Already signed in → skip the form
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                const params = new URLSearchParams(window.location.search);
+                const next = params.get('next') || './dashboard.html';
+                window.location.replace(next);
+            }
+        });
+
+        function clearMessages() {
+            document.getElementById('authError').classList.remove('show');
+            document.getElementById('authSuccess').classList.remove('show');
+        }
+        function showError(msg) {
+            const el = document.getElementById('authError');
+            el.textContent = msg;
+            el.classList.add('show');
+        }
+        function showSuccess(msg) {
+            const el = document.getElementById('authSuccess');
+            el.textContent = msg;
+            el.classList.add('show');
+        }
+        function friendlyAuthError(err) {
+            const code = err?.code || '';
+            switch (code) {
+                case 'auth/invalid-email':          return 'That email address is not valid.';
+                case 'auth/user-disabled':          return 'This account has been disabled. Contact IT.';
+                case 'auth/user-not-found':         return 'No account found with that email.';
+                case 'auth/wrong-password':         return 'Incorrect password.';
+                case 'auth/invalid-credential':     return 'Incorrect email or password.';
+                case 'auth/too-many-requests':      return 'Too many failed attempts. Try again later.';
+                case 'auth/network-request-failed': return 'Network error. Check your connection.';
+                case 'auth/operation-not-allowed':  return 'Email/password sign-in is not enabled in Firebase.';
+                default:                            return err?.message || 'Something went wrong. Please try again.';
+            }
+        }
+
+        // ─── SIGN IN ───
+        window.handleMMSLogin = async function (event) {
+            if (event) event.preventDefault();
+            clearMessages();
+
+            const email = document.getElementById('prodEmail').value.trim();
+            const password = document.getElementById('prodPassword').value;
+            const btn = document.getElementById('signinBtn');
+
+            if (!email || !password) {
+                showError('Please enter both email and password.');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = '⏳ Signing in...';
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                showSuccess('✅ Signed in. Redirecting...');
+                const params = new URLSearchParams(window.location.search);
+                const next = params.get('next') || './dashboard.html';
+                setTimeout(() => { window.location.href = next; }, 400);
+            } catch (err) {
+                console.error('[signin] Firebase error:', err.code, err.message);
+                showError(friendlyAuthError(err));
+                btn.disabled = false;
+                btn.textContent = '🔐 Sign In to Safety System';
+            }
+        };
+
+        // ─── FORGOT PASSWORD ───
+        window.handleForgotPassword = async function (event) {
+            if (event) event.preventDefault();
+            clearMessages();
+
+            const email = document.getElementById('prodEmail').value.trim();
+            if (!email) {
+                showError('Enter your email above first, then click "Forgot password?".');
+                return;
+            }
+
+            try {
+                await sendPasswordResetEmail(auth, email);
+                showSuccess(`✅ Reset link sent to ${email}. Check your inbox.`);
+            } catch (err) {
+                console.error('[forgot-password] Firebase error:', err.code, err.message);
+                showError(friendlyAuthError(err));
+            }
+        };
+    </script>
+</body>
+</html>

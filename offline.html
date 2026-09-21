@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MMS Safety - Offline</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+            text-align: center;
+            line-height: 1.6;
+        }
+        
+        .offline-container {
+            max-width: 500px;
+            width: 100%;
+            background: white;
+            border-radius: 16px;
+            padding: 3rem 2rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border: 1px solid #e2e8f0;
+        }
+        
+        .offline-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            color: #dc2626;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            color: #dc2626;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+        
+        p {
+            color: #64748b;
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .features {
+            text-align: left;
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .features h3 {
+            color: #dc2626;
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+        }
+        
+        .features ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .features li {
+            margin-bottom: 0.75rem;
+            padding-left: 1.75rem;
+            position: relative;
+        }
+        
+        .features li:before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            margin: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: #dc2626;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #b91c1c;
+            transform: translateY(-1px);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
+        }
+        
+        .btn-outline:hover {
+            background: #f1f5f9;
+            border-color: #dc2626;
+            color: #dc2626;
+        }
+        
+        .connection-status {
+            margin-top: 2rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            display: none;
+        }
+        
+        .connection-status.online {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+            display: block;
+        }
+        
+        .connection-status.offline {
+            background: #fecaca;
+            color: #991b1b;
+            border: 1px solid #f87171;
+            display: block;
+        }
+        
+        .footer {
+            margin-top: 2rem;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 480px) {
+            .offline-container {
+                padding: 2rem 1rem;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-container">
+        <div class="offline-icon">📡</div>
+        <h1>You're Offline</h1>
+        <p>The MMS Safety app requires an internet connection for full functionality.</p>
+        
+        <div class="features">
+            <h3>Available Offline Features:</h3>
+            <ul>
+                <li>View cached safety data</li>
+                <li>Access incident reports</li>
+                <li>Check PPE inventory</li>
+                <li>Review training records</li>
+                <li>View employee health data</li>
+            </ul>
+        </div>
+        
+        <p>Some features will be limited until you reconnect.</p>
+        
+        <div class="connection-status offline" id="status">
+            ❌ Currently offline
+        </div>
+        
+        <div style="margin-top: 2rem;">
+            <button class="btn btn-primary" onclick="tryReconnect()">
+                🔄 Try to Reconnect
+            </button>
+            <button class="btn btn-outline" onclick="goToDashboard()">
+                🏠 Go to Dashboard
+            </button>
+        </div>
+        
+        <div class="footer">
+            Metal Management Solutions • Health & Safety System
+        </div>
+    </div>
+
+    <script>
+        function tryReconnect() {
+            const status = document.getElementById('status');
+            status.textContent = '🔄 Checking connection...';
+            status.className = 'connection-status';
+            
+            setTimeout(() => {
+                if (navigator.onLine) {
+                    status.textContent = '✅ Connection restored!';
+                    status.className = 'connection-status online';
+                    
+                    setTimeout(() => {
+                        window.location.href = './index.html';
+                    }, 1500);
+                } else {
+                    status.textContent = '❌ Still offline. Please check your connection.';
+                    status.className = 'connection-status offline';
+                }
+            }, 1000);
+        }
+        
+        function goToDashboard() {
+            window.location.href = './index.html';
+        }
+        
+        // Monitor connection status
+        window.addEventListener('online', () => {
+            const status = document.getElementById('status');
+            status.textContent = '✅ Connection restored!';
+            status.className = 'connection-status online';
+            
+            setTimeout(() => {
+                window.location.href = './index.html';
+            }, 2000);
+        });
+        
+        window.addEventListener('offline', () => {
+            const status = document.getElementById('status');
+            status.textContent = '❌ Connection lost';
+            status.className = 'connection-status offline';
+        });
+        
+        // Check initial connection
+        if (navigator.onLine) {
+            setTimeout(() => {
+                window.location.href = './index.html';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

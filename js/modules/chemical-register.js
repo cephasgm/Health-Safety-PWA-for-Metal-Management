@@ -1,5 +1,4 @@
 // Chemical Register Module - MMS Safety
-import { mmsDB } from '../core/database-service.js';
 
 class ChemicalRegister {
     constructor() {
@@ -125,7 +124,7 @@ class ChemicalRegister {
             
             // Log to Firebase
             if (window.mmsDB) {
-                await mmsDB.logAction('chemical_added', {
+                await window.mmsDB.logAction('chemical_added', {
                     chemical_id: chemicalId,
                     name: chemicalData.name,
                     hazard_class: chemicalData.hazardClass,
@@ -221,7 +220,7 @@ class ChemicalRegister {
         
         // Log to Firebase
         if (window.mmsDB) {
-            await mmsDB.logAction('chemical_reorder_alert', alert);
+            await window.mmsDB.logAction('chemical_reorder_alert', alert);
         }
         
         return alert;

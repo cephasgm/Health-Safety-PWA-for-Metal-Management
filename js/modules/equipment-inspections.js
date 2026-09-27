@@ -1,5 +1,4 @@
 // Equipment Inspections Module - MMS Safety
-import { mmsDB } from '../core/database-service.js';
 
 class EquipmentInspections {
     constructor() {
@@ -108,7 +107,7 @@ class EquipmentInspections {
             
             // Save to Firebase if available
             if (window.mmsDB) {
-                await mmsDB.logAction('equipment_added', {
+                await window.mmsDB.logAction('equipment_added', {
                     equipment_id: equipmentId,
                     type: equipmentData.type,
                     location: equipmentData.location
@@ -201,7 +200,7 @@ class EquipmentInspections {
             
             // Log to Firebase
             if (window.mmsDB) {
-                await mmsDB.logAction('inspection_completed', {
+                await window.mmsDB.logAction('inspection_completed', {
                     equipment_id: equipmentId,
                     inspection_id: inspectionId,
                     passed: results.passed,

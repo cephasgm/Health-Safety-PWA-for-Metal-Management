@@ -68,7 +68,17 @@ var locations = [
     { name: "Poseidon Zambia",       country: "Zambia" },
     { name: "Polytra Kapiri Mposhi", country: "Zambia" }
 ];
-
+// ═══════════════════════════════════════════════════════════════
+// HTML ESCAPE HELPER — used by several module loaders
+// ═══════════════════════════════════════════════════════════════
+function escapeHtml(s) {
+    return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
 // ────────────────────────────────────────────────────────────────
 // EMPTY STATE HELPER
 // ────────────────────────────────────────────────────────────────

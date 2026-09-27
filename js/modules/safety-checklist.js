@@ -1,5 +1,4 @@
 // Safety Checklist System - MMS Safety
-import { mmsDB } from '../core/database-service.js';
 
 class SafetyChecklistSystem {
     constructor() {

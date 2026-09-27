@@ -1,5 +1,4 @@
 // Safety Observations System - MMS Daily Safety Checks
-import { mmsDB } from '../core/database-service.js';
 
 class SafetyObservations {
   constructor() {
@@ -160,12 +159,14 @@ class SafetyObservations {
       await this.saveObservationToDB(observation);
       
       // Log the observation
-      await mmsDB.logAction('safety_observation_recorded', {
+      if (window.mmsDB && typeof window.mmsDB.logAction === 'function') {
+    await window.mmsDB.logAction('safety_observation_recorded', {
         observation_id: observationId,
         category: observation.category,
         type: observation.type,
-        risk_level: observation.risk_level
-      });
+              risk_level: observation.risk_level
+    });
+}
       
       console.log(`✅ Safety observation recorded: ${observationId}`);
       

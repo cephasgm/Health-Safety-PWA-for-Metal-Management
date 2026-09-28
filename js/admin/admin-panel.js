@@ -14,42 +14,55 @@ class AdminPanel {
 
   init() {
     console.log('⚙️ Admin Panel Initializing...');
-    
-    // Check if user is admin
-    if (!this.checkAdminAccess()) {
-      console.log('⛔ User is not admin, admin panel disabled');
+
+    const isAdmin = this.checkAdminAccess();
+
+    if (!isAdmin) {
+      console.log('⏸️ Admin Panel waiting for admin session…');
+      this.waitForAdmin();
       return;
     }
-    
-    // Setup migration button if needed
+
     this.setupMigrationUI();
-    
-    // Load system statistics
     this.loadSystemStats();
-    
-    // Load audit logs
     this.loadAuditLogs();
-    
-    // Setup backup schedule
     this.setupBackupSchedule();
-    
+
     console.log('✅ Admin Panel Ready');
   }
 
+  waitForAdmin() {
+    const self = this;
+    let tries = 0;
+    const check = setInterval(function () {
+      tries++;
+      const ok = window.mmsCurrentUser?.isAdmin === true
+              || window.mmsAuth?.getUserInfo?.()?.role === 'admin';
+      if (ok || tries > 40) {
+        clearInterval(check);
+        if (ok) {
+          self.setupMigrationUI();
+          self.loadSystemStats();
+          self.loadAuditLogs();
+          self.setupBackupSchedule();
+          console.log('✅ Admin Panel Ready (activated on auth)');
+        }
+      }
+    }, 500);
+  }
+
   checkAdminAccess() {
-    // Modern source: auth-bootstrap.js sets window.mmsCurrentUser
+    // Primary source: auth-bootstrap.js sets window.mmsCurrentUser
     const modernUser = window.mmsCurrentUser;
     if (modernUser && modernUser.isAdmin) return true;
 
-    // Legacy source: auth-system.js sets window.mmsAuth
-    const userInfo = window.mmsAuth?.getUserInfo?.();
-    const isAdmin = userInfo?.role === 'admin' || modernUser?.role === 'admin';
+    // Legacy fallback
+    const legacyUser = window.mmsAuth?.getUserInfo?.();
+    const isAdmin = legacyUser?.role === 'admin' || modernUser?.role === 'admin';
 
     if (!isAdmin) {
       const adminPanels = document.querySelectorAll('[data-permission="admin"]');
-      adminPanels.forEach(panel => {
-        panel.style.display = 'none';
-      });
+      adminPanels.forEach(panel => { panel.style.display = 'none'; });
       return false;
     }
     return true;
@@ -358,11 +371,9 @@ class AdminPanel {
     `;
     
     // Insert after header
-    const header = document.querySelector('.header');
+    // Insert at top of main content
     const mainContent = document.querySelector('.main-content');
-    if (header && mainContent) {
-      mainContent.insertBefore(successMsg, header.nextSibling);
-    } else if (mainContent) {
+    if (mainContent) {
       mainContent.insertBefore(successMsg, mainContent.firstChild);
     }
     
@@ -978,10 +989,10 @@ class AdminPanel {
       </div>
     `;
     
-    // Insert in header area
-    const header = document.querySelector('.header');
-    if (header) {
-      header.parentNode.insertBefore(reminder, header.nextSibling);
+    // Insert at top of main content
+    const mainContent = document.querySelector('.main-content');
+    if (mainContent) {
+      mainContent.insertBefore(reminder, mainContent.firstChild);
     }
   }
 

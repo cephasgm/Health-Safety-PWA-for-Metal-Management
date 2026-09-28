@@ -168,8 +168,8 @@
         el.innerHTML = html;
     };
 
-    // ============================================================
-    // EQUIPMENT INSPECTIONS — main loader
+        // ============================================================
+    // EQUIPMENT INSPECTIONS
     // ============================================================
     window.loadEquipmentInspections = function () {
         var el = document.getElementById('equipmentContent');
@@ -183,36 +183,113 @@
         var stats = {};
         try { stats = window.equipmentInspections.getInspectionStatistics() || {}; } catch (e) {}
 
+        var equipment = [];
+        try {
+            if (Array.isArray(window.equipmentInspections.equipment)) {
+                equipment = window.equipmentInspections.equipment;
+            } else if (typeof window.equipmentInspections.getEquipmentList === 'function') {
+                equipment = window.equipmentInspections.getEquipmentList() || [];
+            }
+        } catch (e) {}
+
         var html =
             '<div style="display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-bottom:1.25rem; flex-wrap:wrap;">' +
                 '<div>' +
                     '<div style="font-weight:600;">Equipment Inspection Manager</div>' +
-                    '<div style="font-size:0.82rem; color:#64748b; margin-top:0.15rem;">Track maintenance and inspection schedules</div>' +
+                    '<div style="font-size:0.82rem; color:#64748b; margin-top:0.15rem;">' + equipment.length + ' item' + (equipment.length === 1 ? '' : 's') + ' tracked</div>' +
                 '</div>' +
-                '<button class="btn btn-primary btn-sm" onclick="window.openEquipmentInspections()">\uD83D\uDD27 Open Manager</button>' +
+                '<button class="btn btn-primary btn-sm" onclick="window.__addEquipmentPrompt()">+ Add Equipment</button>' +
             '</div>';
 
-        if (stats && (stats.total != null || stats.overdue != null)) {
-            html += '<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:0.75rem; margin-bottom:1.25rem;">';
-            html += statTile('Total Equipment', stats.total || 0, '#0f172a');
-            html += statTile('Overdue', stats.overdue || 0, (stats.overdue > 0) ? '#dc2626' : '#065f46');
-            html += statTile('Due Soon', stats.dueSoon || 0, '#92400e');
-            html += statTile('Compliant', stats.compliant != null ? stats.compliant : (stats.uptodate || 0), '#065f46');
-            html += '</div>';
-        }
+        html += '<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:0.75rem; margin-bottom:1.25rem;">';
+        html += statTile('Total', stats.total != null ? stats.total : equipment.length, '#0f172a');
+        html += statTile('Overdue', stats.overdue || 0, (stats.overdue > 0) ? '#dc2626' : '#065f46');
+        html += statTile('Due Soon', stats.dueSoon || 0, '#92400e');
+        html += '</div>';
 
-        html += '<div style="text-align:center; padding:2rem 1rem; color:#64748b; border:1px dashed #cbd5e1; border-radius:12px;">' +
-            '<div style="font-size:2.5rem; margin-bottom:0.5rem;">\uD83D\uDD27</div>' +
-            '<div style="font-weight:600; color:#0f172a; margin-bottom:0.35rem;">Open the Equipment Manager</div>' +
-            '<div style="font-size:0.85rem; margin-bottom:1rem;">Full inspection workflow, schedules, and history</div>' +
-            '<button class="btn btn-primary" onclick="window.openEquipmentInspections()">\uD83D\uDD27 Open Equipment Manager</button>' +
-        '</div>';
+        if (equipment.length === 0) {
+            html += '<div style="text-align:center; padding:2.5rem 1rem; color:#64748b; border:1px dashed #cbd5e1; border-radius:12px;">' +
+                '<div style="font-size:3rem; margin-bottom:0.5rem;">\uD83D\uDD27</div>' +
+                '<div style="font-weight:600; color:#0f172a; margin-bottom:0.35rem;">No equipment registered yet</div>' +
+                '<div style="font-size:0.85rem; max-width:400px; margin:0 auto 1rem;">Add forklifts, cranes, presses, and other equipment to track their inspection schedules.</div>' +
+                '<button class="btn btn-primary" onclick="window.__addEquipmentPrompt()">+ Add First Equipment</button>' +
+            '</div>';
+        } else {
+            html += '<div style="overflow-x:auto; background:white; border:1px solid #e2e8f0; border-radius:10px;">' +
+                '<table class="data-table" style="width:100%; border-collapse:collapse; font-size:0.85rem;">' +
+                '<thead><tr style="background:#f8fafc;">' +
+                    '<th style="padding:0.65rem; text-align:left; font-size:0.72rem; color:#64748b; text-transform:uppercase;">Name</th>' +
+                    '<th style="padding:0.65rem; text-align:left; font-size:0.72rem; color:#64748b; text-transform:uppercase;">Type</th>' +
+                    '<th style="padding:0.65rem; text-align:left; font-size:0.72rem; color:#64748b; text-transform:uppercase;">Location</th>' +
+                    '<th style="padding:0.65rem; text-align:left; font-size:0.72rem; color:#64748b; text-transform:uppercase;">Next Due</th>' +
+                    '<th style="padding:0.65rem; text-align:left; font-size:0.72rem; color:#64748b; text-transform:uppercase;">Status</th>' +
+                '</tr></thead><tbody>';
+
+            equipment.forEach(function (item) {
+                var name = item.name || item.equipment_name || '-';
+                var type = item.type || item.equipment_type || '-';
+                var loc = item.location || '-';
+                var next = item.next_inspection || item.nextInspection || '-';
+                var status = item.status || 'Operational';
+                var cls = status === 'Overdue' ? '#fef2f2' : '#ecfdf5';
+                var fg = status === 'Overdue' ? '#991b1b' : '#065f46';
+
+                html += '<tr style="border-bottom:1px solid #f1f5f9;">' +
+                    '<td style="padding:0.65rem;">' + esc(name) + '</td>' +
+                    '<td style="padding:0.65rem;">' + esc(type) + '</td>' +
+                    '<td style="padding:0.65rem;">' + esc(loc) + '</td>' +
+                    '<td style="padding:0.65rem;">' + esc(next) + '</td>' +
+                    '<td style="padding:0.65rem;"><span style="padding:0.15rem 0.5rem; background:' + cls + '; color:' + fg + '; border-radius:6px; font-size:0.72rem; font-weight:600;">' + esc(status) + '</span></td>' +
+                '</tr>';
+            });
+
+            html += '</tbody></table></div>';
+        }
 
         el.innerHTML = html;
     };
 
+    window.__addEquipmentPrompt = function () {
+        var name = prompt('Equipment name (e.g., Forklift Toyota 8FGU25):');
+        if (!name) return;
+        var type = prompt('Type (Forklift / Crane / Press / Welder / Other):', 'Forklift');
+        if (type === null) return;
+        var location = prompt('Location:', '');
+        if (location === null) return;
+
+        var item = {
+            id: 'EQ-' + Date.now(),
+            name: name,
+            type: type || 'Other',
+            location: location || '',
+            status: 'Operational',
+            next_inspection: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            created_at: new Date().toISOString()
+        };
+
+        // Store in the module's list if available
+        try {
+            if (window.equipmentInspections) {
+                if (!Array.isArray(window.equipmentInspections.equipment)) {
+                    window.equipmentInspections.equipment = [];
+                }
+                window.equipmentInspections.equipment.push(item);
+            }
+        } catch (e) {}
+
+        // Persist to localStorage
+        try {
+            var list = JSON.parse(localStorage.getItem('mms_equipment') || '[]');
+            list.push(item);
+            localStorage.setItem('mms_equipment', JSON.stringify(list));
+        } catch (e) {}
+
+        window.loadEquipmentInspections();
+    };
+
     // ============================================================
-    // CHEMICAL REGISTER — main loader
+        // ============================================================
+    // CHEMICAL REGISTER
     // ============================================================
     window.loadChemicalRegister = function () {
         var el = document.getElementById('chemicalContent');
@@ -226,31 +303,114 @@
         var stats = {};
         try { stats = window.chemicalRegister.getChemicalStatistics() || {}; } catch (e) {}
 
+        var chemicals = [];
+        try {
+            if (Array.isArray(window.chemicalRegister.chemicals)) {
+                chemicals = window.chemicalRegister.chemicals;
+            } else if (typeof window.chemicalRegister.getChemicalList === 'function') {
+                chemicals = window.chemicalRegister.getChemicalList() || [];
+            }
+        } catch (e) {}
+
         var html =
             '<div style="display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-bottom:1.25rem; flex-wrap:wrap;">' +
                 '<div>' +
                     '<div style="font-weight:600;">Chemical Safety Register</div>' +
-                    '<div style="font-size:0.82rem; color:#64748b; margin-top:0.15rem;">Inventory, SDS, and hazard tracking</div>' +
+                    '<div style="font-size:0.82rem; color:#64748b; margin-top:0.15rem;">' + chemicals.length + ' chemical' + (chemicals.length === 1 ? '' : 's') + ' tracked</div>' +
                 '</div>' +
-                '<button class="btn btn-primary btn-sm" onclick="window.openChemicalRegister()">\uD83E\uDDEA Open Register</button>' +
+                '<button class="btn btn-primary btn-sm" onclick="window.__addChemicalPrompt()">+ Add Chemical</button>' +
             '</div>';
 
-        if (stats && (stats.total != null || stats.expiringSDS != null)) {
-            html += '<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:0.75rem; margin-bottom:1.25rem;">';
-            html += statTile('Total Chemicals', stats.total || 0, '#0f172a');
-            html += statTile('Expiring SDS', stats.expiringSDS || 0, (stats.expiringSDS > 0) ? '#92400e' : '#065f46');
-            html += statTile('Reorder Alerts', stats.reorderAlerts || 0, (stats.reorderAlerts > 0) ? '#dc2626' : '#065f46');
-            html += '</div>';
+        html += '<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:0.75rem; margin-bottom:1.25rem;">';
+        html += statTile('Total', stats.total != null ? stats.total : chemicals.length, '#0f172a');
+        html += statTile('Expiring SDS', stats.expiringSDS || 0, (stats.expiringSDS > 0) ? '#92400e' : '#065f46');
+        html += statTile('Reorder Alerts', stats.reorderAlerts || 0, (stats.reorderAlerts > 0) ? '#dc2626' : '#065f46');
+        html += '</div>';
+
+        if (chemicals.length === 0) {
+            html += '<div style="text-align:center; padding:2.5rem 1rem; color:#64748b; border:1px dashed #cbd5e1; border-radius:12px;">' +
+                '<div style="font-size:3rem; margin-bottom:0.5rem;">\uD83E\uDDEA</div>' +
+                '<div style="font-weight:600; color:#0f172a; margin-bottom:0.35rem;">No chemicals registered yet</div>' +
+                '<div style="font-size:0.85rem; max-width:400px; margin:0 auto 1rem;">Add acids, solvents, gases, and other chemicals to track SDS and inventory.</div>' +
+                '<button class="btn btn-primary" onclick="window.__addChemicalPrompt()">+ Add First Chemical</button>' +
+            '</div>';
+        } else {
+            html += '<div style="overflow-x:auto; background:white; border:1px solid #e2e8f0; border-radius:10px;">' +
+                '<table class="data-table" style="width:100%; border-collapse:collapse; font-size:0.85rem;">' +
+                '<thead><tr style="background:#f8fafc;">' +
+                    '<th style="padding:0.65rem; text-align:left; font-size:0.72rem; color:#64748b; text-transform:uppercase;">Name</th>' +
+                    '<th style="padding:0.65rem; text-align:left; font-size:0.72rem; color:#64748b; text-transform:uppercase;">Hazard Class</th>' +
+                    '<th style="padding:0.65rem; text-align:left; font-size:0.72rem; color:#64748b; text-transform:uppercase;">Location</th>' +
+                    '<th style="padding:0.65rem; text-align:left; font-size:0.72rem; color:#64748b; text-transform:uppercase;">Qty</th>' +
+                    '<th style="padding:0.65rem; text-align:left; font-size:0.72rem; color:#64748b; text-transform:uppercase;">SDS</th>' +
+                '</tr></thead><tbody>';
+
+            chemicals.forEach(function (c) {
+                var name = c.name || c.chemical_name || '-';
+                var haz = c.hazard_class || c.hazardClass || '-';
+                var loc = c.location || '-';
+                var qty = (c.quantity != null ? c.quantity : '-') + ' ' + (c.unit || '');
+                var sds = c.sds_expiry || c.sdsExpiry || '-';
+
+                html += '<tr style="border-bottom:1px solid #f1f5f9;">' +
+                    '<td style="padding:0.65rem;">' + esc(name) + '</td>' +
+                    '<td style="padding:0.65rem;">' + esc(haz) + '</td>' +
+                    '<td style="padding:0.65rem;">' + esc(loc) + '</td>' +
+                    '<td style="padding:0.65rem;">' + esc(qty) + '</td>' +
+                    '<td style="padding:0.65rem;">' + esc(sds) + '</td>' +
+                '</tr>';
+            });
+
+            html += '</tbody></table></div>';
         }
 
-        html += '<div style="text-align:center; padding:2rem 1rem; color:#64748b; border:1px dashed #cbd5e1; border-radius:12px;">' +
-            '<div style="font-size:2.5rem; margin-bottom:0.5rem;">\uD83E\uDDEA</div>' +
-            '<div style="font-weight:600; color:#0f172a; margin-bottom:0.35rem;">Open the Chemical Register</div>' +
-            '<div style="font-size:0.85rem; margin-bottom:1rem;">Full inventory and SDS management</div>' +
-            '<button class="btn btn-primary" onclick="window.openChemicalRegister()">\uD83E\uDDEA Open Chemical Register</button>' +
-        '</div>';
-
         el.innerHTML = html;
+    };
+
+    window.__addChemicalPrompt = function () {
+        var name = prompt('Chemical name (e.g., Sulfuric Acid 98%):');
+        if (!name) return;
+        var haz = prompt('Hazard class (Corrosive / Flammable / Toxic / Oxidizer / Other):', 'Corrosive');
+        if (haz === null) return;
+        var location = prompt('Location:', '');
+        if (location === null) return;
+        var qty = prompt('Quantity (number):', '1');
+        if (qty === null) return;
+
+        var item = {
+            id: 'CHEM-' + Date.now(),
+            name: name,
+            hazard_class: haz || 'Other',
+            location: location || '',
+            quantity: Number(qty) || 1,
+            unit: 'L',
+            sds_expiry: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            created_at: new Date().toISOString()
+        };
+
+        try {
+            if (window.chemicalRegister) {
+                if (!Array.isArray(window.chemicalRegister.chemicals)) {
+                    window.chemicalRegister.chemicals = [];
+                }
+                window.chemicalRegister.chemicals.push(item);
+            }
+        } catch (e) {}
+
+        try {
+            var list = JSON.parse(localStorage.getItem('mms_chemicals') || '[]');
+            list.push(item);
+            localStorage.setItem('mms_chemicals', JSON.stringify(list));
+        } catch (e) {}
+
+        // If the module has its own add method, prefer it
+        try {
+            if (typeof window.addNewChemical === 'function') {
+                window.addNewChemical();
+            }
+        } catch (e) {}
+
+        window.loadChemicalRegister();
     };
 
     // ============================================================

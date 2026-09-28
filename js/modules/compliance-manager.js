@@ -856,16 +856,17 @@ async function renderObligations() {
                     <div style="font-weight:600;">Legal & Other Requirements Register</div>
                     <div style="font-size:0.82rem; color:#64748b; margin-top:0.2rem;">ISO 45001 Clause 6.1.3 — ${items.length} ${items.length === 1 ? 'entry' : 'entries'}</div>
                 </div>
-                ${isAdmin() ? '<button class="btn btn-primary" onclick="window.__cmShowObligationForm()">+ Add Requirement</button>' : ''}
+                ${isSignedIn() ? '<button class="btn btn-primary" onclick="window.__cmShowObligationForm()">+ Add Requirement</button>' : ''}
             </div>
         `;
 
-        if (items.length === 0) {
+                if (items.length === 0) {
             html += `
                 <div style="text-align:center; padding:3rem 1rem; color:#64748b;">
-                    <div style="font-size:3rem; margin-bottom:0.75rem;">⚖️</div>
+                    <div style="font-size:3rem; margin-bottom:0.75rem;">\u2696\uFE0F</div>
                     <div style="font-weight:600; color:#0f172a; margin-bottom:0.35rem;">No legal requirements recorded yet</div>
-                    <div style="font-size:0.9rem;">Add the applicable laws, regulations, and standards your operations must comply with.</div>
+                    <div style="font-size:0.9rem; max-width:420px; margin:0 auto 1.25rem;">Add the applicable laws, regulations, and standards your operations must comply with.</div>
+                    <button class="btn btn-primary" onclick="window.__cmShowObligationForm()">+ Add Requirement</button>
                 </div>`;
         } else {
             html += '<div style="overflow-x:auto;"><table class="data-table"><thead><tr>' +
@@ -977,16 +978,17 @@ async function renderReviews() {
                     <div style="font-weight:600;">Management Review Register</div>
                     <div style="font-size:0.82rem; color:#64748b; margin-top:0.2rem;">ISO 45001 Clause 9.3 — ${items.length} ${items.length === 1 ? 'review' : 'reviews'}</div>
                 </div>
-                ${isAdmin() ? '<button class="btn btn-primary" onclick="window.__cmShowReviewForm()">+ New Review</button>' : ''}
+                ${isSignedIn() ? '<button class="btn btn-primary" onclick="window.__cmShowReviewForm()">+ New Review</button>' : ''}
             </div>
         `;
 
-        if (items.length === 0) {
+                if (items.length === 0) {
             html += `
                 <div style="text-align:center; padding:3rem 1rem; color:#64748b;">
-                    <div style="font-size:3rem; margin-bottom:0.75rem;">📈</div>
+                    <div style="font-size:3rem; margin-bottom:0.75rem;">\uD83D\uDCC8</div>
                     <div style="font-weight:600; color:#0f172a; margin-bottom:0.35rem;">No management reviews recorded yet</div>
-                    <div style="font-size:0.9rem;">Top management reviews the OH&S system periodically per ISO 45001 Clause 9.3.</div>
+                    <div style="font-size:0.9rem; max-width:420px; margin:0 auto 1.25rem;">Top management reviews the OH&S system periodically per ISO 45001 Clause 9.3.</div>
+                    <button class="btn btn-primary" onclick="window.__cmShowReviewForm()">+ New Review</button>
                 </div>`;
         } else {
             html += items.map(r => {

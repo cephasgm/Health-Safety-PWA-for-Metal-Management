@@ -835,6 +835,9 @@ function escapeHtml(s) {
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
 }
+function isSignedIn() {
+    return !!window.mmsCurrentUser;
+}
 
 function isAdmin() {
     return !!(window.mmsCurrentUser && window.mmsCurrentUser.isAdmin);

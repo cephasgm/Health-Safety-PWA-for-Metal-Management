@@ -370,7 +370,6 @@ class AdminPanel {
       </div>
     `;
     
-    // Insert after header
     // Insert at top of main content
     const mainContent = document.querySelector('.main-content');
     if (mainContent) {
